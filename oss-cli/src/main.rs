@@ -2,6 +2,10 @@ use clap::{Parser, Subcommand};
 use oss_core::{call_tool, SearchEngine, StubEngine};
 use serde_json::{json, Value};
 
+mod hotset;
+
+use hotset::HotsetAction;
+
 #[derive(Parser)]
 #[command(name = "oss-cli", version, about = "Agent-facing OSS search over the 7-tool surface")]
 struct Cli {
@@ -15,6 +19,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    #[command(about = "Build the local hot-set corpus (staged, resumable)")]
+    Hotset {
+        #[command(subcommand)]
+        action: HotsetAction,
+    },
     #[command(about = "Find repositories by topic, name, or description")]
     SearchRepos {
         #[arg(long)]
@@ -222,11 +231,18 @@ fn args_for(command: &Command) -> (String, Value) {
             ("oss_fetch_docs".into(), Value::Object(m))
         }
         Command::Guide {} => ("oss_guide".into(), json!({})),
+        Command::Hotset { .. } => unreachable!("hotset is handled directly in main"),
     }
 }
 
 fn main() {
     let cli = Cli::parse();
+    if let Command::Hotset { action } = &cli.command {
+        let code = match action {
+            HotsetAction::Build(args) => hotset::run(args),
+        };
+        std::process::exit(code);
+    }
     let (tool, args) = args_for(&cli.command);
     let engine: Box<dyn SearchEngine> = if cli.live {
         if std::env::var("GITHUB_TOKEN").map_or(true, |t| t.is_empty()) {

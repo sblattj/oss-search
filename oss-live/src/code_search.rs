@@ -288,7 +288,7 @@ fn first_line(s: &str) -> String {
     line.chars().take(200).collect()
 }
 
-fn query_error(e: QueryError, input: &Value) -> ToolError {
+pub(crate) fn query_error(e: QueryError, input: &Value) -> ToolError {
     ToolError::InvalidValue {
         field: "probes".to_string(),
         message: e.to_string(),

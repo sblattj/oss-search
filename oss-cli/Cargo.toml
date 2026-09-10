@@ -8,8 +8,23 @@ edition = "2024"
 [dependencies]
 oss-core = { path = "../oss-core" }
 oss-live = { path = "../oss-live" }
+oss-corpus = { path = "../oss-corpus" }
+oss-index = { path = "../oss-index" }
+oss-semantic = { path = "../oss-semantic" }
 clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tokio = { version = "1.53.1", features = ["rt-multi-thread"] }
+walkdir = "2.5.0"
+
+[features]
+default = []
+# Real local-ONNX embeddings for the semantic stage (BGESmallENV15; the
+# model downloads once on first use, ~100 MB). Without it the semantic
+# stage is skipped in auto mode and falls back to the deterministic
+# StubEmbedder only under an explicit --semantic.
+semantic-fastembed = ["oss-semantic/fastembed"]
 
 [dev-dependencies]
 oss-core = { path = "../oss-core" }
+tempfile = "3.27.0"

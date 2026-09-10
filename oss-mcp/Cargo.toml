@@ -11,3 +11,7 @@ oss-live = { path = "../oss-live" }
 serde_json = "1"
 rmcp = { version = "3", features = ["server", "transport-io"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std"] }
+
+[dev-dependencies]
+oss-index = { path = "../oss-index" }
+tempfile = "3"

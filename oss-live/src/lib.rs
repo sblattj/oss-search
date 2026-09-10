@@ -23,6 +23,7 @@ mod code_search;
 mod content;
 mod docs;
 mod guide;
+pub mod hotset;
 mod profile;
 mod repo_search;
 mod status;

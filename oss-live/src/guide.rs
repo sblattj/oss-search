@@ -63,6 +63,12 @@ pub fn guide_document() -> Value {
             "github-contents": "trees + contents APIs; 5000 req/hour authenticated, 60/hour anonymous; files <= 1 MB",
         },
         "rate_limit_traps": "an empty result set with an error backend_status is a fetch failure, not a negative finding; partial=true means at least one backend failed while others answered",
+        "hotset": {
+            "status": "not_served",
+            "build_command": "oss-cli hotset build",
+            "index_dir": "<OSS_SEARCH_HOME ?? ~/.cache/oss-search>/index",
+            "note": "oss-mcp auto-detects a built hot-set at startup and serves local results first (backend local_index); build one to enable it"
+        },
         "license_classes": {
             "permissive": "MIT/Apache-2.0/BSD — safe to vendor",
             "copyleft": "GPL family — pattern-only study, linking has obligations",

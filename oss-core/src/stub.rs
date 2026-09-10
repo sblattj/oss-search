@@ -817,6 +817,12 @@ impl SearchEngine for StubEngine {
                 "github_code_search": "literal only, no regex, ~10 req/min, 256-char queries, needs a bare term",
             },
             "rate_limit_traps": "grep.app 504/429s: the server retries once then degrades to Sourcegraph; an empty result with an error backend_status is a fetch failure, not a negative finding",
+            "hotset": {
+                "status": "not_served",
+                "build_command": "oss-cli hotset build",
+                "index_dir": "<OSS_SEARCH_HOME ?? ~/.cache/oss-search>/index",
+                "note": "oss-mcp auto-detects a built hot-set at startup and serves local results first (backend local_index); build one to enable it"
+            },
             "license_classes": {
                 "permissive": "MIT/Apache-2.0/BSD — safe to vendor",
                 "copyleft": "GPL family — pattern-only study, linking has obligations",

@@ -176,6 +176,7 @@ const CONCISE_KEEP_CODE: &[&str] = &[
     "locator",
     "start_line",
     "end_line",
+    "backends",
 ];
 
 pub fn apply_response_format(
