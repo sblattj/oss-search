@@ -1,0 +1,65 @@
+{
+  "backend_status": [
+    {
+      "backend": "github",
+      "status": "ok"
+    },
+    {
+      "backend": "grep.app",
+      "detail": "all 1 probe(s) unavailable: grep.app legacy endpoint rate limited or bot-challenged (429, retry_after=None); the endpoint is undocumented and gated by Vercel; prefer McpGrepAppClient at https://mcp.grep.app",
+      "status": "error"
+    },
+    {
+      "backend": "sourcegraph",
+      "detail": "no Sourcegraph client is wired into the live engine yet",
+      "status": "error"
+    },
+    {
+      "backend": "local_index",
+      "detail": "live engine has no local index; the stub engine serves the hot-set corpus",
+      "status": "error"
+    }
+  ],
+  "has_more": true,
+  "next_cursor": "off:3",
+  "note": "showing 3 of 3 — pass the next_cursor value back as cursor to page",
+  "partial": true,
+  "results": [
+    {
+      "backends": [
+        "github"
+      ],
+      "locator": "NEWS",
+      "path": "NEWS",
+      "probe": "retry",
+      "repo": "flatpak/flatpak",
+      "snippet": " * Don't break if users primary gid is not in the nsswitch database",
+      "url": "https://github.com/flatpak/flatpak/blob/e382cbeb80ce9fbaab587a613a9f35ba0612d8cd/NEWS"
+    },
+    {
+      "backends": [
+        "github"
+      ],
+      "locator": "NEWS",
+      "path": "NEWS",
+      "probe": "retry",
+      "repo": "httperf/httperf",
+      "snippet": "** New options (see man-page for details):",
+      "url": "https://github.com/httperf/httperf/blob/de8cd6ad8a79779a0cb74a4aa2175afa9e24df57/NEWS"
+    },
+    {
+      "backends": [
+        "github"
+      ],
+      "locator": "NEWS",
+      "path": "NEWS",
+      "probe": "retry",
+      "repo": "lucasjones/cpuminer-multi",
+      "snippet": "  if the high 32 bits are 00000000.",
+      "url": "https://github.com/lucasjones/cpuminer-multi/blob/4c9b1e4a5fa2fd6ae755e0a1a87dc3bfd187415f/NEWS"
+    }
+  ],
+  "total": 3,
+  "truncated": false,
+  "warnings": []
+}

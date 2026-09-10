@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = [
+  "oss-core", "oss-query", "oss-facade", "oss-corpus", "oss-index",
+  "oss-semantic", "oss-rank", "oss-eval", "oss-mcp", "oss-cli", "oss-live",
+]

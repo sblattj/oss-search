@@ -1,0 +1,39 @@
+{
+  "backend_status": [
+    {
+      "backend": "github-raw",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "activity": "active",
+      "architecture_top_level": [
+        "docs",
+        "src"
+      ],
+      "archived": false,
+      "catch": "exchange coverage is uneven outside US/EU; no async API",
+      "days_since_activity": 3,
+      "deep_docs": "no llms.txt published by this repo",
+      "last_release": "2026-08-28",
+      "license": "MIT",
+      "license_class": "permissive",
+      "readme_digest": "hashopen computes open/closed market sessions from exchange calendars. Exposes get_special_closes(year) and get_early_closes(year) per exchange. Ships ICS export and a CLI. Supported exchanges: NYSE, NASDAQ, LSE, XETRA.",
+      "release_cadence": "monthly minor, hotfixes within days",
+      "repo": "gabe/hashopen",
+      "runtime_support": [
+        "python >=3.10",
+        "no C extensions"
+      ],
+      "star_tier": "medium",
+      "stars": 812,
+      "what": "Exchange calendar library with special-closes and half-day session handling"
+    }
+  ],
+  "total": 1,
+  "truncated": false,
+  "warnings": []
+}

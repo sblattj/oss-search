@@ -1,0 +1,18 @@
+{
+  "BEL_u0007": 0,
+  "ESC_u001b": 0,
+  "LRI_u2066": 0,
+  "PDF_u202C": 0,
+  "PDI_u2069": 0,
+  "RLO_u202E": 0,
+  "error_path_code": "unknown_field",
+  "error_path_isError": true,
+  "error_path_rlo_visible_marker": true,
+  "raw_bytes": 2198,
+  "success_path_markers": [
+    "<U+202E>",
+    "<U+2066>",
+    "chars truncated]"
+  ],
+  "verdict": "PASS"
+}

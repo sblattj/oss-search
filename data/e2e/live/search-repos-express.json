@@ -1,0 +1,181 @@
+{
+  "backend_status": [
+    {
+      "backend": "npms.io",
+      "status": "ok"
+    },
+    {
+      "backend": "ecosyste.ms",
+      "status": "ok"
+    }
+  ],
+  "has_more": true,
+  "next_cursor": "off:5",
+  "note": "showing 5 of 10 — pass the next_cursor value back as cursor to page",
+  "partial": false,
+  "results": [
+    {
+      "activity": "active",
+      "contributions": {
+        "awesome_list": 0.0,
+        "centrality": 0.0,
+        "dependents": 0.2,
+        "hn_mentions": 0.0,
+        "maintenance": 0.10426027397260275,
+        "maintenance_gate": 0.0,
+        "popularity": 0.15,
+        "quality": 0.05
+      },
+      "days_since_activity": 9,
+      "dependents": 93237,
+      "last_push": "2026-09-01T22:06:51.000Z",
+      "latest_release": "5.2.1",
+      "license": "MIT",
+      "license_class": "permissive",
+      "maintenance_gate": 1.0,
+      "npms_score": 0.9491867880594412,
+      "package": "express",
+      "repo": "expressjs/express",
+      "score": 0.5043,
+      "sources": [
+        "npms.io",
+        "ecosyste.ms"
+      ],
+      "star_tier": "high",
+      "stars": 69417,
+      "url": "https://github.com/expressjs/express",
+      "what": "Fast, unopinionated, minimalist web framework"
+    },
+    {
+      "activity": null,
+      "contributions": {
+        "awesome_list": 0.0,
+        "centrality": 0.0,
+        "dependents": 0.1765784145167123,
+        "hn_mentions": 0.0,
+        "maintenance": 0.10483561643835616,
+        "maintenance_gate": 0.0,
+        "popularity": 0.15,
+        "quality": 0.05
+      },
+      "days_since_activity": null,
+      "dependents": 7,
+      "last_push": null,
+      "latest_release": "3.0.1",
+      "license": "ISC",
+      "license_class": "permissive",
+      "maintenance_gate": 1.0,
+      "npms_score": 0.12255030236588244,
+      "package": "Express",
+      "repo": "Express",
+      "score": 0.4814,
+      "sources": [
+        "npms.io",
+        "ecosyste.ms"
+      ],
+      "star_tier": "low",
+      "stars": 0,
+      "url": "https://www.npmjs.com/package/Express",
+      "what": "This package was published as a result of a bug, please use the [express](https://www.npmjs.com/package/express) package instead."
+    },
+    {
+      "activity": "active",
+      "contributions": {
+        "awesome_list": 0.0,
+        "centrality": 0.0,
+        "dependents": 0.19124974569715358,
+        "hn_mentions": 0.0,
+        "maintenance": 0.10491780821917808,
+        "maintenance_gate": 0.0,
+        "popularity": 0.12497185170978999,
+        "quality": 0.05
+      },
+      "days_since_activity": 1,
+      "dependents": 6683,
+      "last_push": "2026-09-09T14:05:27.000Z",
+      "latest_release": "8.4.2",
+      "license": "MIT",
+      "license_class": "permissive",
+      "maintenance_gate": 1.0,
+      "npms_score": 0.9054553226999096,
+      "package": "path-to-regexp",
+      "repo": "pillarjs/path-to-regexp",
+      "score": 0.4711,
+      "sources": [
+        "npms.io",
+        "ecosyste.ms"
+      ],
+      "star_tier": "medium",
+      "stars": 8602,
+      "url": "https://github.com/pillarjs/path-to-regexp",
+      "what": "Express style path to RegExp utility"
+    },
+    {
+      "activity": "active",
+      "contributions": {
+        "awesome_list": 0.0,
+        "centrality": 0.0,
+        "dependents": 0.2,
+        "hn_mentions": 0.0,
+        "maintenance": 0.09678082191780822,
+        "maintenance_gate": 0.0,
+        "popularity": 0.1218918090350063,
+        "quality": 0.05
+      },
+      "days_since_activity": 2,
+      "dependents": 3400,
+      "last_push": "2026-09-08T07:03:37.000Z",
+      "latest_release": "12.0.1",
+      "license": "MIT",
+      "license_class": "permissive",
+      "maintenance_gate": 1.0,
+      "npms_score": 0.8600477780929461,
+      "package": "@nestjs/platform-express",
+      "repo": "nestjs/nest",
+      "score": 0.4687,
+      "sources": [
+        "npms.io",
+        "ecosyste.ms"
+      ],
+      "star_tier": "high",
+      "stars": 76613,
+      "url": "https://github.com/nestjs/nest",
+      "what": "Nest - modern, fast, powerful node.js web framework (@platform-express)"
+    },
+    {
+      "activity": "steady",
+      "contributions": {
+        "awesome_list": 0.0,
+        "centrality": 0.0,
+        "dependents": 0.15881731036133662,
+        "hn_mentions": 0.0,
+        "maintenance": 0.10442465753424658,
+        "maintenance_gate": 0.0,
+        "popularity": 0.13737578765463807,
+        "quality": 0.05
+      },
+      "days_since_activity": 100,
+      "dependents": 13273,
+      "last_push": "2026-06-02T20:00:40.000Z",
+      "latest_release": "2.8.6",
+      "license": "MIT",
+      "license_class": "permissive",
+      "maintenance_gate": 1.0,
+      "npms_score": 0.9050503673707956,
+      "package": "cors",
+      "repo": "expressjs/cors",
+      "score": 0.4506,
+      "sources": [
+        "npms.io",
+        "ecosyste.ms"
+      ],
+      "star_tier": "medium",
+      "stars": 6194,
+      "url": "https://github.com/expressjs/cors",
+      "what": "Node.js CORS middleware"
+    }
+  ],
+  "total": 10,
+  "truncated": false,
+  "warnings": []
+}

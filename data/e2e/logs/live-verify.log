@@ -1,0 +1,6 @@
+search-code(repos mode): 3 rows, backends={'github': 'ok', 'grep.app': 'error', 'local_index': 'error', 'sourcegraph': 'error'}, partial=True
+search-code(snippets mode): 3 rows, all verified against pinned SHAs (snippet line verbatim + 'retry' present in the real file)
+search-repos: 5 rows, backends={'npms.io': 'ok', 'ecosyste.ms': 'ok'}, expressjs/express present (stars=69417, dependents=93237)
+
+LIVE E2E PASS: backends truthful (status + partial consistent), every hit attributed to a real owner/name repo with query-consistent evidence; expressjs/express found for 'express'.
+exit=0

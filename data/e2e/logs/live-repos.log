@@ -1,0 +1,2 @@
+env GITHUB_TOKEN="$TOKEN" ./target/release/oss-cli --live search-repos --quer  0.01s user 0.01s system 0% cpu 11.702 total
+exit=0

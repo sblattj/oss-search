@@ -1,0 +1,24 @@
+{
+  "backend_status": [
+    {
+      "backend": "github-raw",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "docs/calendars.md"
+    },
+    {
+      "path": "docs/export.md"
+    }
+  ],
+  "total": 3,
+  "truncated": false,
+  "warnings": []
+}

@@ -1,0 +1,2 @@
+PARITY PASS: 7/7 tools — MCP transcript envelopes and CLI outputs carry identical top-level schemas (required ['backend_status', 'has_more', 'partial', 'results', 'total', 'truncated', 'warnings'], optional note/next_cursor), all schema-valid.
+parity_exit=0

@@ -1,0 +1,11 @@
+oss_search_repos: exit 0, envelope schema-valid (2 results, total 2), 933 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/01-oss_search_repos.json : PASS
+oss_search_code: exit 0, envelope schema-valid (2 results, total 2), 802 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/02-oss_search_code.json : PASS
+oss_repo_profile: exit 0, envelope schema-valid (1 results, total 1), 926 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/03-oss_repo_profile.json : PASS
+oss_repo_tree: exit 0, envelope schema-valid (3 results, total 3), 222 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/04-oss_repo_tree.json : PASS
+oss_fetch_file: exit 0, envelope schema-valid (1 results, total 1), 695 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/05-oss_fetch_file.json : PASS
+oss_fetch_docs: exit 0, envelope schema-valid (2 results, total 2), 917 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/06-oss_fetch_docs.json : PASS
+oss_guide: exit 0, envelope schema-valid (1 results, total 1), 1600 bytes -> ~/oss-search/oss-cli/../data/e2e/cli/07-oss_guide.json : PASS
+
+CLI E2E PASS: 7/7 tools schema-valid via release oss-cli; outputs in ~/oss-search/oss-cli/../data/e2e/cli
+./target/release/examples/e2e_cli  0.01s user 0.01s system 2% cpu 0.494 total
+exit=0

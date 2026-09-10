@@ -1,0 +1,10 @@
+{
+  "hostile_query_codepoints": [
+    "U+202E RLO",
+    "U+202C PDF",
+    "U+001B ESC",
+    "[31m"
+  ],
+  "request": "tools/call oss_search_repos {query: <RLO>rdm<PDF>ESC[31m, bogus: 1}",
+  "second_call": "tools/call oss_fetch_file helix/edge-sdk escape-lab.md (fixture content carries ESC/BEL/RLO/LRI/PDI bytes)"
+}

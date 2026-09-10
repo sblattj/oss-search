@@ -1,0 +1,74 @@
+{
+  "backend_status": [
+    {
+      "backend": "github",
+      "status": "ok"
+    },
+    {
+      "backend": "grep.app",
+      "detail": "all 1 probe(s) unavailable: grep.app legacy endpoint rate limited or bot-challenged (429, retry_after=None); the endpoint is undocumented and gated by Vercel; prefer McpGrepAppClient at https://mcp.grep.app",
+      "status": "error"
+    },
+    {
+      "backend": "local_index",
+      "detail": "live engine has no local index; the stub engine serves the hot-set corpus",
+      "status": "error"
+    },
+    {
+      "backend": "sourcegraph",
+      "detail": "no Sourcegraph client is wired into the live engine yet",
+      "status": "error"
+    }
+  ],
+  "has_more": true,
+  "next_cursor": "off:3",
+  "note": "showing 3 of 3 — pass the next_cursor value back as cursor to page",
+  "partial": true,
+  "results": [
+    {
+      "backends": [
+        "github"
+      ],
+      "hit_files": 1,
+      "license": null,
+      "probe_breadth": 1,
+      "probes_hit": [
+        "retry"
+      ],
+      "repo": "flatpak/flatpak",
+      "sample_evidence": "NEWS:  * Don't break if users primary gid is not in the nsswitch database <- probe 'retry'",
+      "total_probes": 1
+    },
+    {
+      "backends": [
+        "github"
+      ],
+      "hit_files": 1,
+      "license": null,
+      "probe_breadth": 1,
+      "probes_hit": [
+        "retry"
+      ],
+      "repo": "httperf/httperf",
+      "sample_evidence": "NEWS: ** New options (see man-page for details): <- probe 'retry'",
+      "total_probes": 1
+    },
+    {
+      "backends": [
+        "github"
+      ],
+      "hit_files": 1,
+      "license": null,
+      "probe_breadth": 1,
+      "probes_hit": [
+        "retry"
+      ],
+      "repo": "lucasjones/cpuminer-multi",
+      "sample_evidence": "NEWS:   if the high 32 bits are 00000000. <- probe 'retry'",
+      "total_probes": 1
+    }
+  ],
+  "total": 3,
+  "truncated": false,
+  "warnings": []
+}

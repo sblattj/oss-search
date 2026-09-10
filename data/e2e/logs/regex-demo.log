@@ -1,0 +1,24 @@
+loaded 13408 docs in 1.14s
+
+regex /fn visit_\w+/ — 5 hits shown of 2429 candidates scanned, 33.14 ms
+  syn:src/gen/visit_mut.rs:L34  fn visit_abi_mut(&mut self, i: &mut crate::Abi) {
+  syn:src/gen/visit.rs:L31  fn visit_abi(&mut self, i: &'ast crate::Abi) {
+  serde:serde/src/private/de.rs:L79  fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+
+regex /class Retry\b/ — 2 hits shown of 3561 candidates scanned, 56.41 ms
+  pip:src/pip/_vendor/urllib3/util/retry.py:L41  class Retry:
+  urllib3:src/urllib3/util/retry.py:L43  class Retry:
+
+regex /serialize_(u8|u16)/ — 5 hits shown of 136 candidates scanned, 5.38 ms
+  serde:serde/src/private/ser.rs:L137  fn serialize_u8(self, _: u8) -> Result<Self::Ok, Self::Error> {
+  json:src/ser.rs:L121  fn serialize_u8(self, value: u8) -> Result<()> {
+  json:src/value/ser.rs:L115  fn serialize_u8(self, value: u8) -> Result<Value> {
+
+regex /module\.exports/ — 5 hits shown of 3886 candidates scanned, 55.87 ms
+  qs:dist/qs.js:L1  (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(t
+  debug:src/browser.js:L155  '+' + module.exports.humanize(this.diff);
+  debug:src/node.js:L176  args.push(colorCode + 'm+' + module.exports.humanize(this.diff) + '\u001B[0m');
+
+REGEX DEMO PASS
+./target/release/examples/regex_demo  1.38s user 0.37s system 86% cpu 2.027 total
+exit=0

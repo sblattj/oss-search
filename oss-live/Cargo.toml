@@ -1,0 +1,16 @@
+[package]
+name = "oss-live"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+oss-core = { path = "../oss-core" }
+oss-facade = { path = "../oss-facade" }
+oss-query = { path = "../oss-query" }
+oss-rank = { path = "../oss-rank" }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }
+wiremock = "0.6"

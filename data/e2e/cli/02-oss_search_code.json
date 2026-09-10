@@ -1,0 +1,47 @@
+{
+  "backend_status": [
+    {
+      "backend": "grep.app",
+      "status": "ok"
+    },
+    {
+      "backend": "sourcegraph",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "days_since_activity": 3,
+      "hit_files": 3,
+      "license": "MIT",
+      "license_class": "permissive",
+      "probe_breadth": 1,
+      "probes_hit": [
+        "special_closes"
+      ],
+      "repo": "gabe/hashopen",
+      "sample_evidence": "src/market.py:8 def get_special_closes(calendar: str, year: int): <- probe 'special_closes'",
+      "stars": 812,
+      "total_probes": 2
+    },
+    {
+      "days_since_activity": 41,
+      "hit_files": 3,
+      "license": "MIT",
+      "license_class": "permissive",
+      "probe_breadth": 1,
+      "probes_hit": [
+        "spawn_worker"
+      ],
+      "repo": "ferrum/poolite",
+      "sample_evidence": "src/pool.rs:9 pub fn spawn_worker<C>(pool: Arc<Pool<C>>) -> tokio::task::JoinHandle<()> <- probe 'spawn_worker'",
+      "stars": 320,
+      "total_probes": 2
+    }
+  ],
+  "total": 2,
+  "truncated": false,
+  "warnings": []
+}

@@ -1,0 +1,4220 @@
+[
+  {
+    "repo": "fixture-alpha",
+    "canonical": null,
+    "files_total": 2,
+    "files_accepted": 2,
+    "rejections": [],
+    "bytes_offered": 2028,
+    "bytes_new_unique": 2028,
+    "dup": {
+      "unique": 2,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [
+      {
+        "path": "vendored/tiny-lru.js",
+        "expression": "MIT"
+      }
+    ],
+    "license": null
+  },
+  {
+    "repo": "fixture-beta",
+    "canonical": null,
+    "files_total": 2,
+    "files_accepted": 2,
+    "rejections": [],
+    "bytes_offered": 2027,
+    "bytes_new_unique": 80,
+    "dup": {
+      "unique": 1,
+      "exact": 1,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [
+      {
+        "path": "vendored/tiny-lru.js",
+        "expression": "MIT"
+      }
+    ],
+    "license": null
+  },
+  {
+    "repo": "fixture-gamma",
+    "canonical": null,
+    "files_total": 2,
+    "files_accepted": 2,
+    "rejections": [],
+    "bytes_offered": 2075,
+    "bytes_new_unique": 2075,
+    "dup": {
+      "unique": 1,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "vendored/tiny-lru.js",
+        "duplicate_of": "vendored/tiny-lru.js",
+        "jaccard": 0.9397590361445783,
+        "estimated": 0.9375
+      }
+    ],
+    "spdx_tags": [
+      {
+        "path": "vendored/tiny-lru.js",
+        "expression": "MIT"
+      }
+    ],
+    "license": null
+  },
+  {
+    "repo": "anyhow",
+    "canonical": null,
+    "files_total": 53,
+    "files_accepted": 53,
+    "rejections": [],
+    "bytes_offered": 222760,
+    "bytes_new_unique": 222760,
+    "dup": {
+      "unique": 53,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "arrow",
+    "canonical": null,
+    "files_total": 49,
+    "files_accepted": 49,
+    "rejections": [],
+    "bytes_offered": 781828,
+    "bytes_new_unique": 781828,
+    "dup": {
+      "unique": 48,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-APACHE",
+        "jaccard": 0.9,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "attrs",
+    "canonical": null,
+    "files_total": 132,
+    "files_accepted": 132,
+    "rejections": [],
+    "bytes_offered": 1427947,
+    "bytes_new_unique": 1427947,
+    "dup": {
+      "unique": 129,
+      "exact": 1,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9244186046511628,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "docs/_static/attrs_logo_white.svg",
+        "duplicate_of": "docs/_static/attrs_logo.svg",
+        "jaccard": 0.995159728944821,
+        "estimated": 0.9921875
+      }
+    ],
+    "spdx_tags": [
+      {
+        "path": "docs/conf.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "pyproject.toml",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/__init__.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_cmp.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_compat.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_config.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_funcs.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_make.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_next_gen.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/_version_info.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/converters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/exceptions.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/filters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/setters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attr/validators.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/__init__.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/converters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/exceptions.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/filters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/setters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/attrs/validators.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/attr_import_star.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/conftest.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/dataclass_transform_example.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/strategies.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_3rd_party.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_abc.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_annotations.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_cmp.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_compat.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_config.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_converters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_dunders.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_filters.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_funcs.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_functional.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_hooks.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_import.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_init_subclass.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_make.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_next_gen.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_packaging.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_pattern_matching.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_pyright.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_setattr.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_slots.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_validators.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/test_version_info.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tests/utils.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "tox.ini",
+        "expression": "MIT"
+      },
+      {
+        "path": "typing_tests/__init__.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "typing_tests/baseline.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "typing_tests/mypy.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "typing_tests/pyrefly.py",
+        "expression": "MIT"
+      }
+    ],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "axios",
+    "canonical": null,
+    "files_total": 457,
+    "files_accepted": 457,
+    "rejections": [],
+    "bytes_offered": 3570403,
+    "bytes_new_unique": 3570403,
+    "dup": {
+      "unique": 450,
+      "exact": 0,
+      "token": 0,
+      "near": 7
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "docs/pages/misc/sponsors.md",
+        "duplicate_of": "docs/fr/pages/misc/sponsors.md",
+        "jaccard": 0.8657718120805369,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "docs/public/logo.svg",
+        "duplicate_of": "docs/public/logo-light.svg",
+        "jaccard": 0.9925611052072264,
+        "estimated": 0.984375
+      },
+      {
+        "path": "docs/public/words.svg",
+        "duplicate_of": "docs/public/words-light.svg",
+        "jaccard": 0.9825378346915018,
+        "estimated": 0.96875
+      },
+      {
+        "path": "docs/zh/index.md",
+        "duplicate_of": "docs/index.md",
+        "jaccard": 0.8702928870292888,
+        "estimated": 0.8515625
+      },
+      {
+        "path": "docs/zh/pages/misc/sponsors.md",
+        "duplicate_of": "docs/pages/misc/sponsors.md",
+        "jaccard": 0.8932714617169374,
+        "estimated": 0.875
+      },
+      {
+        "path": "tests/module/cjs/tests/helpers/ts-require.ts",
+        "duplicate_of": "tests/module/cjs/tests/helpers/ts-require-default.ts",
+        "jaccard": 0.923728813559322,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9636533084808947
+    }
+  },
+  {
+    "repo": "bitflags",
+    "canonical": null,
+    "files_total": 129,
+    "files_accepted": 129,
+    "rejections": [],
+    "bytes_offered": 315891,
+    "bytes_new_unique": 315891,
+    "dup": {
+      "unique": 127,
+      "exact": 0,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-APACHE",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.989466754443713,
+        "estimated": 0.96875
+      },
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "boltons",
+    "canonical": null,
+    "files_total": 113,
+    "files_accepted": 113,
+    "rejections": [],
+    "bytes_offered": 981760,
+    "bytes_new_unique": 981760,
+    "dup": {
+      "unique": 111,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "docs/Makefile",
+        "duplicate_of": "docs/Makefile",
+        "jaccard": 0.8514957264957265,
+        "estimated": 0.8515625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9770491803278688
+    }
+  },
+  {
+    "repo": "bytes",
+    "canonical": null,
+    "files_total": 46,
+    "files_accepted": 46,
+    "rejections": [],
+    "bytes_offered": 410321,
+    "bytes_new_unique": 410321,
+    "dup": {
+      "unique": 44,
+      "exact": 0,
+      "token": 1,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "chalk",
+    "canonical": null,
+    "files_total": 33,
+    "files_accepted": 33,
+    "rejections": [],
+    "bytes_offered": 155687,
+    "bytes_new_unique": 155687,
+    "dup": {
+      "unique": 31,
+      "exact": 0,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "code-of-conduct.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.8821052631578947,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "license",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9298245614035088,
+        "estimated": 0.90625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "license",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "chardet",
+    "canonical": null,
+    "files_total": 146,
+    "files_accepted": 146,
+    "rejections": [],
+    "bytes_offered": 1538306,
+    "bytes_new_unique": 1538306,
+    "dup": {
+      "unique": 145,
+      "exact": 1,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "0BSD",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "chi",
+    "canonical": null,
+    "files_total": 105,
+    "files_accepted": 105,
+    "rejections": [],
+    "bytes_offered": 425712,
+    "bytes_new_unique": 425712,
+    "dup": {
+      "unique": 104,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9190751445086706,
+        "estimated": 0.9375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "chrono",
+    "canonical": null,
+    "files_total": 71,
+    "files_accepted": 71,
+    "rejections": [],
+    "bytes_offered": 1397215,
+    "bytes_new_unique": 1397215,
+    "dup": {
+      "unique": 70,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE-APACHE",
+        "jaccard": 0.8704663212435233,
+        "estimated": 0.859375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "Apache-2.0",
+      "confidence": 0.9653631284916201
+    }
+  },
+  {
+    "repo": "clap",
+    "canonical": null,
+    "files_total": 609,
+    "files_accepted": 609,
+    "rejections": [],
+    "bytes_offered": 3511821,
+    "bytes_new_unique": 3511821,
+    "dup": {
+      "unique": 587,
+      "exact": 1,
+      "token": 5,
+      "near": 16
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9754601226993865,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "clap_complete/tests/snapshots/optional_multi_value_option.ps1",
+        "duplicate_of": "clap_complete/tests/snapshots/multi_value_option.ps1",
+        "jaccard": 0.875,
+        "estimated": 0.8515625
+      },
+      {
+        "path": "clap_complete/tests/snapshots/optional_value_option.elvish",
+        "duplicate_of": "clap_complete/tests/snapshots/optional_multi_value_option.elvish",
+        "jaccard": 0.8783783783783784,
+        "estimated": 0.890625
+      },
+      {
+        "path": "clap_complete/tests/snapshots/optional_value_option.ps1",
+        "duplicate_of": "clap_complete/tests/snapshots/optional_multi_value_option.ps1",
+        "jaccard": 0.9117647058823529,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "clap_complete/tests/snapshots/optional_value_option.zsh",
+        "duplicate_of": "clap_complete/tests/snapshots/optional_multi_value_option.zsh",
+        "jaccard": 0.9042553191489362,
+        "estimated": 0.890625
+      },
+      {
+        "path": "clap_complete/tests/snapshots/value_terminator.ps1",
+        "duplicate_of": "clap_complete/tests/snapshots/multi_value_option.ps1",
+        "jaccard": 0.8686868686868687,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "clap_derive/README.md",
+        "duplicate_of": "clap_builder/README.md",
+        "jaccard": 0.8813559322033898,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "clap_mangen/tests/snapshots/default_subcmd_order.roff",
+        "duplicate_of": "clap_mangen/tests/snapshots/configured_subcmd_order.roff",
+        "jaccard": 0.9340659340659341,
+        "estimated": 0.9375
+      },
+      {
+        "path": "clap_mangen/tests/snapshots/special_commands.bash.roff",
+        "duplicate_of": "clap_mangen/tests/snapshots/feature_sample.bash.roff",
+        "jaccard": 0.8827586206896552,
+        "estimated": 0.84375
+      },
+      {
+        "path": "clap_mangen/tests/snapshots/sub_subcommands.bash.roff",
+        "duplicate_of": "clap_mangen/tests/snapshots/feature_sample.bash.roff",
+        "jaccard": 0.920863309352518,
+        "estimated": 0.90625
+      },
+      {
+        "path": "tests/derive_ui/skip_subcommand.rs",
+        "duplicate_of": "tests/derive_ui/skip_flatten.rs",
+        "jaccard": 0.9008264462809917,
+        "estimated": 0.84375
+      },
+      {
+        "path": "tests/derive_ui/struct_subcommand.rs",
+        "duplicate_of": "tests/derive_ui/rename_all_wrong_casing.rs",
+        "jaccard": 0.8554216867469879,
+        "estimated": 0.875
+      },
+      {
+        "path": "tests/derive_ui/subcommand_and_methods.rs",
+        "duplicate_of": "tests/derive_ui/subcommand_and_flatten.rs",
+        "jaccard": 0.8932038834951457,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "tests/derive_ui/subcommand_opt_opt.rs",
+        "duplicate_of": "tests/derive_ui/subcommand_and_flatten.rs",
+        "jaccard": 0.875,
+        "estimated": 0.84375
+      },
+      {
+        "path": "tests/derive_ui/subcommand_opt_vec.rs",
+        "duplicate_of": "tests/derive_ui/subcommand_opt_opt.rs",
+        "jaccard": 0.9029126213592233,
+        "estimated": 0.90625
+      },
+      {
+        "path": "tests/ui/h_flag_stdout.toml",
+        "duplicate_of": "tests/ui/arg_required_else_help_stderr.toml",
+        "jaccard": 0.8789808917197452,
+        "estimated": 0.90625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "classnames",
+    "canonical": null,
+    "files_total": 28,
+    "files_accepted": 28,
+    "rejections": [],
+    "bytes_offered": 136867,
+    "bytes_new_unique": 136867,
+    "dup": {
+      "unique": 27,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "cli",
+    "canonical": null,
+    "files_total": 164,
+    "files_accepted": 164,
+    "rejections": [],
+    "bytes_offered": 953549,
+    "bytes_new_unique": 953549,
+    "dup": {
+      "unique": 161,
+      "exact": 0,
+      "token": 0,
+      "near": 3
+    },
+    "near_dups": [
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.9419354838709677,
+        "estimated": 0.953125
+      },
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9520958083832335,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "testdata/expected-doc-no-usagetext.md",
+        "duplicate_of": "testdata/expected-doc-no-authors.md",
+        "jaccard": 0.8709677419354839,
+        "estimated": 0.828125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "click",
+    "canonical": null,
+    "files_total": 170,
+    "files_accepted": 170,
+    "rejections": [],
+    "bytes_offered": 1544716,
+    "bytes_new_unique": 1544716,
+    "dup": {
+      "unique": 169,
+      "exact": 1,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "BSD-3-Clause",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "cobra",
+    "canonical": null,
+    "files_total": 65,
+    "files_accepted": 65,
+    "rejections": [],
+    "bytes_offered": 631792,
+    "bytes_new_unique": 631792,
+    "dup": {
+      "unique": 64,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE-APACHE",
+        "jaccard": 0.9963208241353937,
+        "estimated": 1.0
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "color",
+    "canonical": null,
+    "files_total": 10,
+    "files_accepted": 10,
+    "rejections": [],
+    "bytes_offered": 51541,
+    "bytes_new_unique": 51541,
+    "dup": {
+      "unique": 9,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.md",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.md",
+      "spdx": "MIT",
+      "confidence": 0.9615004935834156
+    }
+  },
+  {
+    "repo": "colors.js",
+    "canonical": null,
+    "files_total": 30,
+    "files_accepted": 30,
+    "rejections": [],
+    "bytes_offered": 88033,
+    "bytes_new_unique": 88033,
+    "dup": {
+      "unique": 29,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.8932584269662921,
+        "estimated": 0.8515625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9332129963898917
+    }
+  },
+  {
+    "repo": "commander.js",
+    "canonical": null,
+    "files_total": 215,
+    "files_accepted": 215,
+    "rejections": [],
+    "bytes_offered": 988094,
+    "bytes_new_unique": 988094,
+    "dup": {
+      "unique": 214,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9298245614035088,
+        "estimated": 0.921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9711538461538461
+    }
+  },
+  {
+    "repo": "cors",
+    "canonical": null,
+    "files_total": 29,
+    "files_accepted": 29,
+    "rejections": [],
+    "bytes_offered": 114353,
+    "bytes_new_unique": 114353,
+    "dup": {
+      "unique": 28,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9520958083832335,
+        "estimated": 0.9609375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "crossbeam",
+    "canonical": null,
+    "files_total": 162,
+    "files_accepted": 162,
+    "rejections": [],
+    "bytes_offered": 1481923,
+    "bytes_new_unique": 1471076,
+    "dup": {
+      "unique": 158,
+      "exact": 1,
+      "token": 0,
+      "near": 3
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-APACHE",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.989466754443713,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "crossbeam-deque/tests/lifo.rs",
+        "duplicate_of": "crossbeam-deque/tests/fifo.rs",
+        "jaccard": 0.8772169167803547,
+        "estimated": 0.859375
+      },
+      {
+        "path": "crossbeam-utils/LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.9609375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "dateutil",
+    "canonical": null,
+    "files_total": 96,
+    "files_accepted": 96,
+    "rejections": [],
+    "bytes_offered": 904101,
+    "bytes_new_unique": 904101,
+    "dup": {
+      "unique": 94,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "docs/make.bat",
+        "duplicate_of": "docs/make.bat",
+        "jaccard": 0.86368843069874,
+        "estimated": 0.8125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.8257372654155496
+    }
+  },
+  {
+    "repo": "dayjs",
+    "canonical": null,
+    "files_total": 352,
+    "files_accepted": 352,
+    "rejections": [],
+    "bytes_offered": 800911,
+    "bytes_new_unique": 800911,
+    "dup": {
+      "unique": 343,
+      "exact": 0,
+      "token": 2,
+      "near": 7
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.921875
+      },
+      {
+        "path": "src/locale/en-in.js",
+        "duplicate_of": "src/locale/en-gb.js",
+        "jaccard": 0.8926553672316384,
+        "estimated": 0.8515625
+      },
+      {
+        "path": "src/locale/en-sg.js",
+        "duplicate_of": "src/locale/en-ie.js",
+        "jaccard": 0.8838709677419355,
+        "estimated": 0.8359375
+      },
+      {
+        "path": "src/locale/en-tt.js",
+        "duplicate_of": "src/locale/en-in.js",
+        "jaccard": 0.8926553672316384,
+        "estimated": 0.8515625
+      },
+      {
+        "path": "src/locale/zh.js",
+        "duplicate_of": "src/locale/zh-cn.js",
+        "jaccard": 0.9085365853658537,
+        "estimated": 0.84375
+      },
+      {
+        "path": "test/issues/issue2027.swapped-order.test.js",
+        "duplicate_of": "test/issues/issue2027.correct-order.test.js",
+        "jaccard": 0.9207920792079208,
+        "estimated": 0.921875
+      },
+      {
+        "path": "test/locale/sk.test.js",
+        "duplicate_of": "test/locale/cs.test.js",
+        "jaccard": 0.8522727272727273,
+        "estimated": 0.8828125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "debug",
+    "canonical": null,
+    "files_total": 13,
+    "files_accepted": 13,
+    "rejections": [],
+    "bytes_offered": 50158,
+    "bytes_new_unique": 50158,
+    "dup": {
+      "unique": 12,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.8932584269662921,
+        "estimated": 0.8671875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9711538461538461
+    }
+  },
+  {
+    "repo": "either",
+    "canonical": null,
+    "files_total": 12,
+    "files_accepted": 12,
+    "rejections": [],
+    "bytes_offered": 88929,
+    "bytes_new_unique": 78062,
+    "dup": {
+      "unique": 9,
+      "exact": 2,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9814814814814815,
+        "estimated": 0.984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "env_logger",
+    "canonical": null,
+    "files_total": 57,
+    "files_accepted": 57,
+    "rejections": [],
+    "bytes_offered": 227170,
+    "bytes_new_unique": 224938,
+    "dup": {
+      "unique": 48,
+      "exact": 5,
+      "token": 0,
+      "near": 4
+    },
+    "near_dups": [
+      {
+        "path": ".clippy.toml",
+        "duplicate_of": ".clippy.toml",
+        "jaccard": 0.9473684210526315,
+        "estimated": 0.953125
+      },
+      {
+        "path": ".github/workflows/template.yml",
+        "duplicate_of": ".github/workflows/template.yml",
+        "jaccard": 0.8577981651376146,
+        "estimated": 0.8359375
+      },
+      {
+        "path": "LICENSE-APACHE",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.991424802110818,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "deny.toml",
+        "duplicate_of": "deny.toml",
+        "jaccard": 0.9925046845721424,
+        "estimated": 1.0
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "errors",
+    "canonical": null,
+    "files_total": 17,
+    "files_accepted": 17,
+    "rejections": [],
+    "bytes_offered": 54615,
+    "bytes_new_unique": 54615,
+    "dup": {
+      "unique": 17,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-2-Clause",
+      "confidence": 0.9842381786339754
+    }
+  },
+  {
+    "repo": "fast-deep-equal",
+    "canonical": null,
+    "files_total": 18,
+    "files_accepted": 18,
+    "rejections": [],
+    "bytes_offered": 34804,
+    "bytes_new_unique": 34804,
+    "dup": {
+      "unique": 17,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9765625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "flask",
+    "canonical": null,
+    "files_total": 225,
+    "files_accepted": 225,
+    "rejections": [],
+    "bytes_offered": 1527681,
+    "bytes_new_unique": 1524326,
+    "dup": {
+      "unique": 214,
+      "exact": 7,
+      "token": 2,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": ".github/workflows/publish.yaml",
+        "duplicate_of": ".github/workflows/publish.yaml",
+        "jaccard": 0.8592233009708737,
+        "estimated": 0.828125
+      },
+      {
+        "path": "examples/tutorial/LICENSE.txt",
+        "duplicate_of": "LICENSE.txt",
+        "jaccard": 0.9808612440191388,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "freezegun",
+    "canonical": null,
+    "files_total": 39,
+    "files_accepted": 39,
+    "rejections": [],
+    "bytes_offered": 142203,
+    "bytes_new_unique": 142203,
+    "dup": {
+      "unique": 37,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-APACHE",
+        "jaccard": 0.991424802110818,
+        "estimated": 0.9921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "gin",
+    "canonical": null,
+    "files_total": 130,
+    "files_accepted": 130,
+    "rejections": [],
+    "bytes_offered": 870626,
+    "bytes_new_unique": 870626,
+    "dup": {
+      "unique": 128,
+      "exact": 0,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "duplicate_of": "code-of-conduct.md",
+        "jaccard": 0.8936170212765957,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9298245614035088,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "glob",
+    "canonical": null,
+    "files_total": 12,
+    "files_accepted": 12,
+    "rejections": [],
+    "bytes_offered": 89098,
+    "bytes_new_unique": 77160,
+    "dup": {
+      "unique": 9,
+      "exact": 3,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "globset",
+    "canonical": null,
+    "files_total": 12,
+    "files_accepted": 12,
+    "rejections": [],
+    "bytes_offered": 91964,
+    "bytes_new_unique": 91964,
+    "dup": {
+      "unique": 11,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-MIT",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "go-toml",
+    "canonical": null,
+    "files_total": 116,
+    "files_accepted": 116,
+    "rejections": [],
+    "bytes_offered": 1060858,
+    "bytes_new_unique": 1060858,
+    "dup": {
+      "unique": 112,
+      "exact": 1,
+      "token": 2,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9244186046511628,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9810246679316889
+    }
+  },
+  {
+    "repo": "go.uuid",
+    "canonical": null,
+    "files_total": 11,
+    "files_accepted": 11,
+    "rejections": [],
+    "bytes_offered": 43190,
+    "bytes_new_unique": 43190,
+    "dup": {
+      "unique": 10,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9408284023668639,
+        "estimated": 0.9375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "govalidator",
+    "canonical": null,
+    "files_total": 40,
+    "files_accepted": 40,
+    "rejections": [],
+    "bytes_offered": 318035,
+    "bytes_new_unique": 318035,
+    "dup": {
+      "unique": 39,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "hashbrown",
+    "canonical": null,
+    "files_total": 52,
+    "files_accepted": 52,
+    "rejections": [],
+    "bytes_offered": 875291,
+    "bytes_new_unique": 864444,
+    "dup": {
+      "unique": 50,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9636363636363636,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "httprouter",
+    "canonical": null,
+    "files_total": 10,
+    "files_accepted": 10,
+    "rejections": [],
+    "bytes_offered": 95705,
+    "bytes_new_unique": 95705,
+    "dup": {
+      "unique": 9,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE.txt",
+        "jaccard": 0.9315068493150684,
+        "estimated": 0.921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9865824782951855
+    }
+  },
+  {
+    "repo": "httpx",
+    "canonical": null,
+    "files_total": 112,
+    "files_accepted": 112,
+    "rejections": [],
+    "bytes_offered": 991106,
+    "bytes_new_unique": 991106,
+    "dup": {
+      "unique": 110,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "docs/contributing.md",
+        "duplicate_of": ".github/CONTRIBUTING.md",
+        "jaccard": 0.8978046934140802,
+        "estimated": 0.890625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.md",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9832134292565947
+    }
+  },
+  {
+    "repo": "idna",
+    "canonical": null,
+    "files_total": 39,
+    "files_accepted": 39,
+    "rejections": [],
+    "bytes_offered": 530734,
+    "bytes_new_unique": 530734,
+    "dup": {
+      "unique": 37,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.md",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.9333333333333333,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.md",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9865824782951855
+    }
+  },
+  {
+    "repo": "indexmap",
+    "canonical": null,
+    "files_total": 46,
+    "files_accepted": 46,
+    "rejections": [],
+    "bytes_offered": 526966,
+    "bytes_new_unique": 516119,
+    "dup": {
+      "unique": 43,
+      "exact": 1,
+      "token": 1,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9754601226993865,
+        "estimated": 0.9765625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "itertools",
+    "canonical": null,
+    "files_total": 88,
+    "files_accepted": 88,
+    "rejections": [],
+    "bytes_offered": 790111,
+    "bytes_new_unique": 778221,
+    "dup": {
+      "unique": 85,
+      "exact": 2,
+      "token": 1,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "itoa",
+    "canonical": null,
+    "files_total": 14,
+    "files_accepted": 14,
+    "rejections": [],
+    "bytes_offered": 39227,
+    "bytes_new_unique": 28444,
+    "dup": {
+      "unique": 10,
+      "exact": 4,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "itsdangerous",
+    "canonical": null,
+    "files_total": 49,
+    "files_accepted": 49,
+    "rejections": [],
+    "bytes_offered": 282547,
+    "bytes_new_unique": 281033,
+    "dup": {
+      "unique": 40,
+      "exact": 7,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE.txt",
+        "jaccard": 0.9808612440191388,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "docs/make.bat",
+        "duplicate_of": "docs/make.bat",
+        "jaccard": 0.8803418803418803,
+        "estimated": 0.8984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "BSD-3-Clause",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "jinja",
+    "canonical": null,
+    "files_total": 105,
+    "files_accepted": 105,
+    "rejections": [],
+    "bytes_offered": 1145851,
+    "bytes_new_unique": 1141017,
+    "dup": {
+      "unique": 87,
+      "exact": 12,
+      "token": 1,
+      "near": 5
+    },
+    "near_dups": [
+      {
+        "path": ".github/workflows/publish.yaml",
+        "duplicate_of": ".github/workflows/publish.yaml",
+        "jaccard": 0.9354838709677419,
+        "estimated": 0.9375
+      },
+      {
+        "path": ".github/workflows/tests.yaml",
+        "duplicate_of": ".github/workflows/tests.yaml",
+        "jaccard": 0.9320987654320988,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE.txt",
+        "jaccard": 0.9808612440191388,
+        "estimated": 0.96875
+      },
+      {
+        "path": "docs/make.bat",
+        "duplicate_of": "docs/make.bat",
+        "jaccard": 0.9043478260869565,
+        "estimated": 0.9140625
+      },
+      {
+        "path": "uv.lock",
+        "duplicate_of": "uv.lock",
+        "jaccard": 0.92454789305183,
+        "estimated": 0.921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "BSD-3-Clause",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "js-cookie",
+    "canonical": null,
+    "files_total": 51,
+    "files_accepted": 51,
+    "rejections": [],
+    "bytes_offered": 551139,
+    "bytes_new_unique": 551139,
+    "dup": {
+      "unique": 50,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9244186046511628,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "json",
+    "canonical": null,
+    "files_total": 91,
+    "files_accepted": 91,
+    "rejections": [],
+    "bytes_offered": 737110,
+    "bytes_new_unique": 726076,
+    "dup": {
+      "unique": 83,
+      "exact": 5,
+      "token": 3,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "json5",
+    "canonical": null,
+    "files_total": 39,
+    "files_accepted": 39,
+    "rejections": [],
+    "bytes_offered": 326648,
+    "bytes_new_unique": 326648,
+    "dup": {
+      "unique": 37,
+      "exact": 0,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.md",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9034090909090909,
+        "estimated": 0.90625
+      },
+      {
+        "path": "package.json5",
+        "duplicate_of": "package.json",
+        "jaccard": 0.968,
+        "estimated": 0.9921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.md",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "jwt",
+    "canonical": null,
+    "files_total": 77,
+    "files_accepted": 77,
+    "rejections": [],
+    "bytes_offered": 239166,
+    "bytes_new_unique": 239166,
+    "dup": {
+      "unique": 75,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "lazy-static.rs",
+    "canonical": null,
+    "files_total": 19,
+    "files_accepted": 19,
+    "rejections": [],
+    "bytes_offered": 35591,
+    "bytes_new_unique": 23721,
+    "dup": {
+      "unique": 17,
+      "exact": 2,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "left-pad",
+    "canonical": null,
+    "files_total": 11,
+    "files_accepted": 11,
+    "rejections": [],
+    "bytes_offered": 9588,
+    "bytes_new_unique": 9588,
+    "dup": {
+      "unique": 10,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9609375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "lodash",
+    "canonical": null,
+    "files_total": 102,
+    "files_accepted": 102,
+    "rejections": [],
+    "bytes_offered": 3992443,
+    "bytes_new_unique": 3992443,
+    "dup": {
+      "unique": 99,
+      "exact": 0,
+      "token": 0,
+      "near": 3
+    },
+    "near_dups": [
+      {
+        "path": "fp/_mapping.js",
+        "duplicate_of": "dist/mapping.fp.js",
+        "jaccard": 0.8592321755027422,
+        "estimated": 0.828125
+      },
+      {
+        "path": "vendor/backbone/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "vendor/underscore/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "log",
+    "canonical": null,
+    "files_total": 23,
+    "files_accepted": 23,
+    "rejections": [],
+    "bytes_offered": 297552,
+    "bytes_new_unique": 285625,
+    "dup": {
+      "unique": 20,
+      "exact": 3,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "logrus",
+    "canonical": null,
+    "files_total": 64,
+    "files_accepted": 64,
+    "rejections": [],
+    "bytes_offered": 272764,
+    "bytes_new_unique": 272764,
+    "dup": {
+      "unique": 63,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "mapstructure",
+    "canonical": null,
+    "files_total": 13,
+    "files_accepted": 13,
+    "rejections": [],
+    "bytes_offered": 153126,
+    "bytes_new_unique": 153126,
+    "dup": {
+      "unique": 12,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "markupsafe",
+    "canonical": null,
+    "files_total": 45,
+    "files_accepted": 45,
+    "rejections": [],
+    "bytes_offered": 242263,
+    "bytes_new_unique": 236986,
+    "dup": {
+      "unique": 34,
+      "exact": 10,
+      "token": 1,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "BSD-3-Clause",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "marshmallow",
+    "canonical": null,
+    "files_total": 96,
+    "files_accepted": 96,
+    "rejections": [],
+    "bytes_offered": 1080253,
+    "bytes_new_unique": 1080253,
+    "dup": {
+      "unique": 93,
+      "exact": 1,
+      "token": 1,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "mime",
+    "canonical": null,
+    "files_total": 24,
+    "files_accepted": 24,
+    "rejections": [],
+    "bytes_offered": 102326,
+    "bytes_new_unique": 102306,
+    "dup": {
+      "unique": 22,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9636363636363636,
+        "estimated": 0.984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "minimist",
+    "canonical": null,
+    "files_total": 33,
+    "files_accepted": 33,
+    "rejections": [],
+    "bytes_offered": 60645,
+    "bytes_new_unique": 60645,
+    "dup": {
+      "unique": 32,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "ms",
+    "canonical": null,
+    "files_total": 23,
+    "files_accepted": 23,
+    "rejections": [],
+    "bytes_offered": 189206,
+    "bytes_new_unique": 189206,
+    "dup": {
+      "unique": 22,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "mux",
+    "canonical": null,
+    "files_total": 27,
+    "files_accepted": 27,
+    "rejections": [],
+    "bytes_offered": 255451,
+    "bytes_new_unique": 255451,
+    "dup": {
+      "unique": 27,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9792663476874003
+    }
+  },
+  {
+    "repo": "nanoid",
+    "canonical": null,
+    "files_total": 47,
+    "files_accepted": 47,
+    "rejections": [],
+    "bytes_offered": 233821,
+    "bytes_new_unique": 233821,
+    "dup": {
+      "unique": 46,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9615004935834156
+    }
+  },
+  {
+    "repo": "node-deep-equal",
+    "canonical": null,
+    "files_total": 19,
+    "files_accepted": 19,
+    "rejections": [],
+    "bytes_offered": 96711,
+    "bytes_new_unique": 96656,
+    "dup": {
+      "unique": 16,
+      "exact": 1,
+      "token": 1,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9034090909090909,
+        "estimated": 0.8828125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "node-jsonwebtoken",
+    "canonical": null,
+    "files_total": 84,
+    "files_accepted": 84,
+    "rejections": [],
+    "bytes_offered": 243233,
+    "bytes_new_unique": 243233,
+    "dup": {
+      "unique": 83,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9137931034482759,
+        "estimated": 0.90625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "node-mkdirp",
+    "canonical": null,
+    "files_total": 39,
+    "files_accepted": 39,
+    "rejections": [],
+    "bytes_offered": 209050,
+    "bytes_new_unique": 209050,
+    "dup": {
+      "unique": 37,
+      "exact": 0,
+      "token": 1,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.8594594594594595,
+        "estimated": 0.859375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9819563152896487
+    }
+  },
+  {
+    "repo": "node-semver",
+    "canonical": null,
+    "files_total": 154,
+    "files_accepted": 154,
+    "rejections": [],
+    "bytes_offered": 299483,
+    "bytes_new_unique": 299483,
+    "dup": {
+      "unique": 154,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "ISC",
+      "confidence": 0.9728395061728395
+    }
+  },
+  {
+    "repo": "once_cell",
+    "canonical": null,
+    "files_total": 32,
+    "files_accepted": 32,
+    "rejections": [],
+    "bytes_offered": 163314,
+    "bytes_new_unique": 151444,
+    "dup": {
+      "unique": 30,
+      "exact": 2,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "parking_lot",
+    "canonical": null,
+    "files_total": 57,
+    "files_accepted": 57,
+    "rejections": [],
+    "bytes_offered": 558699,
+    "bytes_new_unique": 547834,
+    "dup": {
+      "unique": 54,
+      "exact": 2,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "lock_api/LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9644970414201184,
+        "estimated": 0.984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "peewee",
+    "canonical": null,
+    "files_total": 181,
+    "files_accepted": 181,
+    "rejections": [],
+    "bytes_offered": 4096235,
+    "bytes_new_unique": 4096235,
+    "dup": {
+      "unique": 179,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.984375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "picocolors",
+    "canonical": null,
+    "files_total": 19,
+    "files_accepted": 19,
+    "rejections": [],
+    "bytes_offered": 33717,
+    "bytes_new_unique": 33717,
+    "dup": {
+      "unique": 19,
+      "exact": 0,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "ISC",
+      "confidence": 0.9728395061728395
+    }
+  },
+  {
+    "repo": "pip",
+    "canonical": null,
+    "files_total": 885,
+    "files_accepted": 885,
+    "rejections": [],
+    "bytes_offered": 7493689,
+    "bytes_new_unique": 7445352,
+    "dup": {
+      "unique": 863,
+      "exact": 5,
+      "token": 5,
+      "near": 12
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.9375
+      },
+      {
+        "path": "src/pip/_vendor/idna/cli.py",
+        "duplicate_of": "idna/cli.py",
+        "jaccard": 0.8605851979345955,
+        "estimated": 0.8203125
+      },
+      {
+        "path": "src/pip/_vendor/idna/compat.py",
+        "duplicate_of": "idna/compat.py",
+        "jaccard": 0.872093023255814,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "src/pip/_vendor/idna/uts46data.py",
+        "duplicate_of": "idna/uts46data.py",
+        "jaccard": 0.9888639040582503,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "src/pip/_vendor/msgpack/COPYING",
+        "duplicate_of": "src/pip/_vendor/cachecontrol/LICENSE.txt",
+        "jaccard": 0.8541666666666666,
+        "estimated": 0.84375
+      },
+      {
+        "path": "src/pip/_vendor/platformdirs/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "src/pip/_vendor/pygments/LICENSE",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.8535353535353535,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "src/pip/_vendor/pyproject_hooks/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9375
+      },
+      {
+        "path": "src/pip/_vendor/rich/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.96875
+      },
+      {
+        "path": "src/pip/_vendor/tomli_w/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "src/pip/_vendor/truststore/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9408284023668639,
+        "estimated": 0.921875
+      },
+      {
+        "path": "src/pip/_vendor/urllib3/LICENSE.txt",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9408284023668639,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [
+      {
+        "path": "src/pip/_vendor/cachecontrol/__init__.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/_cmd.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/adapter.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/cache.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/caches/__init__.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/caches/file_cache.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/caches/redis_cache.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/controller.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/filewrapper.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/heuristics.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/serialize.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/cachecontrol/wrapper.py",
+        "expression": "Apache-2.0"
+      },
+      {
+        "path": "src/pip/_vendor/tomli/__init__.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/pip/_vendor/tomli/_parser.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/pip/_vendor/tomli/_re.py",
+        "expression": "MIT"
+      },
+      {
+        "path": "src/pip/_vendor/tomli/_types.py",
+        "expression": "MIT"
+      }
+    ],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "preact",
+    "canonical": null,
+    "files_total": 290,
+    "files_accepted": 290,
+    "rejections": [],
+    "bytes_offered": 1637222,
+    "bytes_new_unique": 1637222,
+    "dup": {
+      "unique": 288,
+      "exact": 0,
+      "token": 0,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": ".github/CODE_OF_CONDUCT.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.9733924611973392,
+        "estimated": 0.984375
+      },
+      {
+        "path": "jsx-runtime/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9408284023668639,
+        "estimated": 0.9609375
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "pydantic",
+    "canonical": null,
+    "files_total": 755,
+    "files_accepted": 755,
+    "rejections": [],
+    "bytes_offered": 9824806,
+    "bytes_new_unique": 9824806,
+    "dup": {
+      "unique": 747,
+      "exact": 1,
+      "token": 0,
+      "near": 7
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9147727272727273,
+        "estimated": 0.9375
+      },
+      {
+        "path": "docs/badge/v2.json",
+        "duplicate_of": "docs/badge/v1.json",
+        "jaccard": 0.9735099337748344,
+        "estimated": 0.984375
+      },
+      {
+        "path": "docs/logo-white.svg",
+        "duplicate_of": "docs/badge/v1.json",
+        "jaccard": 0.9306930693069307,
+        "estimated": 0.953125
+      },
+      {
+        "path": "pydantic-core/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9375
+      },
+      {
+        "path": "tests/mypy/configs/pyproject-plugin.toml",
+        "duplicate_of": "tests/mypy/configs/pyproject-plugin-no-strict-optional.toml",
+        "jaccard": 0.8977272727272727,
+        "estimated": 0.9140625
+      },
+      {
+        "path": "tests/mypy/outputs/pyproject-plugin-strict_toml/plugin_success.py",
+        "duplicate_of": "tests/mypy/modules/plugin_success.py",
+        "jaccard": 0.9652694610778443,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "tests/mypy/outputs/pyproject-plugin-strict_toml/plugin_success_baseConfig.py",
+        "duplicate_of": "tests/mypy/modules/plugin_success_baseConfig.py",
+        "jaccard": 0.947463768115942,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "python-certifi",
+    "canonical": null,
+    "files_total": 20,
+    "files_accepted": 20,
+    "rejections": [],
+    "bytes_offered": 254424,
+    "bytes_new_unique": 13125,
+    "dup": {
+      "unique": 15,
+      "exact": 4,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "certifi/core.py",
+        "duplicate_of": "src/pip/_vendor/certifi/core.py",
+        "jaccard": 0.8863636363636364,
+        "estimated": 0.8828125
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "python-dotenv",
+    "canonical": null,
+    "files_total": 43,
+    "files_accepted": 43,
+    "rejections": [],
+    "bytes_offered": 144172,
+    "bytes_new_unique": 144146,
+    "dup": {
+      "unique": 41,
+      "exact": 2,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9770491803278688
+    }
+  },
+  {
+    "repo": "pyyaml",
+    "canonical": null,
+    "files_total": 573,
+    "files_accepted": 573,
+    "rejections": [],
+    "bytes_offered": 601827,
+    "bytes_new_unique": 601827,
+    "dup": {
+      "unique": 493,
+      "exact": 1,
+      "token": 77,
+      "near": 2
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9190751445086706,
+        "estimated": 0.9140625
+      },
+      {
+        "path": "tests/legacy_tests/data/construct-binary-py3.code",
+        "duplicate_of": "tests/legacy_tests/data/construct-binary-py2.code",
+        "jaccard": 0.9126984126984127,
+        "estimated": 0.875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "qs",
+    "canonical": null,
+    "files_total": 31,
+    "files_accepted": 31,
+    "rejections": [],
+    "bytes_offered": 380814,
+    "bytes_new_unique": 380297,
+    "dup": {
+      "unique": 27,
+      "exact": 3,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.md",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.8969957081545065,
+        "estimated": 0.9140625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.md",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9865824782951855
+    }
+  },
+  {
+    "repo": "rayon",
+    "canonical": null,
+    "files_total": 214,
+    "files_accepted": 214,
+    "rejections": [],
+    "bytes_offered": 1329356,
+    "bytes_new_unique": 1318509,
+    "dup": {
+      "unique": 211,
+      "exact": 2,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "rayon-core/LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9644970414201184,
+        "estimated": 0.9765625
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "regex",
+    "canonical": null,
+    "files_total": 387,
+    "files_accepted": 387,
+    "rejections": [],
+    "bytes_offered": 7231079,
+    "bytes_new_unique": 7219117,
+    "dup": {
+      "unique": 381,
+      "exact": 3,
+      "token": 0,
+      "near": 3
+    },
+    "near_dups": [
+      {
+        "path": "fuzz/fuzz_targets/fuzz_regex_automata_deserialize_sparse_dfa.rs",
+        "duplicate_of": "fuzz/fuzz_targets/fuzz_regex_automata_deserialize_dense_dfa.rs",
+        "jaccard": 0.9045454545454545,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "regex-lite/src/interpolate.rs",
+        "duplicate_of": "regex-automata/src/util/interpolate.rs",
+        "jaccard": 0.9153638814016173,
+        "estimated": 0.859375
+      },
+      {
+        "path": "src/regexset/string.rs",
+        "duplicate_of": "src/regexset/bytes.rs",
+        "jaccard": 0.867138072199479,
+        "estimated": 0.84375
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "requests",
+    "canonical": null,
+    "files_total": 121,
+    "files_accepted": 121,
+    "rejections": [],
+    "bytes_offered": 1547802,
+    "bytes_new_unique": 1518908,
+    "dup": {
+      "unique": 102,
+      "exact": 8,
+      "token": 1,
+      "near": 10
+    },
+    "near_dups": [
+      {
+        "path": ".github/AI_POLICY.md",
+        "duplicate_of": ".github/AI_POLICY.md",
+        "jaccard": 0.8982118294360385,
+        "estimated": 0.890625
+      },
+      {
+        "path": "docs/make.bat",
+        "duplicate_of": "docs/make.bat",
+        "jaccard": 0.953970080552359,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "src/requests/_types.py",
+        "duplicate_of": "src/pip/_vendor/requests/_types.py",
+        "jaccard": 0.9442622950819672,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "src/requests/adapters.py",
+        "duplicate_of": "src/pip/_vendor/requests/adapters.py",
+        "jaccard": 0.9550802139037433,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "src/requests/auth.py",
+        "duplicate_of": "src/pip/_vendor/requests/auth.py",
+        "jaccard": 0.9781078967943706,
+        "estimated": 0.96875
+      },
+      {
+        "path": "src/requests/cookies.py",
+        "duplicate_of": "src/pip/_vendor/requests/cookies.py",
+        "jaccard": 0.995480690221857,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "src/requests/exceptions.py",
+        "duplicate_of": "src/pip/_vendor/requests/exceptions.py",
+        "jaccard": 0.9801980198019802,
+        "estimated": 0.96875
+      },
+      {
+        "path": "src/requests/models.py",
+        "duplicate_of": "src/pip/_vendor/requests/models.py",
+        "jaccard": 0.9550394204133816,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "src/requests/sessions.py",
+        "duplicate_of": "src/pip/_vendor/requests/sessions.py",
+        "jaccard": 0.9849232456140351,
+        "estimated": 0.984375
+      },
+      {
+        "path": "src/requests/utils.py",
+        "duplicate_of": "src/pip/_vendor/requests/utils.py",
+        "jaccard": 0.9834144183989385,
+        "estimated": 0.9921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "rich",
+    "canonical": null,
+    "files_total": 527,
+    "files_accepted": 527,
+    "rejections": [],
+    "bytes_offered": 4262666,
+    "bytes_new_unique": 4001613,
+    "dup": {
+      "unique": 444,
+      "exact": 31,
+      "token": 1,
+      "near": 51
+    },
+    "near_dups": [
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.8944099378881988,
+        "estimated": 0.921875
+      },
+      {
+        "path": "docs/Makefile",
+        "duplicate_of": "docs/Makefile",
+        "jaccard": 0.8928571428571429,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "make.bat",
+        "duplicate_of": "docs/make.bat",
+        "jaccard": 0.9224137931034483,
+        "estimated": 0.9140625
+      },
+      {
+        "path": "rich/__init__.py",
+        "duplicate_of": "src/pip/_vendor/rich/__init__.py",
+        "jaccard": 0.95448798988622,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/_inspect.py",
+        "duplicate_of": "src/pip/_vendor/rich/_inspect.py",
+        "jaccard": 0.9707446808510638,
+        "estimated": 0.984375
+      },
+      {
+        "path": "rich/_log_render.py",
+        "duplicate_of": "src/pip/_vendor/rich/_log_render.py",
+        "jaccard": 0.9731182795698925,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/_unicode_data/unicode12-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode11-0-0.py",
+        "jaccard": 0.8625840179238238,
+        "estimated": 0.8359375
+      },
+      {
+        "path": "rich/_unicode_data/unicode12-1-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode12-0-0.py",
+        "jaccard": 0.9835164835164835,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/_unicode_data/unicode15-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode14-0-0.py",
+        "jaccard": 0.8803894297635605,
+        "estimated": 0.890625
+      },
+      {
+        "path": "rich/_unicode_data/unicode15-1-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode15-0-0.py",
+        "jaccard": 0.9775524981897176,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/_unicode_data/unicode16-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode15-1-0.py",
+        "jaccard": 0.8721244925575101,
+        "estimated": 0.859375
+      },
+      {
+        "path": "rich/_unicode_data/unicode17-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode16-0-0.py",
+        "jaccard": 0.9108710330857529,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "rich/_unicode_data/unicode5-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode4-1-0.py",
+        "jaccard": 0.8887240356083086,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "rich/_unicode_data/unicode6-1-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode6-0-0.py",
+        "jaccard": 0.8757539203860072,
+        "estimated": 0.8515625
+      },
+      {
+        "path": "rich/_unicode_data/unicode6-2-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode6-1-0.py",
+        "jaccard": 0.9874843554443054,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/_unicode_data/unicode6-3-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode6-1-0.py",
+        "jaccard": 0.9641975308641976,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/_unicode_data/unicode8-0-0.py",
+        "duplicate_of": "rich/_unicode_data/unicode7-0-0.py",
+        "jaccard": 0.8693361433087461,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "rich/_win32_console.py",
+        "duplicate_of": "src/pip/_vendor/rich/_win32_console.py",
+        "jaccard": 0.98707453683757,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/_windows.py",
+        "duplicate_of": "src/pip/_vendor/rich/_windows.py",
+        "jaccard": 0.8918918918918919,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "rich/_windows_renderer.py",
+        "duplicate_of": "src/pip/_vendor/rich/_windows_renderer.py",
+        "jaccard": 0.9288256227758007,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "rich/abc.py",
+        "duplicate_of": "src/pip/_vendor/rich/abc.py",
+        "jaccard": 0.908256880733945,
+        "estimated": 0.890625
+      },
+      {
+        "path": "rich/align.py",
+        "duplicate_of": "src/pip/_vendor/rich/align.py",
+        "jaccard": 0.9084210526315789,
+        "estimated": 0.859375
+      },
+      {
+        "path": "rich/ansi.py",
+        "duplicate_of": "src/pip/_vendor/rich/ansi.py",
+        "jaccard": 0.9274965800273598,
+        "estimated": 0.921875
+      },
+      {
+        "path": "rich/box.py",
+        "duplicate_of": "src/pip/_vendor/rich/box.py",
+        "jaccard": 0.9678111587982833,
+        "estimated": 0.953125
+      },
+      {
+        "path": "rich/console.py",
+        "duplicate_of": "src/pip/_vendor/rich/console.py",
+        "jaccard": 0.9514591726441977,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "rich/control.py",
+        "duplicate_of": "src/pip/_vendor/rich/control.py",
+        "jaccard": 0.9862068965517241,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/default_styles.py",
+        "duplicate_of": "src/pip/_vendor/rich/default_styles.py",
+        "jaccard": 0.8622305529522024,
+        "estimated": 0.890625
+      },
+      {
+        "path": "rich/file_proxy.py",
+        "duplicate_of": "src/pip/_vendor/rich/file_proxy.py",
+        "jaccard": 0.9597989949748744,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "rich/highlighter.py",
+        "duplicate_of": "src/pip/_vendor/rich/highlighter.py",
+        "jaccard": 0.937447168216399,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "rich/json.py",
+        "duplicate_of": "src/pip/_vendor/rich/json.py",
+        "jaccard": 0.9773755656108597,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "rich/jupyter.py",
+        "duplicate_of": "src/pip/_vendor/rich/jupyter.py",
+        "jaccard": 0.9719887955182073,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/layout.py",
+        "duplicate_of": "src/pip/_vendor/rich/layout.py",
+        "jaccard": 0.9684282772820865,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/live.py",
+        "duplicate_of": "src/pip/_vendor/rich/live.py",
+        "jaccard": 0.9914057704112953,
+        "estimated": 1.0
+      },
+      {
+        "path": "rich/logging.py",
+        "duplicate_of": "src/pip/_vendor/rich/logging.py",
+        "jaccard": 0.921715452688904,
+        "estimated": 0.9375
+      },
+      {
+        "path": "rich/markup.py",
+        "duplicate_of": "src/pip/_vendor/rich/markup.py",
+        "jaccard": 0.9774774774774775,
+        "estimated": 0.984375
+      },
+      {
+        "path": "rich/padding.py",
+        "duplicate_of": "src/pip/_vendor/rich/padding.py",
+        "jaccard": 0.9811320754716981,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/pretty.py",
+        "duplicate_of": "src/pip/_vendor/rich/pretty.py",
+        "jaccard": 0.9887039239001189,
+        "estimated": 0.984375
+      },
+      {
+        "path": "rich/progress.py",
+        "duplicate_of": "src/pip/_vendor/rich/progress.py",
+        "jaccard": 0.993032636596993,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/prompt.py",
+        "duplicate_of": "src/pip/_vendor/rich/prompt.py",
+        "jaccard": 0.9830364715860899,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "rich/repr.py",
+        "duplicate_of": "src/pip/_vendor/rich/repr.py",
+        "jaccard": 0.9525862068965517,
+        "estimated": 0.9375
+      },
+      {
+        "path": "rich/rule.py",
+        "duplicate_of": "src/pip/_vendor/rich/rule.py",
+        "jaccard": 0.980544747081712,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "rich/screen.py",
+        "duplicate_of": "src/pip/_vendor/rich/screen.py",
+        "jaccard": 0.9421965317919075,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "rich/segment.py",
+        "duplicate_of": "src/pip/_vendor/rich/segment.py",
+        "jaccard": 0.9624060150375939,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/style.py",
+        "duplicate_of": "src/pip/_vendor/rich/style.py",
+        "jaccard": 0.9756871035940803,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "rich/styled.py",
+        "duplicate_of": "src/pip/_vendor/rich/styled.py",
+        "jaccard": 0.8581560283687943,
+        "estimated": 0.796875
+      },
+      {
+        "path": "rich/syntax.py",
+        "duplicate_of": "src/pip/_vendor/rich/syntax.py",
+        "jaccard": 0.969039428420217,
+        "estimated": 0.96875
+      },
+      {
+        "path": "rich/table.py",
+        "duplicate_of": "src/pip/_vendor/rich/table.py",
+        "jaccard": 0.9819261554350632,
+        "estimated": 0.984375
+      },
+      {
+        "path": "rich/text.py",
+        "duplicate_of": "src/pip/_vendor/rich/text.py",
+        "jaccard": 0.990420658059142,
+        "estimated": 1.0
+      },
+      {
+        "path": "rich/theme.py",
+        "duplicate_of": "src/pip/_vendor/rich/theme.py",
+        "jaccard": 0.9729119638826185,
+        "estimated": 0.984375
+      },
+      {
+        "path": "rich/traceback.py",
+        "duplicate_of": "src/pip/_vendor/rich/traceback.py",
+        "jaccard": 0.925748884639898,
+        "estimated": 0.9375
+      },
+      {
+        "path": "rich/tree.py",
+        "duplicate_of": "src/pip/_vendor/rich/tree.py",
+        "jaccard": 0.950199203187251,
+        "estimated": 0.9140625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "rust-smallvec",
+    "canonical": null,
+    "files_total": 41,
+    "files_accepted": 41,
+    "rejections": [],
+    "bytes_offered": 218061,
+    "bytes_new_unique": 207214,
+    "dup": {
+      "unique": 39,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "rust-url",
+    "canonical": null,
+    "files_total": 70,
+    "files_accepted": 70,
+    "rejections": [],
+    "bytes_offered": 2524745,
+    "bytes_new_unique": 2513873,
+    "dup": {
+      "unique": 64,
+      "exact": 2,
+      "token": 0,
+      "near": 4
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9520958083832335,
+        "estimated": 0.96875
+      },
+      {
+        "path": "form_urlencoded/LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9532163742690059,
+        "estimated": 0.96875
+      },
+      {
+        "path": "idna/tests/IdnaTestV2.txt",
+        "duplicate_of": "idna/tests/IdnaTestV2-Unicode16.txt",
+        "jaccard": 0.997079754601227,
+        "estimated": 1.0
+      },
+      {
+        "path": "url/tests/urltestdata.json",
+        "duplicate_of": "tests/models/whatwg.json",
+        "jaccard": 0.9461859979101358,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-MIT",
+      "spdx": "MIT",
+      "confidence": 0.9990338164251208
+    }
+  },
+  {
+    "repo": "ryu",
+    "canonical": null,
+    "files_total": 39,
+    "files_accepted": 39,
+    "rejections": [],
+    "bytes_offered": 161939,
+    "bytes_new_unique": 152147,
+    "dup": {
+      "unique": 36,
+      "exact": 3,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "semver",
+    "canonical": null,
+    "files_total": 28,
+    "files_accepted": 28,
+    "rejections": [],
+    "bytes_offered": 120054,
+    "bytes_new_unique": 109292,
+    "dup": {
+      "unique": 25,
+      "exact": 3,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "serde",
+    "canonical": null,
+    "files_total": 345,
+    "files_accepted": 345,
+    "rejections": [],
+    "bytes_offered": 1331537,
+    "bytes_new_unique": 1320482,
+    "dup": {
+      "unique": 340,
+      "exact": 5,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "syn",
+    "canonical": null,
+    "files_total": 167,
+    "files_accepted": 167,
+    "rejections": [],
+    "bytes_offered": 2559292,
+    "bytes_new_unique": 2548456,
+    "dup": {
+      "unique": 162,
+      "exact": 5,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "tempfile",
+    "canonical": null,
+    "files_total": 34,
+    "files_accepted": 34,
+    "rejections": [],
+    "bytes_offered": 187683,
+    "bytes_new_unique": 176818,
+    "dup": {
+      "unique": 31,
+      "exact": 2,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE-MIT",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.953125
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "thiserror",
+    "canonical": null,
+    "files_total": 116,
+    "files_accepted": 116,
+    "rejections": [],
+    "bytes_offered": 192157,
+    "bytes_new_unique": 181122,
+    "dup": {
+      "unique": 104,
+      "exact": 6,
+      "token": 2,
+      "near": 4
+    },
+    "near_dups": [
+      {
+        "path": "impl/src/scan_expr.rs",
+        "duplicate_of": "src/scan_expr.rs",
+        "jaccard": 0.9028132992327366,
+        "estimated": 0.953125
+      },
+      {
+        "path": "tests/ui/source-enum-unnamed-field-not-error.stderr",
+        "duplicate_of": "tests/ui/source-enum-not-error.stderr",
+        "jaccard": 0.8611111111111112,
+        "estimated": 0.8125
+      },
+      {
+        "path": "tests/ui/transparent-enum-unnamed-field-not-error.stderr",
+        "duplicate_of": "tests/ui/transparent-enum-not-error.stderr",
+        "jaccard": 0.8958333333333334,
+        "estimated": 0.9375
+      },
+      {
+        "path": "tests/ui/transparent-struct-unnamed-field-not-error.stderr",
+        "duplicate_of": "tests/ui/transparent-struct-not-error.stderr",
+        "jaccard": 0.8913043478260869,
+        "estimated": 0.875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-APACHE",
+      "spdx": "Apache-2.0",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "toml",
+    "canonical": null,
+    "files_total": 967,
+    "files_accepted": 967,
+    "rejections": [],
+    "bytes_offered": 441147,
+    "bytes_new_unique": 441146,
+    "dup": {
+      "unique": 840,
+      "exact": 2,
+      "token": 124,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "cmd/tomlv/COPYING",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "tqdm",
+    "canonical": null,
+    "files_total": 105,
+    "files_accepted": 105,
+    "rejections": [],
+    "bytes_offered": 508128,
+    "bytes_new_unique": 508098,
+    "dup": {
+      "unique": 103,
+      "exact": 2,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "tracing",
+    "canonical": null,
+    "files_total": 328,
+    "files_accepted": 328,
+    "rejections": [],
+    "bytes_offered": 2928146,
+    "bytes_new_unique": 2928146,
+    "dup": {
+      "unique": 323,
+      "exact": 0,
+      "token": 0,
+      "near": 5
+    },
+    "near_dups": [
+      {
+        "path": "SECURITY.md",
+        "duplicate_of": "SECURITY.md",
+        "jaccard": 0.8888888888888888,
+        "estimated": 0.921875
+      },
+      {
+        "path": "examples/examples/fmt.rs",
+        "duplicate_of": "examples/examples/fmt-compact.rs",
+        "jaccard": 0.8928571428571429,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "tracing/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9695121951219512,
+        "estimated": 0.96875
+      },
+      {
+        "path": "tracing-core/src/spin/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9352941176470588,
+        "estimated": 0.921875
+      },
+      {
+        "path": "tracing-subscriber/tests/unhinted_layer_filters_dont_break_other_layers.rs",
+        "duplicate_of": "tracing-subscriber/tests/cached_layer_filters_dont_break_other_layers.rs",
+        "jaccard": 0.894927536231884,
+        "estimated": 0.8671875
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  },
+  {
+    "repo": "urllib3",
+    "canonical": null,
+    "files_total": 175,
+    "files_accepted": 175,
+    "rejections": [],
+    "bytes_offered": 1903362,
+    "bytes_new_unique": 1775481,
+    "dup": {
+      "unique": 137,
+      "exact": 25,
+      "token": 0,
+      "near": 13
+    },
+    "near_dups": [
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.9842632331902719,
+        "estimated": 0.984375
+      },
+      {
+        "path": "docs/Makefile",
+        "duplicate_of": "docs/Makefile",
+        "jaccard": 0.923728813559322,
+        "estimated": 0.90625
+      },
+      {
+        "path": "docs/_static/dark-logo.svg",
+        "duplicate_of": "docs/_static/banner.svg",
+        "jaccard": 0.9413793103448276,
+        "estimated": 0.96875
+      },
+      {
+        "path": "src/urllib3/_collections.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/_collections.py",
+        "jaccard": 0.9821162444113264,
+        "estimated": 1.0
+      },
+      {
+        "path": "src/urllib3/connection.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/connection.py",
+        "jaccard": 0.8548049476688868,
+        "estimated": 0.90625
+      },
+      {
+        "path": "src/urllib3/connectionpool.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/connectionpool.py",
+        "jaccard": 0.947000211999152,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "src/urllib3/contrib/socks.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/contrib/socks.py",
+        "jaccard": 0.921146953405018,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "src/urllib3/http2/connection.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/http2/connection.py",
+        "jaccard": 0.9700822737471952,
+        "estimated": 0.984375
+      },
+      {
+        "path": "src/urllib3/poolmanager.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/poolmanager.py",
+        "jaccard": 0.9329084199932909,
+        "estimated": 0.953125
+      },
+      {
+        "path": "src/urllib3/response.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/response.py",
+        "jaccard": 0.9754787900483265,
+        "estimated": 0.96875
+      },
+      {
+        "path": "src/urllib3/util/retry.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/util/retry.py",
+        "jaccard": 0.9578860445912469,
+        "estimated": 0.9375
+      },
+      {
+        "path": "src/urllib3/util/ssl_.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/util/ssl_.py",
+        "jaccard": 0.9859665006790402,
+        "estimated": 0.9921875
+      },
+      {
+        "path": "src/urllib3/util/timeout.py",
+        "duplicate_of": "src/pip/_vendor/urllib3/util/timeout.py",
+        "jaccard": 0.9913589945011784,
+        "estimated": 0.9921875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "uuid",
+    "canonical": null,
+    "files_total": 33,
+    "files_accepted": 33,
+    "rejections": [],
+    "bytes_offered": 83696,
+    "bytes_new_unique": 83696,
+    "dup": {
+      "unique": 32,
+      "exact": 0,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE",
+        "jaccard": 0.9441860465116279,
+        "estimated": 0.9609375
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "BSD-3-Clause",
+      "confidence": 0.9792663476874003
+    }
+  },
+  {
+    "repo": "validator",
+    "canonical": null,
+    "files_total": 100,
+    "files_accepted": 100,
+    "rejections": [],
+    "bytes_offered": 2254796,
+    "bytes_new_unique": 2254796,
+    "dup": {
+      "unique": 96,
+      "exact": 0,
+      "token": 0,
+      "near": 4
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9464285714285714,
+        "estimated": 0.9375
+      },
+      {
+        "path": "translations/ko/ko.go",
+        "duplicate_of": "translations/ja/ja.go",
+        "jaccard": 0.8962008141112618,
+        "estimated": 0.890625
+      },
+      {
+        "path": "translations/zh_tw/zh_tw.go",
+        "duplicate_of": "translations/zh/zh.go",
+        "jaccard": 0.9573672400897532,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "translations/zh_tw/zh_tw_test.go",
+        "duplicate_of": "translations/zh/zh_test.go",
+        "jaccard": 0.8957088538837589,
+        "estimated": 0.9140625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "walkdir",
+    "canonical": null,
+    "files_total": 20,
+    "files_accepted": 20,
+    "rejections": [],
+    "bytes_offered": 121468,
+    "bytes_new_unique": 118985,
+    "dup": {
+      "unique": 15,
+      "exact": 5,
+      "token": 0,
+      "near": 0
+    },
+    "near_dups": [],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE-MIT",
+      "spdx": "MIT",
+      "confidence": 0.9913710450623202
+    }
+  },
+  {
+    "repo": "werkzeug",
+    "canonical": null,
+    "files_total": 254,
+    "files_accepted": 254,
+    "rejections": [],
+    "bytes_offered": 1915423,
+    "bytes_new_unique": 1908467,
+    "dup": {
+      "unique": 232,
+      "exact": 14,
+      "token": 0,
+      "near": 8
+    },
+    "near_dups": [
+      {
+        "path": ".github/workflows/publish.yaml",
+        "duplicate_of": ".github/workflows/publish.yaml",
+        "jaccard": 0.95,
+        "estimated": 0.921875
+      },
+      {
+        "path": "docs/deployment/mod_wsgi.rst",
+        "duplicate_of": "docs/deploying/mod_wsgi.rst",
+        "jaccard": 0.9784688995215312,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "docs/deployment/proxy_fix.rst",
+        "duplicate_of": "docs/deploying/proxy_fix.rst",
+        "jaccard": 0.905982905982906,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "docs/deployment/uwsgi.rst",
+        "duplicate_of": "docs/deploying/uwsgi.rst",
+        "jaccard": 0.8664021164021164,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "examples/manage-i18nurls.py",
+        "duplicate_of": "examples/manage-coolmagic.py",
+        "jaccard": 0.949238578680203,
+        "estimated": 0.9375
+      },
+      {
+        "path": "examples/shorty/templates/list.html",
+        "duplicate_of": "examples/couchy/templates/list.html",
+        "jaccard": 0.8913043478260869,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "examples/shorty/templates/new.html",
+        "duplicate_of": "examples/couchy/templates/new.html",
+        "jaccard": 0.9052631578947369,
+        "estimated": 0.890625
+      },
+      {
+        "path": "uv.lock",
+        "duplicate_of": "uv.lock",
+        "jaccard": 0.922876243274091,
+        "estimated": 0.9296875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "BSD-3-Clause",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "wheel",
+    "canonical": null,
+    "files_total": 53,
+    "files_accepted": 53,
+    "rejections": [],
+    "bytes_offered": 216109,
+    "bytes_new_unique": 216109,
+    "dup": {
+      "unique": 51,
+      "exact": 1,
+      "token": 0,
+      "near": 1
+    },
+    "near_dups": [
+      {
+        "path": "LICENSE.txt",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9298245614035088,
+        "estimated": 0.96875
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE.txt",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "yargs",
+    "canonical": null,
+    "files_total": 172,
+    "files_accepted": 172,
+    "rejections": [],
+    "bytes_offered": 1270214,
+    "bytes_new_unique": 1270189,
+    "dup": {
+      "unique": 160,
+      "exact": 1,
+      "token": 3,
+      "near": 8
+    },
+    "near_dups": [
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "duplicate_of": ".github/CODE_OF_CONDUCT.md",
+        "jaccard": 0.9601769911504425,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9034090909090909,
+        "estimated": 0.90625
+      },
+      {
+        "path": "locales/ja.json",
+        "duplicate_of": "locales/he.json",
+        "jaccard": 0.8939393939393939,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "locales/ko.json",
+        "duplicate_of": "locales/he.json",
+        "jaccard": 0.9291338582677166,
+        "estimated": 0.90625
+      },
+      {
+        "path": "locales/ru.json",
+        "duplicate_of": "locales/ko.json",
+        "jaccard": 0.9672131147540983,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "locales/th.json",
+        "duplicate_of": "locales/be.json",
+        "jaccard": 0.9196428571428571,
+        "estimated": 0.9375
+      },
+      {
+        "path": "locales/uk_UA.json",
+        "duplicate_of": "locales/ru.json",
+        "jaccard": 0.8529411764705882,
+        "estimated": 0.8359375
+      },
+      {
+        "path": "locales/zh_TW.json",
+        "duplicate_of": "locales/zh_CN.json",
+        "jaccard": 0.9,
+        "estimated": 0.8515625
+      }
+    ],
+    "spdx_tags": [],
+    "license": {
+      "file": "LICENSE",
+      "spdx": "MIT",
+      "confidence": 1.0
+    }
+  },
+  {
+    "repo": "zod",
+    "canonical": null,
+    "files_total": 664,
+    "files_accepted": 664,
+    "rejections": [],
+    "bytes_offered": 5657512,
+    "bytes_new_unique": 5657510,
+    "dup": {
+      "unique": 631,
+      "exact": 2,
+      "token": 3,
+      "near": 28
+    },
+    "near_dups": [
+      {
+        "path": "packages/bench/object-moltar.ts",
+        "duplicate_of": "packages/bench/object-moltar-jitless.ts",
+        "jaccard": 0.9592875318066157,
+        "estimated": 0.96875
+      },
+      {
+        "path": "packages/docs/public/blog/compile-speedup.svg",
+        "duplicate_of": "packages/docs/public/blog/compile-speedup-light.svg",
+        "jaccard": 0.9746666666666667,
+        "estimated": 1.0
+      },
+      {
+        "path": "packages/docs/public/blog/fail.svg",
+        "duplicate_of": "packages/docs/public/blog/fail-light.svg",
+        "jaccard": 0.8994708994708994,
+        "estimated": 0.90625
+      },
+      {
+        "path": "packages/docs/public/blog/moltar-assertLoose.svg",
+        "duplicate_of": "packages/docs/public/blog/moltar-assertLoose-light.svg",
+        "jaccard": 0.9475138121546961,
+        "estimated": 0.96875
+      },
+      {
+        "path": "packages/docs/public/blog/moltar.svg",
+        "duplicate_of": "packages/docs/public/blog/moltar-light.svg",
+        "jaccard": 0.9467787114845938,
+        "estimated": 0.96875
+      },
+      {
+        "path": "packages/docs/public/codecs/codecs-network-light.svg",
+        "duplicate_of": "packages/docs/public/codecs/codecs-network-dark.svg",
+        "jaccard": 0.9763435642363217,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "packages/docs-v3/CODE_OF_CONDUCT.md",
+        "duplicate_of": "CODE_OF_CONDUCT.md",
+        "jaccard": 0.8620236530880421,
+        "estimated": 0.890625
+      },
+      {
+        "path": "packages/docs-v3/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9453125
+      },
+      {
+        "path": "packages/docs-v3/blog/clerk-fellowship.md",
+        "duplicate_of": "packages/docs/content/blog/clerk-fellowship.mdx",
+        "jaccard": 0.9516393442622951,
+        "estimated": 0.953125
+      },
+      {
+        "path": "packages/integration/fixtures/internal-types/index.ts",
+        "duplicate_of": "packages/integration/fixtures/internal-types/cjs-test.cts",
+        "jaccard": 0.8533333333333334,
+        "estimated": 0.84375
+      },
+      {
+        "path": "packages/resolution/src/index.ts",
+        "duplicate_of": "packages/resolution/src/index.mts",
+        "jaccard": 0.9787234042553191,
+        "estimated": 0.9765625
+      },
+      {
+        "path": "packages/zod/LICENSE",
+        "duplicate_of": "LICENSE-MIT",
+        "jaccard": 0.9578313253012049,
+        "estimated": 0.9609375
+      },
+      {
+        "path": "packages/zod/src/v4/core/tests/locales/ru.test.ts",
+        "duplicate_of": "packages/zod/src/v4/core/tests/locales/be.test.ts",
+        "jaccard": 0.8522167487684729,
+        "estimated": 0.859375
+      },
+      {
+        "path": "packages/zod/src/v4/locales/el.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ar.ts",
+        "jaccard": 0.8651685393258427,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "packages/zod/src/v4/locales/fa.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ar.ts",
+        "jaccard": 0.8872832369942196,
+        "estimated": 0.890625
+      },
+      {
+        "path": "packages/zod/src/v4/locales/hi.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/bn.ts",
+        "jaccard": 0.9057142857142857,
+        "estimated": 0.921875
+      },
+      {
+        "path": "packages/zod/src/v4/locales/ka.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/fa.ts",
+        "jaccard": 0.9014492753623189,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "packages/zod/src/v4/locales/km.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ar.ts",
+        "jaccard": 0.8579545454545454,
+        "estimated": 0.875
+      },
+      {
+        "path": "packages/zod/src/v4/locales/mk.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/km.ts",
+        "jaccard": 0.8767908309455588,
+        "estimated": 0.8671875
+      },
+      {
+        "path": "packages/zod/src/v4/locales/ne.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/bn.ts",
+        "jaccard": 0.9648093841642229,
+        "estimated": 1.0
+      },
+      {
+        "path": "packages/zod/src/v4/locales/ps.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/fa.ts",
+        "jaccard": 0.9785932721712538,
+        "estimated": 0.984375
+      },
+      {
+        "path": "packages/zod/src/v4/locales/pt.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/pt-BR.ts",
+        "jaccard": 0.8601307189542484,
+        "estimated": 0.890625
+      },
+      {
+        "path": "packages/zod/src/v4/locales/ta.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ar.ts",
+        "jaccard": 0.9020172910662824,
+        "estimated": 0.9296875
+      },
+      {
+        "path": "packages/zod/src/v4/locales/tg.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ne.ts",
+        "jaccard": 0.9052924791086351,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "packages/zod/src/v4/locales/th.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/km.ts",
+        "jaccard": 0.9262536873156342,
+        "estimated": 0.890625
+      },
+      {
+        "path": "packages/zod/src/v4/locales/uk.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/ka.ts",
+        "jaccard": 0.9164265129682997,
+        "estimated": 0.8828125
+      },
+      {
+        "path": "packages/zod/src/v4/locales/zh-CN.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/km.ts",
+        "jaccard": 0.9008746355685131,
+        "estimated": 0.8984375
+      },
+      {
+        "path": "packages/zod/src/v4/locales/zh-TW.ts",
+        "duplicate_of": "packages/zod/src/v4/locales/uk.ts",
+        "jaccard": 0.9239766081871345,
+        "estimated": 0.9453125
+      }
+    ],
+    "spdx_tags": [],
+    "license": null
+  }
+]

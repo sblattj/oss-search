@@ -1,0 +1,15 @@
+running oss_eval::run_all into ~/oss-search/oss-eval/../data/e2e/eval
+code  : 29 queries over 300 docs
+        ndcg@10 = 1.0000 (bar >= 0.5)
+        mrr     = 1.0000
+        recall@50 = 1.0000
+repo  : hit_rate@10 = 1.0000
+latency: 60 queries, p50 = 1515 us (bar < 100_000), p90 = 1587 us
+wrote ~/oss-search/oss-eval/../data/e2e/eval/EVAL.md
+wrote ~/oss-search/oss-eval/../data/e2e/eval/code_eval.json
+wrote ~/oss-search/oss-eval/../data/e2e/eval/repo_eval.json
+wrote ~/oss-search/oss-eval/../data/e2e/eval/latency.json
+
+EVAL E2E PASS in 0.2s: EVAL.md + 3 JSON reports at ~/oss-search/oss-eval/../data/e2e/eval
+./target/release/examples/run_eval  0.19s user 0.01s system 38% cpu 0.524 total
+exit=0

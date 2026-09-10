@@ -1,0 +1,10 @@
+/target
+/data/corpus/work
+/data/corpus/repos
+/data/corpus/cas
+/data/corpus/index
+/data/corpus/semantic
+**/*.rs.bk
+.DS_Store
+/.fastembed_cache
+**/.fastembed_cache
