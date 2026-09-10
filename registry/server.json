@@ -9,12 +9,12 @@
     "url": "https://github.com/sblattj/oss-search",
     "source": "github",
     "id": "1364505521",
-    "subfolder": "npm/oss-mcp"
+    "subfolder": "npm/oss-search"
   },
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "oss-mcp",
+      "identifier": "oss-search",
       "version": "0.2.0",
       "registryBaseUrl": "https://registry.npmjs.org",
       "runtimeHint": "npx",
