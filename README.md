@@ -21,15 +21,15 @@ Not recreating the wheel is a superpower. `oss-search` answers two questions for
 
 Two front doors: `oss-mcp` (MCP server) and `oss-cli` (CLI twin). Three ways to get them:
 
-**1. npm** — an `oss-mcp` shim that downloads the platform-matched prebuilt
+**1. npm** — an `oss-search` shim that downloads the platform-matched prebuilt
 binary on first run and caches it under `~/.cache/oss-search/bin/` (override
 with `OSS_SEARCH_CACHE_DIR`):
 
 ```sh
-npx -y oss-mcp --version
+npx -y oss-search --version
 ```
 
-> **Status (pre-publish):** the `oss-mcp` npm package and its matching GitHub
+> **Status (pre-publish):** the `oss-search` npm package and its matching GitHub
 > release (v0.2.0) are being published now. Until they land, `npx` will fail
 > with a 404 on the release asset — use option 2 or 3 below.
 
@@ -107,7 +107,7 @@ npx form (no absolute path needed):
   "mcpServers": {
     "oss-search": {
       "command": "npx",
-      "args": ["-y", "oss-mcp", "--live"],
+      "args": ["-y", "oss-search", "--live"],
       "env": { "GITHUB_TOKEN": "ghp_..." }
     }
   }

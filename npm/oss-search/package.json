@@ -1,5 +1,5 @@
 {
-  "name": "oss-mcp",
+  "name": "oss-search",
   "version": "0.2.0",
   "description": "MCP server for oss-search: fast local + federated OSS code search and repo discovery. Downloads the platform binary on first run.",
   "type": "module",
@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sblattj/oss-search.git",
-    "directory": "npm/oss-mcp"
+    "directory": "npm/oss-search"
   },
   "homepage": "https://github.com/sblattj/oss-search#readme",
   "bugs": "https://github.com/sblattj/oss-search/issues",

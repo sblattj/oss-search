@@ -13,14 +13,14 @@ This package contains no compiled code and has **zero runtime dependencies**. On
 ## Run once
 
 ```sh
-npx oss-mcp            # speaks MCP over stdio
-npx oss-mcp --live     # enable remote backends (GitHub code search, grep.app, deps.dev, ...)
+npx oss-search            # speaks MCP over stdio
+npx oss-search --live     # enable remote backends (GitHub code search, grep.app, deps.dev, ...)
 ```
 
 ## Install globally
 
 ```sh
-npm install -g oss-mcp
+npm install -g oss-search
 oss-mcp
 ```
 
