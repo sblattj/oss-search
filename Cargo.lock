@@ -2101,8 +2101,15 @@ version = "0.2.0"
 dependencies = [
  "clap",
  "oss-core",
+ "oss-corpus",
+ "oss-index",
  "oss-live",
+ "oss-semantic",
+ "serde",
  "serde_json",
+ "tempfile",
+ "tokio",
+ "walkdir",
 ]
 
 [[package]]
@@ -2172,9 +2179,12 @@ version = "0.2.0"
 dependencies = [
  "oss-core",
  "oss-facade",
+ "oss-index",
  "oss-query",
  "oss-rank",
+ "regex",
  "serde_json",
+ "tempfile",
  "tokio",
  "wiremock",
 ]
@@ -2184,9 +2194,11 @@ name = "oss-mcp"
 version = "0.2.0"
 dependencies = [
  "oss-core",
+ "oss-index",
  "oss-live",
  "rmcp",
  "serde_json",
+ "tempfile",
  "tokio",
 ]
 

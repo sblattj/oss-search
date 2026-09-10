@@ -12,8 +12,14 @@ use serde_json::{json, Value};
 const FIXTURE_REPO: &str = "helix/edge-sdk";
 const FIXTURE_PATH: &str = "packages/core/src/vendor/escape-lab.md";
 
+/// Pin OSS_SEARCH_HOME to a directory that never contains an index so
+/// these sessions deterministically exercise the stub engine regardless
+/// of any real hot-set built under ~/.cache/oss-search.
+const NO_HOTSET_HOME: &str = concat!(env!("CARGO_TARGET_TMPDIR"), "/oss-mcp-sec-no-hotset");
+
 fn session_raw(requests: &[Value]) -> String {
     let mut child = Command::new(env!("CARGO_BIN_EXE_oss-mcp"))
+        .env("OSS_SEARCH_HOME", NO_HOTSET_HOME)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())

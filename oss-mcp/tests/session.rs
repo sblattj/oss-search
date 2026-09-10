@@ -5,8 +5,14 @@ use serde_json::{json, Value};
 
 const CAP: usize = 25_000;
 
+/// Pin OSS_SEARCH_HOME to a directory that never contains an index so the
+/// golden sessions deterministically exercise the stub engine regardless
+/// of any real hot-set built under ~/.cache/oss-search.
+const NO_HOTSET_HOME: &str = concat!(env!("CARGO_TARGET_TMPDIR"), "/oss-mcp-golden-no-hotset");
+
 fn session(requests: &[Value]) -> Vec<Value> {
     let mut child = Command::new(env!("CARGO_BIN_EXE_oss-mcp"))
+        .env("OSS_SEARCH_HOME", NO_HOTSET_HOME)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())

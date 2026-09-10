@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use oss_core::{SearchEngine, StubEngine};
+use oss_live::hotset::{HotsetEngine, MergedEngine};
+use oss_live::LiveEngine;
 use oss_mcp::version::VERSION;
+use oss_mcp::{choose_engine, parse_engine_flag, EngineChoice};
 use rmcp::handler::server::ServerHandler;
 use rmcp::model::{
     CallToolRequestParams, CallToolResponse, ContentBlock, ListToolsResult, PaginatedRequestParams,
@@ -90,17 +93,68 @@ const USAGE: &str = "\
 oss-mcp — OSS search MCP server for agents
 
 USAGE:
-    oss-mcp [--live]
+    oss-mcp [--live] [--engine stub|live|hotset]
 
 OPTIONS:
-        --live      Use the live engine (real backends: GitHub code search, grep.app,
-                    npms.io, ecosyste.ms, deps.dev). Default is the offline stub engine.
+        --live      Federate with real backends (GitHub code search, grep.app,
+                    npms.io, ecosyste.ms, deps.dev).
+        --engine E  Force an engine: stub (offline fixtures), live (remote
+                    backends only), or hotset (local index only; exits if no
+                    index is built).
     -h, --help      Print this help and exit (never starts the stdio server)
     -V, --version   Print version and exit
+
+ENGINE SELECTION
+    An explicit --engine value wins. Without one, oss-mcp auto-detects a
+    built hot-set at <OSS_SEARCH_HOME ?? ~/.cache/oss-search>/index: when
+    it exists and loads, local results are served first (backend
+    local_index), merged with the remote backends when --live is also
+    passed; otherwise the offline stub engine serves, and --live alone
+    serves the live engine. Build the hot-set with `oss-cli hotset build`.
 
 With no arguments, oss-mcp serves MCP over stdio; run it from your agent host
 and it exits when stdin closes. Set GITHUB_TOKEN in the environment for --live
 GitHub code search.";
+
+/// Parse the argument vector (argv[1..]) into (live, engine).
+fn parse_args(args: &[String]) -> Result<(bool, Option<String>), String> {
+    let mut live = false;
+    let mut engine: Option<String> = None;
+    let mut i = 0usize;
+    while i < args.len() {
+        let arg = args[i].as_str();
+        match arg {
+            "--live" => live = true,
+            "--engine" => {
+                let value = args.get(i + 1).ok_or_else(|| {
+                    "--engine requires a value (stub, live, or hotset)".to_string()
+                })?;
+                parse_engine_flag(value)?;
+                engine = Some(value.clone());
+                i += 1;
+            }
+            _ if arg.starts_with("--engine=") => {
+                let value = &arg["--engine=".len()..];
+                parse_engine_flag(value)?;
+                engine = Some(value.to_string());
+            }
+            other => {
+                return Err(format!("unrecognized argument '{other}'"));
+            }
+        }
+        i += 1;
+    }
+    Ok((live, engine))
+}
+
+fn live_engine() -> LiveEngine {
+    if std::env::var("GITHUB_TOKEN").map_or(true, |t| t.is_empty()) {
+        eprintln!(
+            "warning: GITHUB_TOKEN is not set; GitHub code search requires auth and will answer 401 (unauthenticated contents/tree budget is 60/hr)"
+        );
+    }
+    LiveEngine::new()
+}
 
 fn main() {
     // Invocation guard: resolve --help/--version and reject unknown arguments
@@ -115,23 +169,68 @@ fn main() {
         println!("oss-mcp {}", env!("CARGO_PKG_VERSION"));
         return;
     }
-    if let Some(bad) = args.iter().find(|a| a.as_str() != "--live") {
-        eprintln!("oss-mcp: unrecognized argument '{bad}'\n\n{USAGE}");
-        std::process::exit(2);
-    }
-    let live = args.iter().any(|a| a == "--live");
-    let handler = if live {
-        if std::env::var("GITHUB_TOKEN").map_or(true, |t| t.is_empty()) {
-            eprintln!(
-                "warning: GITHUB_TOKEN is not set; GitHub code search requires auth and will answer 401 (unauthenticated contents/tree budget is 60/hr)"
-            );
+    let (live, engine_flag) = match parse_args(&args) {
+        Ok(parsed) => parsed,
+        Err(problem) => {
+            eprintln!("oss-mcp: {problem}\n\n{USAGE}");
+            std::process::exit(2);
         }
-        OssServer {
-            engine: Arc::new(oss_live::LiveEngine::new()),
+    };
+
+    // Hot-set auto-detection (only after the invocation guards): attempt a
+    // load only when the index directory exists, and fall back with a
+    // warning when a present index fails to load.
+    let hotset_dir = oss_live::hotset::default_index_dir();
+    let hotset = if hotset_dir.exists() {
+        match HotsetEngine::open(&hotset_dir) {
+            Ok(h) => Some(h),
+            Err(e) => {
+                eprintln!(
+                    "oss-mcp: warning: hot-set at {} failed to load ({e}); serving without it",
+                    hotset_dir.display()
+                );
+                None
+            }
         }
     } else {
-        OssServer {
+        None
+    };
+
+    let choice = match choose_engine(live, engine_flag.as_deref(), hotset.is_some()) {
+        Ok(c) => c,
+        Err(problem) => {
+            eprintln!("oss-mcp: {problem}\n\n{USAGE}");
+            std::process::exit(2);
+        }
+    };
+    let handler = match choice {
+        EngineChoice::Stub => OssServer {
             engine: Arc::new(StubEngine::new()),
+        },
+        EngineChoice::Live => OssServer {
+            engine: Arc::new(live_engine()),
+        },
+        EngineChoice::Hotset => {
+            let hotset = hotset.expect("choice Hotset implies hotset loaded");
+            eprintln!(
+                "oss-mcp: engine: hotset ({} docs from {})",
+                hotset.doc_count(),
+                hotset.index_dir().display()
+            );
+            OssServer {
+                engine: Arc::new(hotset),
+            }
+        }
+        EngineChoice::Merged => {
+            let hotset = hotset.expect("choice Merged implies hotset loaded");
+            eprintln!(
+                "oss-mcp: engine: hotset+live ({} docs from {})",
+                hotset.doc_count(),
+                hotset.index_dir().display()
+            );
+            OssServer {
+                engine: Arc::new(MergedEngine::new(hotset, live_engine())),
+            }
         }
     };
     let runtime = tokio::runtime::Builder::new_current_thread()
