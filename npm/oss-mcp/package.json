@@ -1,0 +1,36 @@
+{
+  "name": "oss-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for oss-search: fast local + federated OSS code search and repo discovery. Downloads the platform binary on first run.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sblattj/oss-search.git",
+    "directory": "npm/oss-mcp"
+  },
+  "homepage": "https://github.com/sblattj/oss-search#readme",
+  "bugs": "https://github.com/sblattj/oss-search/issues",
+  "bin": {
+    "oss-mcp": "bin/oss-mcp.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "oss-search",
+    "code-search",
+    "cli"
+  ]
+}

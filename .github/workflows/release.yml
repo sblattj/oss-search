@@ -1,0 +1,115 @@
+# Cross-compiled release builds for oss-mcp + oss-cli.
+#
+# Trigger: push a tag `v*` (e.g. v0.2.0) -> builds, uploads artifacts, and
+# attaches assets to the GitHub Release named after the tag.
+# Trigger: workflow_dispatch -> dry-run build; artifacts only, no Release
+# (pass the `version` input, or leave empty to use the workspace version).
+#
+# Build decisions:
+# - Only the two shipped binaries are built (-p oss-mcp -p oss-cli). Their
+#   dependency graph is pure Rust (serde/clap/tokio/rmcp/reqwest+rustls);
+#   fastembed, tree-sitter, and rusqlite live in oss-semantic, which these
+#   binaries do not depend on, so release builds have NO fastembed and need
+#   no C compiler.
+# - reqwest uses rustls (no OpenSSL), so Linux targets need no pkg-config/libssl.
+# - Linux aarch64 builds natively on the ubuntu-24.04-arm runner (no cross or
+#   cargo-zigbuild needed). macOS x86_64 is a supported arm64->x86_64
+#   cross-compile on the macos-latest (arm64) runner via the Apple SDK.
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version for asset naming (default: [workspace.package] version from Cargo.toml)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            runs-on: macos-latest
+          - target: aarch64-apple-darwin
+            runs-on: macos-latest
+          - target: x86_64-unknown-linux-gnu
+            runs-on: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Resolve version
+        id: ver
+        env:
+          DISPATCH_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${DISPATCH_VERSION}" ]]; then
+            version="${DISPATCH_VERSION}"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            # fall back to the workspace version ([workspace.package] in the root manifest)
+            version="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n1)"
+          fi
+          if [[ -z "${version}" ]]; then
+            echo "::error::could not resolve version (set the workflow_dispatch 'version' input or fix the workspace manifest)" >&2
+            exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build (locked)
+        run: cargo build --release --locked --target ${{ matrix.target }} -p oss-mcp -p oss-cli
+
+      - name: Package
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          name="oss-search-${VERSION}-${TARGET}"
+          mkdir "${name}"
+          cp "target/${TARGET}/release/oss-mcp" "target/${TARGET}/release/oss-cli" "${name}/"
+          tar czf "${name}.tar.gz" "${name}"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256"
+          else
+            shasum -a 256 "${name}.tar.gz" > "${name}.tar.gz.sha256"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: oss-search-${{ steps.ver.outputs.version }}-${{ matrix.target }}
+          path: oss-search-*.tar.gz*
+          if-no-files-found: error
+
+      - name: Attach to GitHub Release
+        if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
+        with:
+          files: |
+            oss-search-*.tar.gz
+            oss-search-*.tar.gz.sha256

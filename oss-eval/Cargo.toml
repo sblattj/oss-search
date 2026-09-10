@@ -1,6 +1,8 @@
 [package]
 name = "oss-eval"
-version = "0.1.0"
+version.workspace = true
+license.workspace = true
+repository.workspace = true
 edition = "2024"
 
 [dependencies]

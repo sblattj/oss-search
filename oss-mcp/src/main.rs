@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use oss_core::{SearchEngine, StubEngine};
+use oss_mcp::version::VERSION;
 use rmcp::handler::server::ServerHandler;
 use rmcp::model::{
     CallToolRequestParams, CallToolResponse, ContentBlock, ListToolsResult, PaginatedRequestParams,
     ServerCapabilities, ServerInfo, TextContent, Tool,
 };
-use rmcp::service::{RequestContext, RoleServer};
+use rmcp::service::{QuitReason, RequestContext, RoleServer};
 use rmcp::transport::io::stdio;
 use rmcp::ServiceExt;
 use serde_json::Value;
@@ -19,10 +20,7 @@ struct OssServer {
 impl ServerHandler for OssServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
-            .with_server_info(rmcp::model::Implementation::new(
-                "oss-mcp",
-                env!("CARGO_PKG_VERSION"),
-            ))
+            .with_server_info(rmcp::model::Implementation::new("oss-mcp", VERSION))
             .with_instructions(
                 "OSS search for agents: discover repos, vet by code idioms, drill into files and docs. Call oss_guide once when unsure which tool to use.",
             )
@@ -88,8 +86,40 @@ fn schema_to_map(v: Value) -> serde_json::Map<String, Value> {
     }
 }
 
+const USAGE: &str = "\
+oss-mcp — OSS search MCP server for agents
+
+USAGE:
+    oss-mcp [--live]
+
+OPTIONS:
+        --live      Use the live engine (real backends: GitHub code search, grep.app,
+                    npms.io, ecosyste.ms, deps.dev). Default is the offline stub engine.
+    -h, --help      Print this help and exit (never starts the stdio server)
+    -V, --version   Print version and exit
+
+With no arguments, oss-mcp serves MCP over stdio; run it from your agent host
+and it exits when stdin closes. Set GITHUB_TOKEN in the environment for --live
+GitHub code search.";
+
 fn main() {
-    let live = std::env::args().any(|a| a == "--live");
+    // Invocation guard: resolve --help/--version and reject unknown arguments
+    // BEFORE any environment read or engine construction, so inspection and
+    // typo'd invocations can never start (or block on) the stdio server.
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.iter().any(|a| a == "-h" || a == "--help") {
+        println!("{USAGE}");
+        return;
+    }
+    if args.iter().any(|a| a == "-V" || a == "--version") {
+        println!("oss-mcp {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+    if let Some(bad) = args.iter().find(|a| a.as_str() != "--live") {
+        eprintln!("oss-mcp: unrecognized argument '{bad}'\n\n{USAGE}");
+        std::process::exit(2);
+    }
+    let live = args.iter().any(|a| a == "--live");
     let handler = if live {
         if std::env::var("GITHUB_TOKEN").map_or(true, |t| t.is_empty()) {
             eprintln!(
@@ -110,7 +140,21 @@ fn main() {
         .expect("tokio runtime");
     runtime.block_on(async move {
         let transport = stdio();
-        let server = handler.serve(transport).await.expect("stdio server");
-        server.waiting().await.expect("server run");
+        let server = match handler.serve(transport).await {
+            Ok(server) => server,
+            Err(e) => {
+                eprintln!("oss-mcp: stdio server failed to start: {e}");
+                std::process::exit(1);
+            }
+        };
+        let code = match server.waiting().await {
+            Ok(QuitReason::Closed) | Ok(QuitReason::Cancelled) => 0,
+            Ok(QuitReason::JoinError(e)) | Err(e) => {
+                eprintln!("oss-mcp: server stopped abnormally: {e}");
+                1
+            }
+            _ => 0,
+        };
+        std::process::exit(code);
     });
 }
