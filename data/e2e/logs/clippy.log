@@ -1,0 +1,14 @@
+    Checking oss-rank v0.1.0 (~/oss-search/oss-rank)
+    Checking oss-core v0.1.0 (~/oss-search/oss-core)
+    Checking oss-query v0.1.0 (~/oss-search/oss-query)
+    Checking oss-index v0.1.0 (~/oss-search/oss-index)
+    Checking oss-corpus v0.1.0 (~/oss-search/oss-corpus)
+    Checking oss-semantic v0.1.0 (~/oss-search/oss-semantic)
+    Checking oss-facade v0.1.0 (~/oss-search/oss-facade)
+    Checking oss-eval v0.1.0 (~/oss-search/oss-eval)
+    Checking oss-live v0.1.0 (~/oss-search/oss-live)
+    Checking oss-cli v0.1.0 (~/oss-search/oss-cli)
+    Checking oss-mcp v0.1.0 (~/oss-search/oss-mcp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.28s
+cargo clippy --workspace --all-targets -- -D warnings 2>&1  8.02s user 3.52s system 493% cpu 2.335 total
+exit=0

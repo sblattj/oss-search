@@ -1,0 +1,567 @@
+   Compiling oss-index v0.1.0 (~/oss-search/oss-index)
+   Compiling oss-eval v0.1.0 (~/oss-search/oss-eval)
+   Compiling oss-mcp v0.1.0 (~/oss-search/oss-mcp)
+   Compiling oss-cli v0.1.0 (~/oss-search/oss-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s
+     Running unittests src/main.rs (target/debug/deps/oss_cli-6c8f3a526c343469)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (target/debug/deps/cli-f44555fc1cf97297)
+
+running 10 tests
+test cli_error_is_typed_json_on_stderr ... ok
+test fetch_file_snapshot_matches_dispatch ... ok
+test repo_tree_snapshot_matches_dispatch ... ok
+test search_repos_snapshot_matches_dispatch ... ok
+test repo_profile_snapshot_matches_dispatch ... ok
+test fetch_docs_snapshot_matches_dispatch ... ok
+test search_code_snippets_snapshot_matches_dispatch ... ok
+test search_code_snapshot_matches_dispatch ... ok
+test guide_snapshot_matches_dispatch ... ok
+test cli_parity_with_mcp_all_seven_tools ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.15s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_core-db4bff628543b9fd)
+
+running 26 tests
+test dispatch::tests::guide_rejects_any_arguments ... ok
+test dispatch::tests::unknown_tool_lists_known_tools ... ok
+test envelope::tests::small_envelope_untouched ... ok
+test dispatch::tests::not_found_gives_actionable_correction ... ok
+test dispatch::tests::unknown_param_echoes_input_and_known_fields ... ok
+test dispatch::tests::missing_required_field_names_correction ... ok
+test shaping::tests::concise_drops_heavy_fields ... ok
+test shaping::tests::context_lines_clamped_to_range ... ok
+test dispatch::tests::sanitized_fixture_flows_through_with_warning ... ok
+test shaping::tests::caps_long_lines_on_char_boundaries ... ok
+test shaping::tests::detailed_keeps_everything ... ok
+test shaping::tests::escapes_bidi_overrides_with_marker ... ok
+test shaping::tests::escapes_isolates_and_c1 ... ok
+test dispatch::tests::guide_returns_playbook_envelope ... ok
+test dispatch::tests::search_repos_default_call_under_budget ... ok
+test shaping::tests::sanitize_value_walks_nested_rows ... ok
+test schema::tests::schemas_declare_additional_properties_false ... ok
+test schema::tests::seven_tools_in_deterministic_order ... ok
+test shaping::tests::snippet_locator_and_bounds ... ok
+test shaping::tests::strips_ansi_escapes_keeps_newline_tab ... ok
+test schema::tests::required_fields_declared ... ok
+test schema::tests::schema_properties_match_param_struct_fields ... ok
+test dispatch::tests::envelope_shape_on_every_tool ... ok
+test envelope::tests::single_oversized_result_fits_with_zero_results ... ok
+test envelope::tests::keeps_max_results_that_fit ... ok
+test envelope::tests::never_exceeds_cap_random_payloads ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+     Running tests/security.rs (target/debug/deps/security-71bfa532179e8866)
+
+running 6 tests
+test fetch_file_content_flows_through_shared_escaper ... ok
+test escaper_fixture_no_raw_control_or_bidi_in_tool_output ... ok
+test redos_patterns_bounded_through_escaper ... ok
+test long_line_capped_with_marker_and_warning ... ok
+test error_echo_path_sanitized ... ok
+test escaper_bounded_on_control_sequence_flood ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_corpus-a74b8743a3f636cf)
+
+running 26 tests
+test admission::tests::entropy_of_known_inputs ... ok
+test admission::tests::accepts_plain_source ... ok
+test admission::tests::rejects_nul_binary ... ok
+test admission::tests::rejects_oversized ... ok
+test cas::tests::hash_hex_roundtrip ... ok
+test clone::tests::safe_paths ... ok
+test clone::tests::repo_name_extraction ... ok
+test dedup::tests::token_hash_stable_across_whitespace ... ok
+test dedup::tests::token_and_exact_tiers ... ok
+test dedup::tests::tokenize_normalizes ... ok
+test license::tests::copyright_only_file_is_no_license ... ok
+test license::tests::license_file_name_priority ... ok
+test license::tests::spdx_tag_scan ... ok
+test admission::tests::rejects_high_entropy_without_nul ... ok
+test dedup::tests::minhash_estimates_jaccard ... ok
+test dedup::tests::dissimilar_files_not_flagged ... ok
+test license::tests::exact_mit_with_owner_substituted ... ok
+test license::tests::exact_gpl2_and_apache ... ok
+test dedup::tests::near_dup_pair_flagged_and_verified ... ok
+test cas::tests::missing_blob_errors ... ok
+test license::tests::fuzzy_mit_with_edited_wording ... ok
+test license::tests::fuzzy_bsd3_with_appended_clause ... ok
+test cas::tests::put_get_dedup_roundtrip ... ok
+test cas::tests::seal_starts_new_pack ... ok
+test cas::tests::rotation_by_size ... ok
+test license::tests::gpl2_with_modified_preamble_still_family_detected ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/corpus.rs (target/debug/deps/corpus-127797666cab8f4c)
+
+running 9 tests
+test admission_gates_reject_oversized_and_binary_with_named_reasons ... ok
+test fork_map_stored_as_metadata ... ok
+test spdx_tags_recorded_per_file ... ok
+test token_tier_collapses_whitespace_variants ... ok
+test ingest_worktree_walks_nested_tree_in_sorted_order ... ok
+test minhash_flags_near_duplicate_pair_and_exact_verifies ... ok
+test two_repos_sharing_vendored_file_dedup_to_one_blob ... ok
+test clone_materializes_and_update_path_logs_decisions ... ok
+test parallel_clone_eight_way ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+     Running tests/nettest.rs (target/debug/deps/nettest-d0a1bc6bf624045e)
+
+running 1 test
+test clones_two_tiny_real_repos_end_to_end ... ignored, requires network access to github.com
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/security.rs (target/debug/deps/security-717e06da57233be7)
+
+running 5 tests
+test gate_precedence_size_before_nul_before_entropy ... ok
+test nul_containing_binary_rejected_with_offset ... ok
+test two_mb_file_rejected_as_too_large ... ok
+test ten_k_nul_free_emoji_behavior_deliberate ... ok
+test high_entropy_random_file_rejection_is_intended ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_eval-d3443c4b06c18bd2)
+
+running 30 tests
+test latency::tests::percentile_nearest_rank_hand_computed ... ok
+test metrics::tests::mrr_hand_computed ... ok
+test golden::tests::golden_set_shape ... ok
+test metrics::tests::dcg_hand_computed ... ok
+test metrics::tests::ndcg_k_beyond_length_clamps ... ok
+test metrics::tests::ndcg_degenerate_inputs ... ok
+test metrics::tests::ndcg_hand_computed_classic_permutation ... ok
+test metrics::tests::ndcg_perfect_ordering_is_one ... ok
+test metrics::tests::ndcg_relevant_demoted_to_rank_two ... ok
+test repo_eval::tests::ground_truth_covers_at_least_five_topics ... ok
+test report::tests::md_table_renders_header_separator_and_rows ... ok
+test metrics::tests::recall_hand_computed ... ok
+test repo_eval::tests::decoys_rank_below_every_ground_truth_repo ... ok
+test repo_eval::tests::ranker_hits_every_topic_in_top_10 ... ok
+test golden::tests::qrels_reference_existing_docs ... ok
+test golden::tests::corpus_has_exactly_300_docs ... ok
+test golden::tests::corpus_files_are_utf8_and_small ... ok
+test golden::tests::corpus_paths_are_unique ... ok
+test golden::tests::every_literal_query_matches_its_judged_docs ... ok
+test golden::tests::corpus_is_deterministic ... ok
+test golden::tests::needle_spot_checks ... ok
+test golden::tests::filler_never_contains_a_query_needle ... ok
+test code_eval::tests::regex_query_returns_judged_docs ... ok
+test code_eval::tests::golden_eval_meets_the_ndcg_bar ... ok
+test code_eval::tests::identifier_query_puts_canonical_doc_first ... ok
+test code_eval::tests::metrics_are_finite ... ok
+test latency::tests::percentiles_are_monotonic ... ok
+test latency::tests::runs_at_least_fifty_queries_over_expanded_corpus ... ok
+test tests::run_all_writes_reports_meeting_quality_bars ... ok
+test tests::run_all_code_metrics_are_deterministic ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.19s
+
+     Running tests/eval_integration.rs (target/debug/deps/eval_integration-12a9f4fc3acc190d)
+
+running 1 test
+test full_eval_harness_end_to_end ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.06s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_facade-f58ff790d48348d2)
+
+running 49 tests
+test deps_dev::tests::maps_languages_to_systems ... ok
+test deps_dev::tests::parses_system_qualified_queries ... ok
+test github::tests::builds_legacy_syntax_query ... ok
+test github::tests::empty_query_is_rejected ... ok
+test ecosystems::tests::lookup_404_is_none ... ok
+test deps_dev::tests::search_code_unknown_package_is_ok_with_zero_hits ... ok
+test ecosystems::tests::repository_lookup_parses ... ok
+test ecosystems::tests::lookup_parses_live_repo_metadata_shape ... ok
+test ecosystems::tests::rate_limit_is_unavailable_with_warning ... ok
+test ecosystems::tests::package_metadata_parses_live_shape ... ok
+test deps_dev::tests::retries_5xx_then_succeeds ... ok
+test ecosystems::tests::search_code_routes_slash_queries_to_repos ... ok
+test ecosystems::tests::unknown_repo_is_ok_zero_hits ... ok
+test github::tests::exhausted_quota_403_is_unavailable ... ok
+test ecosystems::tests::search_code_routes_bare_names_to_npm_packages ... ok
+test github::tests::regex_requests_warn_and_literals_survive ... ok
+test github::tests::noassertion_license_becomes_none ... ok
+test github::tests::parses_hits_with_text_matches_and_license ... ok
+test github::tests::caps_and_partial_results_surface_as_warnings ... ok
+test deps_dev::tests::version_details_and_advisories_parse ... ok
+test github::tests::missing_token_surfaces_warning ... ok
+test deps_dev::tests::package_metadata_parses_and_tolerates_both_shapes ... ok
+test grep_app::tests::cleans_snippet_markup ... ok
+test grep_app::tests::parses_github_blob_urls ... ok
+test grep_app::tests::parses_line_numbers ... ok
+test grep_app::tests::parses_mcp_text_into_hits ... ok
+test github::tests::rate_limit_response_is_unavailable_not_empty_results ... ok
+test npms::tests::computes_days_old ... ok
+test github::tests::retries_5xx_then_succeeds ... ok
+test github::tests::validation_failure_is_an_error ... ok
+test github_content::tests::contents_decodes_base64_with_embedded_newlines ... ok
+test github_content::tests::ref_is_passed_as_query_param ... ok
+test github_content::tests::tree_404_is_none ... ok
+test github_content::tests::too_large_403_names_the_raw_fallback ... ok
+test github_content::tests::tree_parses_entries_and_truncation ... ok
+test grep_app::tests::legacy_429_is_unavailable_not_empty ... ok
+test github_content::tests::contents_404_is_none_and_401_is_typed_error ... ok
+test grep_app::tests::legacy_html_challenge_is_unavailable ... ok
+test grep_app::tests::legacy_parses_hits_and_totals ... ok
+test npms::tests::rate_limit_is_unavailable_not_empty_results ... ok
+test npms::tests::clamps_and_warns_on_caps ... ok
+test rate::tests::spaces_permits_evenly ... ok
+test npms::tests::package_scores_flags_stale_analysis ... ok
+test npms::tests::search_parses_results_and_totals ... ok
+test grep_app::tests::mcp_tool_error_is_degraded ... ok
+test grep_app::tests::mcp_initializes_then_searches ... ok
+test rate::tests::ten_per_minute_allows_exactly_ten_in_first_window ... ok
+test github::tests::hard_limiter_allows_at_most_10_requests_per_minute ... ok
+test github::tests::persistent_5xx_is_unavailable ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_index-c5fae2af547dbbe8)
+
+running 32 tests
+test tests::binary_rejected_by_admission ... ok
+test tests::literal_case_sensitive_misses ... ok
+test tests::case_sensitive_match_beyond_display_truncation_does_not_panic ... ok
+test tests::empty_index_errors_on_unindexable_but_ok_on_literal ... ok
+test tests::posting_roundtrip ... ok
+test tests::filter_by_repo ... ok
+test tests::crlf_handled ... ok
+test tests::filter_by_lang ... ok
+test tests::oversized_rejected_by_admission ... ok
+test tests::oversized_not_indexed ... ok
+test tests::filter_exclude_repo ... ok
+test tests::regex_without_literal_is_not_indexable ... ok
+test tests::trigram_short_input ... ok
+test tests::literal_case_insensitive_default ... ok
+test tests::trigram_extraction ... ok
+test tests::filter_path_contains_and_excludes ... ok
+test tests::literal_search_finds_match ... ok
+test tests::no_truncation_flag_when_under_cap ... ok
+test tests::ranking_filename_match_boosted ... ok
+test tests::regex_search_with_literal_anchor ... ok
+test tests::ranking_whole_word_beats_partial ... ok
+test tests::remove_repo_clears_everything ... ok
+test tests::score_components_inspectable ... ok
+test tests::unicode_content_searchable ... ok
+test tests::ranking_test_path_penalized ... ok
+test tests::truncation_signaled ... ok
+test tests::update_doc_replaces_content ... ok
+test tests::save_load_roundtrip ... ok
+test tests::update_touches_only_changed_doc ... ok
+test tests::index_matches_brute_force_regex ... ok
+test tests::literal_property_against_brute_force ... ok
+test tests::literal_query_latency_p50_under_100ms_on_10k_files ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.42s
+
+     Running tests/hotset.rs (target/debug/deps/hotset-e3bf1dc488034007)
+
+running 1 test
+test real_corpus_update_doc_reindexes_exactly_one_file ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.48s
+
+     Running tests/security.rs (target/debug/deps/security-3881dc678d152943)
+
+running 12 tests
+test nul_binary_rejected_reason_names_binary ... ok
+test oversized_boundary_exact ... ok
+test two_mb_file_rejected_reason_names_size ... ok
+test ten_k_emoji_admitted_deliberately ... ok
+test redos_classic_alternation_bounded ... ok
+test redos_nested_quantifier_nonmatch_bounded ... ok
+test redos_nested_quantifier_bounded ... ok
+test redos_classic_alternation_indexable_variant_bounded ... ok
+test redos_nested_quantifier_indexable_variant_bounded ... ok
+test redos_alternation_bomb_10kb_indexable_variant_bounded ... ok
+test redos_alternation_bomb_10kb_bounded ... ok
+test redos_patterns_rejected_or_bounded_not_panicking ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_live-e4a9ea0e1581a13d)
+
+running 5 tests
+test util::tests::days_since_known_offset ... ok
+test util::tests::days_since_today_is_zero ... ok
+test util::tests::split_repo_and_probes ... ok
+test util::tests::license_classes ... ok
+test util::tests::owner_name_from_url_variants ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/live_engine.rs (target/debug/deps/live_engine-8f6d470b7f7e9127)
+
+running 18 tests
+test stub_stays_default_and_live_is_separate ... ok
+test guide_is_static_and_describes_grammar ... ok
+test search_code_regex_probe_error_propagates_typed ... ok
+test repo_profile_unknown_repo_is_not_found ... ok
+test search_repos_npms_down_is_partial_not_negative ... ok
+test repo_tree_filters_prefix_glob_and_pages ... ok
+test search_code_snippets_mode_rows ... ok
+test token_absence_is_reported_not_fatal ... ok
+test repo_tree_truncated_tree_is_partial_degraded ... ok
+test search_code_dedupes_and_attributes_both_backends ... ok
+test search_code_merges_two_backends_one_unavailable ... ok
+test fetch_file_ranges_lines_and_missing_file_is_not_found ... ok
+test search_code_two_probes_widen_probe_breadth ... ok
+test repo_profile_merges_ecosystems_and_deps_dev ... ok
+test repo_profile_deps_dev_absent_is_ok_not_degraded ... ok
+test fetch_docs_searches_readme_with_breadcrumbs ... ok
+test search_repos_ranks_with_per_signal_contributions ... ok
+test fetch_docs_never_fakes_content_when_unavailable ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+     Running unittests src/main.rs (target/debug/deps/oss_mcp-969fe2d9cdf45ad8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/security.rs (target/debug/deps/security-93e34f8665d43f2a)
+
+running 2 tests
+test hostile_error_echo_is_sanitized_on_the_wire ... ok
+test raw_response_bytes_carry_no_control_or_bidi_characters ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/session.rs (target/debug/deps/session-ca22de87e5c484b8)
+
+running 5 tests
+test sanitized_fixture_visible_through_mcp ... ok
+test unknown_tool_is_typed_error ... ok
+test snippets_mode_uses_line_locators ... ok
+test unknown_param_is_typed_error_echoing_input ... ok
+test golden_session_all_seven_tools ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_query-dd43ad1f9c24c242)
+
+running 34 tests
+test tests::json_bad_json ... ok
+test tests::error_display_echoes_input ... ok
+test tests::json_roundtrip ... ok
+test tests::parse_invalid_type_value ... ok
+test tests::parse_invalid_scope_value ... ok
+test tests::parse_text_case_and_scope ... ok
+test tests::parse_invalid_case_value ... ok
+test tests::json_unknown_field ... ok
+test tests::parse_invalid_in_value ... ok
+test tests::parse_text_basic ... ok
+test tests::parse_unknown_key_is_typed_error ... ok
+test tests::parse_text_negations ... ok
+test tests::plan_both_scope_all_backends ... ok
+test tests::plan_hotset_only_local ... ok
+test tests::plan_remote_excludes_local ... ok
+test tests::plan_symbol_filter_warns_on_grepapp ... ok
+test tests::roundtrip_bare_pattern ... ok
+test tests::roundtrip_all_filters ... ok
+test tests::roundtrip_case_modes ... ok
+test tests::roundtrip_each_scope ... ok
+test tests::roundtrip_excludes_only ... ok
+test tests::roundtrip_multi_value_commas ... ok
+test tests::roundtrip_multi_word_pattern ... ok
+test tests::roundtrip_regex_kind ... ok
+test tests::roundtrip_repo_scope ... ok
+test tests::roundtrip_symbols ... ok
+test tests::text_serialization_stable ... ok
+test tests::trigrams_ok_cases ... ok
+test tests::validate_backreference_rejected ... ok
+test tests::validate_empty_pattern ... ok
+test tests::validate_bad_regex ... ok
+test tests::validate_regex_without_literal_not_indexable ... ok
+test tests::plan_regex_warns_on_github ... ok
+test tests::validate_regex_with_literal_ok ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/security.rs (target/debug/deps/security-3e9ab9d98a5a8a6c)
+
+running 5 tests
+test validate_nested_quantifier_bounded ... ok
+test validate_classic_alternation_bounded ... ok
+test validate_alternation_bomb_10kb_bounded ... ok
+test validate_alternation_bomb_with_literal_bounded ... ok
+test validate_hostile_nesting_shapes_bounded ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_rank-3b976c408cc4973e)
+
+running 41 tests
+test candidates::tests::canonical_url_normalizes_case_git_and_slashes ... ok
+test candidates::tests::merge_combines_signals_and_dedupes_provenance ... ok
+test candidates::tests::merge_dedupes_url_variants_and_unions_provenance ... ok
+test eval::tests::eval_empty_ground_truth_is_zeroes ... ok
+test candidates::tests::merge_preserves_first_appearance_order ... ok
+test graph::tests::build_dedupes_edges_and_drops_self_loops_sorted ... ok
+test eval::tests::eval_mrr_beyond_k_counts_for_mrr_not_hits ... ok
+test eval::tests::eval_matches_url_variants ... ok
+test eval::tests::eval_toy_ground_truth_hit_rate_and_mrr ... ok
+test graph::tests::build_is_input_order_independent ... ok
+test graph::tests::pagerank_self_loop_edge_is_ignored_matches_closed_form ... ok
+test graph::tests::pagerank_mass_flows_dependents_to_dependencies ... ok
+test graph::tests::pagerank_dangling_mass_keeps_sum_one ... ok
+test graph::tests::pagerank_two_node_cycle_is_uniform ... ok
+test graph::tests::pagerank_star_graph_matches_closed_form ... ok
+test graph::tests::personalized_ppr_concentrates_on_seed_cluster ... ok
+test graph::tests::personalized_ppr_falls_back_to_uniform_on_empty_seeds ... ok
+test normalize::tests::aggregation_from_values_basics ... ok
+test graph::tests::pagerank_converges_within_bounds_on_quasi_random_graph ... ok
+test normalize::tests::bezier_endpoints_are_exact ... ok
+test normalize::tests::bezier_midpoint_hand_computed ... ok
+test normalize::tests::bezier_off_diagonal_hand_computed ... ok
+test graph::tests::personalized_ppr_seed_dupes_and_out_of_range_are_cleaned ... ok
+test normalize::tests::log_saturate_endpoints_and_midpoint ... ok
+test normalize::tests::bezier_is_monotonic_and_bounded ... ok
+test normalize::tests::min_max_basic_clamps_and_degenerate ... ok
+test normalize::tests::npms_score_uses_normalized_mean_and_orders_with_value ... ok
+test rank::tests::archived_and_stale_penalties_stack ... ok
+test rank::tests::awesome_list_bonus_matches_weight ... ok
+test rank::tests::centrality_and_dependents_dominate_default_ordering ... ok
+test rank::tests::contributions_sum_exactly_to_score ... ok
+test rank::tests::custom_config_single_signal_controls_ordering ... ok
+test rank::tests::default_weights_sum_to_one ... ok
+test rank::tests::normalize_by_max_basics ... ok
+test rank::tests::rank_is_deterministic_with_url_tiebreak ... ok
+test rank::tests::stale_over_threshold_tanks_via_gate ... ok
+test rank::tests::unknown_push_date_does_not_trigger_gate ... ok
+test rank::tests::well_maintained_centrality_beats_archived_high_stars ... ok
+test signals::tests::absorb_takes_max_counts_or_flags_and_freshest_days ... ok
+test signals::tests::signals_default_is_all_unknown_or_zero ... ok
+test signals::tests::signals_serde_round_trip ... ok
+
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/oss_semantic-2994f4a214b7b168)
+
+running 3 tests
+test embedding::tests::stub_is_deterministic ... ok
+test embedding::tests::stub_respects_dim_and_normalizes ... ok
+test embedding::tests::stub_separates_disjoint_texts ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hotset_hybrid.rs (target/debug/deps/hotset_hybrid-a24267c2c2ca8ca3)
+
+running 2 tests
+test routing_identifier_vs_natural_language ... ok
+test hybrid_nl_query_fuses_to_real_backoff_chunk ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.09s
+
+     Running tests/integration.rs (target/debug/deps/integration-cc242a86051b1aff)
+
+running 33 tests
+test classify_identifier_queries ... ok
+test fallback_window_short_file_is_one_chunk ... ok
+test classify_natural_language_queries ... ok
+test fallback_window_exact_boundary ... ok
+test chunk_by_extension_dispatches ... ok
+test c_struct_declaration_and_function ... ok
+test registry_lookup_by_extension ... ok
+test fallback_window_spans_overlap_10 ... ok
+test parse_with_no_items_falls_back_to_window ... ok
+test registry_lookup_by_name_and_parser ... ok
+test rrf_covers_union_and_breaks_ties_deterministically ... ok
+test go_types_functions_methods ... ok
+test rrf_empty_inputs ... ok
+test rrf_hand_computed_example ... ok
+test javascript_export_wrappers_and_class ... ok
+test python_broken_code_still_chunks_surrounding_items ... ok
+test python_functions_and_class_with_docstrings ... ok
+test vector_store_cosine_top_k ... ok
+test vector_store_dim_mismatch_and_id_replace ... ok
+test rust_kinds_struct_enum_trait_impl ... ok
+test rust_broken_code_still_chunks_valid_prefix ... ok
+test vector_store_pre_filters_before_scoring ... ok
+test vector_store_zero_norms_score_zero ... ok
+test window_module_constants_match_behavior ... ok
+test rust_three_functions_exact_spans ... ok
+test typescript_interface_with_jsdoc_and_function ... ok
+test rust_module_comment_not_attached_across_blank_line ... ok
+test vector_store_persistence_roundtrip ... ok
+test chunk_store_resolves_embedding_ids ... ok
+test pipeline_vector_store_persistence_via_pipeline ... ok
+test chunk_store_upsert_replaces ... ok
+test pipeline_index_and_search_resolves_file_line ... ok
+test chunk_store_roundtrip_across_connections ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_corpus
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_eval
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_facade
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_index
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_live
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_query
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_rank
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests oss_semantic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+cargo test --workspace 2>&1  35.67s user 5.14s system 116% cpu 35.005 total
+exit=0

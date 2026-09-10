@@ -1,0 +1,112 @@
+   Compiling memchr v2.8.3
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-io v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.44
+   Compiling num-traits v0.2.19
+   Compiling ref-cast v1.0.27
+   Compiling utf8parse v0.2.2
+   Compiling rusqlite v0.40.2
+   Compiling anstyle-query v1.1.5
+   Compiling colorchoice v1.0.5
+   Compiling anstyle v1.0.14
+   Compiling anstyle-parse v1.0.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling tree-sitter v0.27.0
+   Compiling tree-sitter-javascript v0.25.0
+   Compiling tree-sitter-python v0.25.0
+   Compiling tree-sitter-typescript v0.23.2
+   Compiling tree-sitter-go v0.25.0
+   Compiling tree-sitter-c v0.24.2
+   Compiling anstream v1.0.0
+   Compiling tree-sitter-rust v0.24.2
+   Compiling aho-corasick v1.1.5
+   Compiling rmcp v3.2.0
+   Compiling heck v0.5.0
+   Compiling strsim v0.11.1
+   Compiling dyn-clone v1.0.20
+   Compiling clap_lex v1.1.0
+   Compiling clap_builder v4.6.6
+   Compiling tempfile v3.27.0
+   Compiling regex-automata v0.4.18
+   Compiling uuid v1.26.1
+   Compiling base64 v0.23.1
+   Compiling darling_core v0.24.1
+   Compiling serde_derive_internals v0.30.0
+   Compiling synstructure v0.13.2
+   Compiling serde_json v1.0.151
+   Compiling regex v1.13.1
+   Compiling indexmap v2.14.2
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling serde_derive v1.0.229
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling futures-macro v0.3.34
+   Compiling thiserror-impl v2.0.20
+   Compiling tracing-attributes v0.1.31
+   Compiling zerofrom v0.1.8
+   Compiling async-trait v0.1.92
+   Compiling tokio v1.53.1
+   Compiling darling_macro v0.24.1
+   Compiling ref-cast-impl v1.0.27
+   Compiling futures-util v0.3.34
+   Compiling schemars_derive v1.2.2
+   Compiling darling v0.24.1
+   Compiling clap_derive v4.6.4
+   Compiling thiserror v2.0.20
+   Compiling yoke v0.8.3
+   Compiling tracing v0.1.44
+   Compiling rmcp-macros v3.2.0
+   Compiling clap v4.6.6
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling rustls-webpki v0.103.15
+   Compiling serde_urlencoded v0.7.1
+   Compiling oss-rank v0.1.0 (~/oss-search/oss-rank)
+   Compiling oss-core v0.1.0 (~/oss-search/oss-core)
+   Compiling oss-query v0.1.0 (~/oss-search/oss-query)
+   Compiling chrono v0.4.45
+   Compiling oss-index v0.1.0 (~/oss-search/oss-index)
+   Compiling bincode v2.0.1
+   Compiling oss-eval v0.1.0 (~/oss-search/oss-eval)
+   Compiling oss-semantic v0.1.0 (~/oss-search/oss-semantic)
+   Compiling schemars v1.2.2
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.19
+   Compiling oss-corpus v0.1.0 (~/oss-search/oss-corpus)
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling hyper-util v0.1.20
+   Compiling icu_provider v2.3.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling tokio-rustls v0.26.5
+   Compiling url v2.5.8
+   Compiling hyper-rustls v0.27.9
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.12.28
+   Compiling oss-facade v0.1.0 (~/oss-search/oss-facade)
+   Compiling oss-live v0.1.0 (~/oss-search/oss-live)
+   Compiling oss-cli v0.1.0 (~/oss-search/oss-cli)
+   Compiling oss-mcp v0.1.0 (~/oss-search/oss-mcp)
+    Finished `release` profile [optimized] target(s) in 17.53s
+
+real	0m17.559s
+user	2m29.958s
+sys	0m8.716s
+exit=0

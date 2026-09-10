@@ -1,0 +1,51 @@
+{
+  "backend_status": [
+    {
+      "backend": "static",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "license_classes": {
+        "AGPL": "network copyleft — treat as toxic for SaaS embedding",
+        "copyleft": "GPL family — pattern-only study, linking has obligations",
+        "permissive": "MIT/Apache-2.0/BSD — safe to vendor"
+      },
+      "probe_writing": {
+        "bad": [
+          "market calendars",
+          "rust http library",
+          "error handling"
+        ],
+        "good": [
+          "spawn_worker",
+          "special_closes",
+          "x-ratelimit-remaining",
+          "/early[Cc]loses/"
+        ],
+        "rule": "search for code, not concepts; uniqueness beats correctness; 2-5 orthogonal probes per call"
+      },
+      "rate_limit_traps": "grep.app 504/429s: the server retries once then degrades to Sourcegraph; an empty result with an error backend_status is a fetch failure, not a negative finding",
+      "regex_backend_matrix": {
+        "github_code_search": "literal only, no regex, ~10 req/min, 256-char queries, needs a bare term",
+        "grep.app": "regex via /.../ probes",
+        "sourcegraph": "regex via /.../ probes; pass count:100 style limits server-side"
+      },
+      "response_budget": "default calls stay under ~25KB; truncated=true means results were dropped to fit — narrow the query or page with next_cursor",
+      "which_tool_when": [
+        "oss_search_repos: discovery — 'does a tool for X exist?' (README-visible categories)",
+        "oss_search_code: vetting — 'who actually implements idiom X?' (implementation details)",
+        "oss_repo_profile: one-repo brief before adopting",
+        "oss_repo_tree: file map before guessing any path",
+        "oss_fetch_file: byte-exact file read, prefer line_range",
+        "oss_fetch_docs: doc search with Source: breadcrumbs"
+      ]
+    }
+  ],
+  "total": 1,
+  "truncated": false,
+  "warnings": []
+}

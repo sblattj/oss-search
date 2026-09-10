@@ -1,0 +1,44 @@
+{
+  "binary": "~/oss-search/oss-mcp/../target/release/oss-mcp",
+  "session_ms": 288.44,
+  "tool_calls": [
+    {
+      "ms": 0.19,
+      "tool": "oss_search_repos"
+    },
+    {
+      "ms": 0.09,
+      "tool": "oss_search_code"
+    },
+    {
+      "ms": 0.07,
+      "tool": "oss_repo_profile"
+    },
+    {
+      "ms": 0.05,
+      "tool": "oss_repo_tree"
+    },
+    {
+      "ms": 0.06,
+      "tool": "oss_fetch_file"
+    },
+    {
+      "ms": 0.07,
+      "tool": "oss_fetch_docs"
+    },
+    {
+      "ms": 0.07,
+      "tool": "oss_guide"
+    }
+  ],
+  "tools_listed": [
+    "oss_search_repos",
+    "oss_search_code",
+    "oss_repo_profile",
+    "oss_repo_tree",
+    "oss_fetch_file",
+    "oss_fetch_docs",
+    "oss_guide"
+  ],
+  "transcript": "~/oss-search/oss-mcp/../data/e2e/mcp-transcript.jsonl"
+}

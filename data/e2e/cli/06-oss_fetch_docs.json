@@ -1,0 +1,49 @@
+{
+  "backend_status": [
+    {
+      "backend": "llms-txt",
+      "status": "ok"
+    },
+    {
+      "backend": "docs-pages",
+      "detail": "one page behind origin",
+      "status": "degraded"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "hits": [
+        {
+          "breadcrumb": "Source: https://gabe.dev/hashopen/docs/calendars",
+          "line": 4,
+          "text": "Special closes are full-day closures; early closes are half-day sessions"
+        },
+        {
+          "breadcrumb": "Source: https://gabe.dev/hashopen/docs/calendars",
+          "line": 5,
+          "text": "before a holiday. Use `get_early_closes(exchange, year)` for half-days."
+        }
+      ],
+      "page": "docs/calendars.md",
+      "repo": "gabe/hashopen",
+      "source_url": "https://gabe.dev/hashopen/docs/calendars"
+    },
+    {
+      "hits": [
+        {
+          "breadcrumb": "Source: https://gabe.dev/hashopen/docs/export",
+          "line": 3,
+          "text": "ICS export covers special closes and early closes in one calendar feed."
+        }
+      ],
+      "page": "docs/export.md",
+      "repo": "gabe/hashopen",
+      "source_url": "https://gabe.dev/hashopen/docs/export"
+    }
+  ],
+  "total": 2,
+  "truncated": false,
+  "warnings": []
+}

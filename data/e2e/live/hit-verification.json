@@ -1,0 +1,26 @@
+{
+  "method": "fetched each hit file from its pinned SHA via GitHub contents API (raw) and checked (a) the returned snippet line appears verbatim, (b) the probe term occurs in the file",
+  "hits": [
+    {
+      "repo": "flatpak/flatpak",
+      "sha": "e382cbeb80ce9fbaab587a613a9f35ba0612d8cd",
+      "path": "NEWS",
+      "snippet_line_verbatim_in_file": true,
+      "retry_ci_in_file": true
+    },
+    {
+      "repo": "httperf/httperf",
+      "sha": "de8cd6ad8a79779a0cb74a4aa2175afa9e24df57",
+      "path": "NEWS",
+      "snippet_line_verbatim_in_file": true,
+      "retry_ci_in_file": true
+    },
+    {
+      "repo": "lucasjones/cpuminer-multi",
+      "sha": "4c9b1e4a5fa2fd6ae755e0a1a87dc3bfd187415f",
+      "path": "NEWS",
+      "snippet_line_verbatim_in_file": true,
+      "retry_ci_in_file": true
+    }
+  ]
+}

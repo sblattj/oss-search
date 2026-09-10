@@ -1,0 +1,180 @@
+{
+  "binary": "~/oss-search/oss-cli/../target/release/oss-cli",
+  "cases": [
+    {
+      "args": [
+        "search-repos",
+        "--query",
+        "pool; calendar"
+      ],
+      "backend_status": [
+        {
+          "backend": "grep.app",
+          "status": "ok"
+        },
+        {
+          "backend": "sourcegraph",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 291.4,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/01-oss_search_repos.json",
+      "results": 2,
+      "tool": "oss_search_repos",
+      "total": 2
+    },
+    {
+      "args": [
+        "search-code",
+        "--probe",
+        "special_closes",
+        "--probe",
+        "spawn_worker",
+        "--response-format",
+        "detailed"
+      ],
+      "backend_status": [
+        {
+          "backend": "grep.app",
+          "status": "ok"
+        },
+        {
+          "backend": "sourcegraph",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.94,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/02-oss_search_code.json",
+      "results": 2,
+      "tool": "oss_search_code",
+      "total": 2
+    },
+    {
+      "args": [
+        "repo-profile",
+        "--repo",
+        "gabe/hashopen",
+        "--deep-docs"
+      ],
+      "backend_status": [
+        {
+          "backend": "github-raw",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.57,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/03-oss_repo_profile.json",
+      "results": 1,
+      "tool": "oss_repo_profile",
+      "total": 1
+    },
+    {
+      "args": [
+        "repo-tree",
+        "--repo",
+        "gabe/hashopen",
+        "--glob",
+        "*.md"
+      ],
+      "backend_status": [
+        {
+          "backend": "github-raw",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.72,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/04-oss_repo_tree.json",
+      "results": 3,
+      "tool": "oss_repo_tree",
+      "total": 3
+    },
+    {
+      "args": [
+        "fetch-file",
+        "--repo",
+        "gabe/hashopen",
+        "--path",
+        "src/market.py",
+        "--line-start",
+        "8",
+        "--line-end",
+        "16"
+      ],
+      "backend_status": [
+        {
+          "backend": "github-raw",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.59,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/05-oss_fetch_file.json",
+      "results": 1,
+      "tool": "oss_fetch_file",
+      "total": 1
+    },
+    {
+      "args": [
+        "fetch-docs",
+        "--repo",
+        "gabe/hashopen",
+        "--pattern",
+        "early"
+      ],
+      "backend_status": [
+        {
+          "backend": "llms-txt",
+          "status": "ok"
+        },
+        {
+          "backend": "docs-pages",
+          "detail": "one page behind origin",
+          "status": "degraded"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.54,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/06-oss_fetch_docs.json",
+      "results": 2,
+      "tool": "oss_fetch_docs",
+      "total": 2
+    },
+    {
+      "args": [
+        "guide"
+      ],
+      "backend_status": [
+        {
+          "backend": "static",
+          "status": "ok"
+        }
+      ],
+      "exit": 0,
+      "has_more": false,
+      "ms": 1.54,
+      "output": "~/oss-search/oss-cli/../data/e2e/cli/07-oss_guide.json",
+      "results": 1,
+      "tool": "oss_guide",
+      "total": 1
+    }
+  ],
+  "schema_fields_required": [
+    "results",
+    "total",
+    "has_more",
+    "partial",
+    "backend_status",
+    "warnings",
+    "truncated"
+  ]
+}

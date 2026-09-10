@@ -1,0 +1,47 @@
+{
+  "backend_status": [
+    {
+      "backend": "grep.app",
+      "status": "ok"
+    },
+    {
+      "backend": "sourcegraph",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "activity": "active",
+      "archived": false,
+      "catch": "exchange coverage is uneven outside US/EU; no async API",
+      "days_since_activity": 3,
+      "last_release": "2026-08-28",
+      "license": "MIT",
+      "license_class": "permissive",
+      "repo": "gabe/hashopen",
+      "star_tier": "medium",
+      "stars": 812,
+      "url": "https://github.com/gabe/hashopen",
+      "what": "Exchange calendar library with special-closes and half-day session handling"
+    },
+    {
+      "activity": "steady",
+      "archived": false,
+      "catch": "single-backend per pool; no runtime-generic API yet",
+      "days_since_activity": 41,
+      "last_release": "2026-07-14",
+      "license": "MIT",
+      "license_class": "permissive",
+      "repo": "ferrum/poolite",
+      "star_tier": "low",
+      "stars": 320,
+      "url": "https://github.com/ferrum/poolite",
+      "what": "Small async connection pool with worker recycling and leases"
+    }
+  ],
+  "total": 2,
+  "truncated": false,
+  "warnings": []
+}

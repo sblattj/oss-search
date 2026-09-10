@@ -1,0 +1,58 @@
+loaded 13408 docs from ~/oss-search/oss-index/../data/corpus/index in 1.12s
+
+51 queries: total 1988ms  p50=33.68ms p90=72.31ms p99=104.66ms max=104.66ms
+  29.95ms  Serialize                    LiteralCI    hits=50  scanned=880
+  67.99ms  deserialize_struct           LiteralCI    hits=9   scanned=4022
+  90.57ms  serialize_str                LiteralCI    hits=46  scanned=6158
+   9.91ms  Visitor                      LiteralCI    hits=50  scanned=274
+  65.06ms  route                        LiteralCI    hits=50  scanned=3027
+  72.31ms  render_template              LiteralCI    hits=47  scanned=4231
+  48.78ms  before_request               LiteralCI    hits=24  scanned=1938
+  44.70ms  debounce                     LiteralCI    hits=35  scanned=2099
+  55.16ms  throttle                     LiteralCI    hits=31  scanned=2442
+  39.65ms  memoize                      LiteralCI    hits=50  scanned=1303
+  16.46ms  chunkSize                    LiteralCI    hits=9   scanned=423
+  56.44ms  backoff_factor               LiteralCI    hits=6   scanned=2599
+  70.77ms  get_backoff_time             LiteralCI    hits=3   scanned=4626
+  85.71ms  parse_obj_as                 LiteralCI    hits=11  scanned=5909
+  35.57ms  BaseModel                    LiteralCI    hits=50  scanned=1218
+  82.83ms  par_iter                     LiteralCI    hits=50  scanned=5909
+  39.22ms  join_context                 LiteralCI    hits=6   scanned=1577
+  16.35ms  BytesMut                     LiteralCI    hits=17  scanned=523
+   2.94ms  NaiveDateTime                LiteralCI    hits=37  scanned=78
+  22.08ms  ArgMatches                   LiteralCI    hits=35  scanned=1086
+   9.66ms  GlobMatcher                  LiteralCI    hits=3   scanned=221
+  11.30ms  RawTable                     LiteralCI    hits=10  scanned=266
+  50.64ms  maybe_uninit                 LiteralCI    hits=3   scanned=1991
+  41.23ms  urlAlphabet                  LiteralCI    hits=18  scanned=2117
+  32.93ms  deepEqual                    LiteralCI    hits=50  scanned=1033
+   4.03ms  isBefore                     LiteralCI    hits=27  scanned=94
+  31.03ms  WithError                    LiteralCI    hits=17  scanned=1069
+  21.96ms  NewRandom                    LiteralCI    hits=3   scanned=830
+   3.95ms  Unmarshal                    LiteralCI    hits=50  scanned=131
+   5.25ms  Middleware                   LiteralCI    hits=50  scanned=110
+   4.05ms  Mount                        LiteralCI    hits=50  scanned=84
+ 104.66ms  stringify                    LiteralCI    hits=50  scanned=7867
+  66.98ms  module.exports               LiteralCI    hits=50  scanned=4047
+  64.71ms  subscriber                   LiteralCI    hits=50  scanned=2927
+  16.63ms  Serialize                    LiteralCS    hits=50  scanned=880
+  54.73ms  deserialize_struct           LiteralCS    hits=9   scanned=3772
+  32.61ms  Retry                        LiteralCS    hits=50  scanned=1207
+  33.68ms  DateTime                     LiteralCS    hits=50  scanned=1534
+  29.68ms  debounce                     LiteralCS    hits=35  scanned=1305
+  20.57ms  deepEqual                    LiteralCS    hits=50  scanned=788
+  13.72ms  Span                         LiteralCS    hits=50  scanned=478
+  55.12ms  function debounce            Regex        hits=1   scanned=3757
+  29.18ms  fn visit_                    Regex        hits=50  scanned=2429
+  52.48ms  class Retry                  Regex        hits=4   scanned=3561
+  56.66ms  self\.sleep                  Regex        hits=8   scanned=3521
+   5.56ms  serialize_(u8|u16)           Regex        hits=16  scanned=136
+  17.09ms  impl.*Serializer             Regex        hits=50  scanned=735
+  73.96ms  def __init__                 Regex        hits=50  scanned=6141
+  30.83ms  fn main\(\)                  Regex        hits=50  scanned=2429
+  55.76ms  module\.exports              Regex        hits=50  scanned=3886
+   3.49ms  \.MustParse|ParseU           Regex        hits=4   scanned=63
+
+wrote ~/oss-search/oss-index/../data/corpus/index/LATENCY.md
+./target/release/examples/bench_hotset  3.14s user 0.38s system 99% cpu 3.547 total
+exit=0

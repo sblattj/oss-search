@@ -1,0 +1,24 @@
+{
+  "backend_status": [
+    {
+      "backend": "github-raw",
+      "status": "ok"
+    }
+  ],
+  "has_more": false,
+  "partial": false,
+  "results": [
+    {
+      "content": "def get_special_closes(calendar: str, year: int):\n    \"\"\"Full-day closures for a calendar and year.\"\"\"\n    return SPECIAL_CLOSES.setdefault(year, load(calendar, year))\n\n\ndef get_early_closes(calendar: str, year: int):\n    \"\"\"Half-day sessions before holidays (earlyCloses upstream config).\"\"\"\n    cfg = upstream_config(calendar, key=\"earlyCloses\")\n    return EARLY_CLOSES.setdefault(year, expand(cfg, year))",
+      "end_line": 16,
+      "path": "src/market.py",
+      "ref": "main",
+      "repo": "gabe/hashopen",
+      "start_line": 8,
+      "total_lines": 21
+    }
+  ],
+  "total": 1,
+  "truncated": false,
+  "warnings": []
+}

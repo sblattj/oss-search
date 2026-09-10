@@ -1,0 +1,13 @@
+spawning RELEASE binary ~/oss-search/oss-mcp/../target/release/oss-mcp (9446448 bytes, mtime SystemTime { tv_sec: 1789029061, tv_nsec: 477318902 })
+tools/list: exactly 7 tools, correct names + schemas: PASS
+oss_search_repos: isError=false, envelope schema-valid (2 results, total 2, has_more false), 933 bytes: PASS
+oss_search_code: isError=false, envelope schema-valid (2 results, total 2, has_more false), 802 bytes: PASS
+oss_repo_profile: isError=false, envelope schema-valid (1 results, total 1, has_more false), 926 bytes: PASS
+oss_repo_tree: isError=false, envelope schema-valid (3 results, total 3, has_more false), 222 bytes: PASS
+oss_fetch_file: isError=false, envelope schema-valid (1 results, total 1, has_more false), 695 bytes: PASS
+oss_fetch_docs: isError=false, envelope schema-valid (2 results, total 2, has_more false), 917 bytes: PASS
+oss_guide: isError=false, envelope schema-valid (1 results, total 1, has_more false), 1600 bytes: PASS
+
+MCP E2E PASS: 7/7 tools schema-valid; transcript ~/oss-search/oss-mcp/../data/e2e/mcp-transcript.jsonl; meta ~/oss-search/oss-mcp/../data/e2e/mcp-session.json
+./target/release/examples/e2e_session  0.00s user 0.00s system 1% cpu 0.583 total
+exit=0

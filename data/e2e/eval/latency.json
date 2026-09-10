@@ -1,0 +1,251 @@
+{
+  "queries": 60,
+  "docs": 3000,
+  "p50_us": 1515,
+  "p90_us": 1587,
+  "p99_us": 1728,
+  "max_us": 1728,
+  "mean_us": 931.6333333333333,
+  "per_query": [
+    {
+      "query": "retry_with_backoff",
+      "micros": 894
+    },
+    {
+      "query": "lru_cache_insert",
+      "micros": 66
+    },
+    {
+      "query": "parse_json_value",
+      "micros": 77
+    },
+    {
+      "query": "debounce",
+      "micros": 56
+    },
+    {
+      "query": "acquire_token",
+      "micros": 74
+    },
+    {
+      "query": "bloom_filter_add",
+      "micros": 55
+    },
+    {
+      "query": "slugify_title",
+      "micros": 92
+    },
+    {
+      "query": "circuit_breaker_trip",
+      "micros": 72
+    },
+    {
+      "query": "pool_acquire",
+      "micros": 56
+    },
+    {
+      "query": "try_acquire_permit",
+      "micros": 1176
+    },
+    {
+      "query": "redact_secrets",
+      "micros": 94
+    },
+    {
+      "query": "throttle",
+      "micros": 62
+    },
+    {
+      "query": "uuid_v4",
+      "micros": 41
+    },
+    {
+      "query": "tail_lines",
+      "micros": 65
+    },
+    {
+      "query": "connection pool",
+      "micros": 931
+    },
+    {
+      "query": "exponential backoff",
+      "micros": 723
+    },
+    {
+      "query": "circuit breaker",
+      "micros": 102
+    },
+    {
+      "query": "least recently used",
+      "micros": 108
+    },
+    {
+      "query": "rate limiting",
+      "micros": 78
+    },
+    {
+      "query": "breadth first",
+      "micros": 75
+    },
+    {
+      "query": "shortest path",
+      "micros": 69
+    },
+    {
+      "query": "deep merge",
+      "micros": 53
+    },
+    {
+      "query": "base64",
+      "micros": 61
+    },
+    {
+      "query": "health check",
+      "micros": 77
+    },
+    {
+      "query": "cache eviction",
+      "micros": 59
+    },
+    {
+      "query": "unified diff",
+      "micros": 56
+    },
+    {
+      "query": "consistent hashing",
+      "micros": 1198
+    },
+    {
+      "query": "glob pattern",
+      "micros": 54
+    },
+    {
+      "query": "retry_with_\\w+",
+      "micros": 962
+    },
+    {
+      "query": "panel_state_0500",
+      "micros": 1637
+    },
+    {
+      "query": "panel_state_0507",
+      "micros": 1551
+    },
+    {
+      "query": "panel_state_0514",
+      "micros": 1532
+    },
+    {
+      "query": "panel_state_0521",
+      "micros": 1519
+    },
+    {
+      "query": "panel_state_0528",
+      "micros": 1549
+    },
+    {
+      "query": "panel_state_0535",
+      "micros": 1547
+    },
+    {
+      "query": "panel_state_0542",
+      "micros": 1577
+    },
+    {
+      "query": "panel_state_0549",
+      "micros": 1570
+    },
+    {
+      "query": "panel_state_0556",
+      "micros": 1592
+    },
+    {
+      "query": "panel_state_0563",
+      "micros": 1516
+    },
+    {
+      "query": "panel_state_0570",
+      "micros": 1539
+    },
+    {
+      "query": "panel_state_0577",
+      "micros": 1540
+    },
+    {
+      "query": "panel_state_0584",
+      "micros": 1531
+    },
+    {
+      "query": "panel_state_0591",
+      "micros": 1515
+    },
+    {
+      "query": "panel_state_0598",
+      "micros": 1535
+    },
+    {
+      "query": "panel_state_0605",
+      "micros": 1516
+    },
+    {
+      "query": "panel_state_0612",
+      "micros": 1522
+    },
+    {
+      "query": "panel_state_0619",
+      "micros": 1523
+    },
+    {
+      "query": "panel_state_0626",
+      "micros": 1539
+    },
+    {
+      "query": "panel_state_0633",
+      "micros": 1569
+    },
+    {
+      "query": "panel_state_0640",
+      "micros": 1728
+    },
+    {
+      "query": "panel_state_0647",
+      "micros": 1643
+    },
+    {
+      "query": "panel_state_0654",
+      "micros": 1623
+    },
+    {
+      "query": "panel_state_0661",
+      "micros": 1573
+    },
+    {
+      "query": "panel_state_0668",
+      "micros": 1534
+    },
+    {
+      "query": "panel_state_0675",
+      "micros": 1542
+    },
+    {
+      "query": "panel_state_0682",
+      "micros": 1578
+    },
+    {
+      "query": "panel_state_0689",
+      "micros": 1587
+    },
+    {
+      "query": "panel_state_0696",
+      "micros": 1559
+    },
+    {
+      "query": "panel_state_0703",
+      "micros": 1593
+    },
+    {
+      "query": "panel_state_0710",
+      "micros": 1533
+    }
+  ]
+}

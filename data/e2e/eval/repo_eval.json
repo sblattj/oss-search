@@ -1,0 +1,108 @@
+{
+  "eval": {
+    "k": 10,
+    "topics": 6,
+    "hit_rate_at_k": 1.0,
+    "mrr": 1.0,
+    "per_topic": [
+      {
+        "topic": "rust async runtime",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "topic": "rust error handling",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "topic": "rust http client",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "topic": "rust json serialization",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "topic": "rust logging",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "topic": "rust lru cache",
+        "hit_at_k": true,
+        "first_hit_rank": 1,
+        "reciprocal_rank": 1.0
+      }
+    ]
+  },
+  "decoy_ranks": [
+    {
+      "topic": "rust async runtime",
+      "repo_url": "https://github.com/legacy-archive/runtime-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust async runtime",
+      "repo_url": "https://github.com/vaporware/runtime-next",
+      "rank": 5
+    },
+    {
+      "topic": "rust error handling",
+      "repo_url": "https://github.com/legacy-archive/handling-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust error handling",
+      "repo_url": "https://github.com/vaporware/handling-next",
+      "rank": 5
+    },
+    {
+      "topic": "rust http client",
+      "repo_url": "https://github.com/legacy-archive/client-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust http client",
+      "repo_url": "https://github.com/vaporware/client-next",
+      "rank": 5
+    },
+    {
+      "topic": "rust json serialization",
+      "repo_url": "https://github.com/legacy-archive/serialization-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust json serialization",
+      "repo_url": "https://github.com/vaporware/serialization-next",
+      "rank": 5
+    },
+    {
+      "topic": "rust logging",
+      "repo_url": "https://github.com/legacy-archive/logging-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust logging",
+      "repo_url": "https://github.com/vaporware/logging-next",
+      "rank": 5
+    },
+    {
+      "topic": "rust lru cache",
+      "repo_url": "https://github.com/legacy-archive/cache-classic",
+      "rank": 6
+    },
+    {
+      "topic": "rust lru cache",
+      "repo_url": "https://github.com/vaporware/cache-next",
+      "rank": 5
+    }
+  ]
+}
