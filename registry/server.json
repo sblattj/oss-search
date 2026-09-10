@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.sblattj/oss-search",
+  "title": "oss-search",
+  "description": "Fast local and federated OSS code search and repo discovery for AI agents",
+  "version": "0.2.0",
+  "websiteUrl": "https://github.com/sblattj/oss-search",
+  "repository": {
+    "url": "https://github.com/sblattj/oss-search",
+    "source": "github",
+    "id": "1364505521",
+    "subfolder": "npm/oss-mcp"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "oss-mcp",
+      "version": "0.2.0",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

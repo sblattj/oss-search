@@ -19,6 +19,41 @@ Not recreating the wheel is a superpower. `oss-search` answers two questions for
 
 ## Install
 
+Two front doors: `oss-mcp` (MCP server) and `oss-cli` (CLI twin). Three ways to get them:
+
+**1. npm** — an `oss-mcp` shim that downloads the platform-matched prebuilt
+binary on first run and caches it under `~/.cache/oss-search/bin/` (override
+with `OSS_SEARCH_CACHE_DIR`):
+
+```sh
+npx -y oss-mcp --version
+```
+
+> **Status (pre-publish):** the `oss-mcp` npm package and its matching GitHub
+> release (v0.2.0) are being published now. Until they land, `npx` will fail
+> with a 404 on the release asset — use option 2 or 3 below.
+
+**2. cargo install from git** (requires a Rust toolchain):
+
+```sh
+cargo install --git https://github.com/sblattj/oss-search oss-mcp
+cargo install --git https://github.com/sblattj/oss-search oss-cli
+```
+
+Binaries land in `~/.cargo/bin/`.
+
+**3. Prebuilt binaries** — every release publishes
+`oss-search-<version>-<target>.tar.gz` plus `checksums.txt` (sha256) at
+<https://github.com/sblattj/oss-search/releases/latest>, for targets
+`aarch64-apple-darwin`, `x86_64-apple-darwin`, `aarch64-unknown-linux-gnu`,
+`x86_64-unknown-linux-gnu`:
+
+```sh
+curl -fsSL https://github.com/sblattj/oss-search/releases/latest/download/oss-search-0.2.0-aarch64-apple-darwin.tar.gz | tar xz
+```
+
+From a checkout instead:
+
 ```sh
 cargo build --release
 # binaries: target/release/oss-mcp  target/release/oss-cli
@@ -26,26 +61,93 @@ cargo build --release
 
 ## Quickstart (CLI)
 
+`oss-cli` mirrors the 7-tool surface one-to-one (offline stub engine by
+default; `--live` switches to the real backends):
+
 ```sh
+# Probe-writing and query-syntax playbook — offline, zero setup
+oss-cli guide
+
 # Repo discovery — which wheel exists?
 oss-cli search-repos --query "express" --limit 5
 
-# Code search (federated, needs GITHUB_TOKEN for the github backend)
-GITHUB_TOKEN=... oss-cli --live search-code --pattern "retry" --limit 3
-
-# Local hot-set (after building a corpus; see data/corpus/REPORT.md)
-oss-cli search-code --pattern "retry_with_backoff" --in hotset
+# Code search by distinctive idioms (federated; GITHUB_TOKEN unlocks the github backend)
+GITHUB_TOKEN=... oss-cli --live search-code --probe "retry_with_backoff" --limit 3
 ```
+
+All commands emit the same structured JSON envelope (`results`, `total`,
+`has_more`, `partial`, `backend_status`) that the MCP tools return.
 
 ## Quickstart (MCP)
 
-`oss-mcp` speaks MCP over stdio. Point your agent host at the binary:
+`oss-mcp` speaks MCP over stdio. Invocation safety: `--help` / `--version`
+print and exit 0 without ever starting the server; unknown arguments exit 2
+with usage instead of silently serving a stub; with no arguments it serves
+until stdin closes.
+
+Claude Code — `.mcp.json` at the project root (use the absolute path your
+install produced, or the `npx` form):
 
 ```json
-{ "mcpServers": { "oss-search": { "command": "/path/to/target/release/oss-mcp" } } }
+{
+  "mcpServers": {
+    "oss-search": {
+      "command": "/Users/YOU/.cargo/bin/oss-mcp",
+      "args": ["--live"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}
 ```
 
-Add `--live` to enable remote backends (GitHub REST code search, grep.app, deps.dev, ecosyste.ms, npms.io).
+npx form (no absolute path needed):
+
+```json
+{
+  "mcpServers": {
+    "oss-search": {
+      "command": "npx",
+      "args": ["-y", "oss-mcp", "--live"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}
+```
+
+Claude Desktop — `claude_desktop_config.json` (macOS:
+`~/Library/Application Support/Claude/claude_desktop_config.json`; `~` is not
+expanded inside the JSON — use the absolute path):
+
+```json
+{
+  "mcpServers": {
+    "oss-search": {
+      "command": "/Users/YOU/.cargo/bin/oss-mcp",
+      "args": ["--live"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}
+```
+
+opencode — `opencode.json` at the project root:
+
+```json
+{
+  "mcp": {
+    "oss-search": {
+      "type": "local",
+      "command": ["oss-mcp", "--live"],
+      "environment": { "GITHUB_TOKEN": "ghp_..." },
+      "enabled": true
+    }
+  }
+}
+```
+
+`--live` enables the remote backends (GitHub REST code search, grep.app,
+deps.dev, ecosyste.ms, npms.io); without it `oss-mcp` serves an offline stub.
+`oss-mcp --help` prints the full invocation contract.
 
 ## Query language
 
@@ -60,7 +162,7 @@ Structured JSON fields are canonical (arrays = OR, across fields = AND, `-` pref
 The repo ships its own evidence: `data/e2e/E2E-REPORT.md` (9/9 gate through the release binaries), golden-set eval (`data/e2e/eval/EVAL.md`), and the hot-set latency table (`data/e2e/hotset/LATENCY.md`).
 
 ```sh
-cargo test --workspace   # 355 tests
+cargo test --workspace   # 368 tests
 ```
 
 ## Workspace layout
