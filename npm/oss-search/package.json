@@ -32,5 +32,6 @@
     "oss-search",
     "code-search",
     "cli"
-  ]
+  ],
+  "mcpName": "io.github.sblattj/oss-search"
 }
