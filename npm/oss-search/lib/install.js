@@ -68,25 +68,43 @@ function findBinary(root) {
 
 async function fetchAndVerify({ version, target }) {
   const name = assetFilename(version, target);
-  process.stderr.write(`oss-mcp: downloading ${assetUrl(version, target)}\n`);
-  const tarball = await download(assetUrl(version, target));
+  const url = assetUrl(version, target);
+  process.stderr.write(`oss-mcp: downloading ${url}\n`);
+  const tarball = await download(url);
 
-  let checksums = null;
+  let verified = false;
   try {
-    checksums = parseChecksums(await download(checksumsUrl(version)));
-  } catch {
-    process.stderr.write(
-      "oss-mcp: no checksums.txt in this release; skipping sha256 verification\n"
-    );
-  }
-  if (checksums) {
-    const expected = checksums.get(name);
-    if (!expected) throw new Error(`checksums.txt has no entry for ${name}`);
-    const actual = sha256(tarball);
-    if (actual !== expected) {
-      throw new Error(`sha256 mismatch for ${name}: expected ${expected}, got ${actual}`);
+    const sidecar = String(await download(`${url}.sha256`));
+    const m = sidecar.match(/^([0-9a-fA-F]{64})/);
+    if (m) {
+      const actual = sha256(tarball);
+      if (actual !== m[1].toLowerCase()) {
+        throw new Error(`sha256 mismatch for ${name}: expected ${m[1].toLowerCase()}, got ${actual}`);
+      }
+      process.stderr.write(`oss-mcp: sha256 verified for ${name}\n`);
+      verified = true;
     }
-    process.stderr.write(`oss-mcp: sha256 verified for ${name}\n`);
+  } catch (e) {
+    if (e instanceof Error && e.message.startsWith("sha256 mismatch")) throw e;
+  }
+  if (!verified) {
+    let checksums = null;
+    try {
+      checksums = parseChecksums(await download(checksumsUrl(version)));
+    } catch {}
+    if (checksums) {
+      const expected = checksums.get(name);
+      if (!expected) throw new Error(`checksums.txt has no entry for ${name}`);
+      const actual = sha256(tarball);
+      if (actual !== expected) {
+        throw new Error(`sha256 mismatch for ${name}: expected ${expected}, got ${actual}`);
+      }
+      process.stderr.write(`oss-mcp: sha256 verified for ${name}\n`);
+    } else {
+      process.stderr.write(
+        "oss-mcp: no .sha256 sidecar or checksums.txt in this release; skipping sha256 verification\n"
+      );
+    }
   }
   return { tarball, name };
 }

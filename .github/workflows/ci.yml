@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@9a55e65b0b3c4d4e5b31d1b54d8b1a5f3c902444 # v2
+      - uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
         with:
           workspaces: .
       - name: Build
