@@ -81,10 +81,10 @@ fn changelog_heading_matches_workspace_version() {
 }
 
 #[test]
-fn all_three_sources_read_0_2_0() {
-    assert_eq!(workspace_version(), "0.2.0");
-    assert_eq!(oss_mcp::version::VERSION, "0.2.0");
-    assert_eq!(changelog_version(), "0.2.0");
+fn all_three_sources_read_0_3_0() {
+    assert_eq!(workspace_version(), "0.3.0");
+    assert_eq!(oss_mcp::version::VERSION, "0.3.0");
+    assert_eq!(changelog_version(), "0.3.0");
 }
 
 #[test]

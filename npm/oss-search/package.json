@@ -1,6 +1,6 @@
 {
   "name": "oss-search",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for oss-search: fast local + federated OSS code search and repo discovery. Downloads the platform binary on first run.",
   "type": "module",
   "license": "MIT",

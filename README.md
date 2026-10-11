@@ -29,10 +29,6 @@ with `OSS_SEARCH_CACHE_DIR`):
 npx -y oss-search --version
 ```
 
-> **Status (pre-publish):** the `oss-search` npm package and its matching GitHub
-> release (v0.2.0) are being published now. Until they land, `npx` will fail
-> with a 404 on the release asset — use option 2 or 3 below.
-
 **2. cargo install from git** (requires a Rust toolchain):
 
 ```sh
@@ -49,7 +45,7 @@ Binaries land in `~/.cargo/bin/`.
 `x86_64-unknown-linux-gnu`:
 
 ```sh
-curl -fsSL https://github.com/sblattj/oss-search/releases/latest/download/oss-search-0.2.0-aarch64-apple-darwin.tar.gz | tar xz
+curl -fsSL https://github.com/sblattj/oss-search/releases/latest/download/oss-search-0.3.0-aarch64-apple-darwin.tar.gz | tar xz
 ```
 
 From a checkout instead:
@@ -169,7 +165,7 @@ Structured JSON fields are canonical (arrays = OR, across fields = AND, `-` pref
 The repo ships its own evidence: `data/e2e/E2E-REPORT.md` (9/9 gate through the release binaries), golden-set eval (`data/e2e/eval/EVAL.md`), and the hot-set latency table (`data/e2e/hotset/LATENCY.md`).
 
 ```sh
-cargo test --workspace   # 368 tests
+cargo test --workspace   # 432 tests
 ```
 
 ## Workspace layout

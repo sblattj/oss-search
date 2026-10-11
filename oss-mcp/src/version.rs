@@ -6,7 +6,7 @@
 //! stale constant or changelog.
 
 /// Version of the `oss-mcp` binary, reported in MCP `serverInfo`.
-pub const VERSION: &str = "0.2.0";
+pub const VERSION: &str = "0.3.0";
 
 #[cfg(test)]
 mod tests {
