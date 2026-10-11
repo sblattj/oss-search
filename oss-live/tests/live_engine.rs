@@ -379,6 +379,15 @@ async fn search_repos_ranks_with_per_signal_contributions() {
         .mount(&server)
         .await;
 
+    // GitHub repository search answers with nothing new for this fixture
+    Mock::given(method("GET"))
+        .and(path("/search/repositories"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "total_count": 0, "incomplete_results": false, "items": []
+        })))
+        .mount(&server)
+        .await;
+
     let engine = live_engine(&server).await;
     let out = call(
         &engine,
@@ -410,6 +419,7 @@ async fn search_repos_ranks_with_per_signal_contributions() {
     assert!(big["contributions"]["maintenance_gate"].as_f64().unwrap() < 0.0);
 
     assert_eq!(backend_status(&out, "npms.io")["status"], json!("ok"));
+    assert_eq!(backend_status(&out, "github")["status"], json!("ok"));
     assert_eq!(backend_status(&out, "ecosyste.ms")["status"], json!("ok"));
     assert_eq!(out["partial"], json!(false));
 }
@@ -463,6 +473,208 @@ async fn search_repos_npms_down_is_partial_not_negative() {
         json!("error"),
         "ecosyste.ms is reported as skipped, not consulted"
     );
+}
+
+fn gh_repo(full_name: &str, stars: u64, language: &str) -> Value {
+    json!({
+        "full_name": full_name,
+        "html_url": format!("https://github.com/{full_name}"),
+        "description": format!("{full_name} description"),
+        "language": language,
+        "stargazers_count": stars,
+        "forks_count": 10,
+        "pushed_at": pushed_days_ago(10),
+        "archived": false,
+        "license": { "spdx_id": "MIT" },
+        "topics": []
+    })
+}
+
+async fn mount_npms_one_package(server: &MockServer) {
+    Mock::given(method("GET"))
+        .and(path("/v2/search"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "total": 1,
+            "results": [{
+                "package": {
+                    "name": "pkg-a",
+                    "description": "an npm package",
+                    "links": { "npm": "https://www.npmjs.com/package/pkg-a", "repository": "https://github.com/Acme/Pkg-A" },
+                    "license": "MIT"
+                },
+                "score": { "final": 0.5 }
+            }]
+        })))
+        .mount(server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/api/v1/registries/npmjs.org/packages/pkg-a"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "name": "pkg-a",
+            "dependent_packages_count": 40,
+            "repository_url": "https://github.com/Acme/Pkg-A",
+            "normalized_licenses": ["MIT"]
+        })))
+        .mount(server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/api/v1/repositories/lookup"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "full_name": "Acme/Pkg-A",
+            "stargazers_count": 5,
+            "forks_count": 1,
+            "pushed_at": pushed_days_ago(400),
+            "archived": false,
+            "html_url": "https://github.com/Acme/Pkg-A",
+            "repository_url": "https://github.com/Acme/Pkg-A"
+        })))
+        .mount(server)
+        .await;
+}
+
+#[tokio::test]
+async fn search_repos_merges_github_dedupes_and_surfaces_github_only() {
+    let server = MockServer::start().await;
+    mount_npms_one_package(&server).await;
+    Mock::given(method("GET"))
+        .and(path("/search/repositories"))
+        .and(query_param("q", "airbnb scraper"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "total_count": 2,
+            "incomplete_results": false,
+            "items": [
+                gh_repo("acme/pkg-a", 777, "JavaScript"),
+                gh_repo("johnbalvin/pyairbnb", 150, "Python")
+            ]
+        })))
+        .expect(1)
+        .mount(&server)
+        .await;
+
+    let engine = live_engine(&server).await;
+    let out = call(
+        &engine,
+        "oss_search_repos",
+        json!({"query": "airbnb scraper", "limit": 10}),
+    )
+    .await
+    .unwrap();
+
+    let rows = out["results"].as_array().unwrap();
+    assert_eq!(rows.len(), 2, "acme/pkg-a deduped across sources: {rows:?}");
+    let both = rows
+        .iter()
+        .find(|r| r["package"] == json!("pkg-a"))
+        .expect("npm row kept");
+    assert_eq!(both["stars"], json!(777), "live GitHub stars win");
+    assert_eq!(both["dependents"], json!(40));
+    let sources = both["sources"].as_array().unwrap();
+    for s in ["npms.io", "ecosyste.ms", "github"] {
+        assert!(sources.contains(&json!(s)), "{s} in {sources:?}");
+    }
+    let py = rows
+        .iter()
+        .find(|r| r["repo"] == json!("johnbalvin/pyairbnb"))
+        .expect("GitHub-only repo present");
+    assert_eq!(py["package"], Value::Null);
+    assert_eq!(py["sources"], json!(["github"]));
+    assert_eq!(py["stars"], json!(150));
+    assert_eq!(py["license"], json!("MIT"));
+    assert!(py["score"].as_f64().unwrap() > 0.0);
+    assert!(py["last_push"].is_string());
+    assert_eq!(py["url"], json!("https://github.com/johnbalvin/pyairbnb"));
+    assert!(py["contributions"].as_object().unwrap().contains_key("popularity"));
+    assert_eq!(backend_status(&out, "github")["status"], json!("ok"));
+    assert_eq!(out["partial"], json!(false));
+}
+
+#[tokio::test]
+async fn search_repos_github_rate_limited_is_partial_not_empty_negative() {
+    let server = MockServer::start().await;
+    mount_npms_one_package(&server).await;
+    Mock::given(method("GET"))
+        .and(path("/search/repositories"))
+        .respond_with(
+            ResponseTemplate::new(403)
+                .insert_header("x-ratelimit-remaining", "0")
+                .insert_header("x-ratelimit-reset", "1770000000"),
+        )
+        .mount(&server)
+        .await;
+
+    let engine = live_engine(&server).await;
+    let out = call(&engine, "oss_search_repos", json!({"query": "pkg"}))
+        .await
+        .unwrap();
+    assert_eq!(out["results"].as_array().unwrap().len(), 1, "npm candidates survive");
+    assert_eq!(out["partial"], json!(true));
+    let gh = backend_status(&out, "github");
+    assert_eq!(gh["status"], json!("error"));
+    assert!(gh["detail"].as_str().unwrap().contains("rate limit"));
+    assert_eq!(backend_status(&out, "npms.io")["status"], json!("ok"));
+}
+
+#[tokio::test]
+async fn search_repos_github_only_when_npms_is_down() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/v2/search"))
+        .respond_with(ResponseTemplate::new(429))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/search/repositories"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "total_count": 1, "incomplete_results": false,
+            "items": [gh_repo("johnbalvin/pyairbnb", 150, "Python")]
+        })))
+        .mount(&server)
+        .await;
+    let engine = live_engine(&server).await;
+    let out = call(&engine, "oss_search_repos", json!({"query": "airbnb scraper"}))
+        .await
+        .unwrap();
+    assert_eq!(out["results"].as_array().unwrap().len(), 1);
+    assert_eq!(out["partial"], json!(true));
+    assert_eq!(backend_status(&out, "npms.io")["status"], json!("error"));
+    assert_eq!(backend_status(&out, "github")["status"], json!("ok"));
+}
+
+#[tokio::test]
+async fn search_repos_maps_filters_to_github_qualifiers() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/v2/search"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"total": 0, "results": []})))
+        .mount(&server)
+        .await;
+    // only matches when every qualifier and the sort are present
+    Mock::given(method("GET"))
+        .and(path("/search/repositories"))
+        .and(query_param("q", "scraper language:Python stars:>=100 topic:airbnb"))
+        .and(query_param("sort", "stars"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "total_count": 2, "incomplete_results": false,
+            "items": [
+                gh_repo("a/big", 500, "Python"),
+                gh_repo("b/small", 50, "Python")
+            ]
+        })))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let engine = live_engine(&server).await;
+    let out = call(
+        &engine,
+        "oss_search_repos",
+        json!({"query": "scraper", "language": "Python", "min_stars": 100, "topic": "airbnb", "sort": "stars"}),
+    )
+    .await
+    .unwrap();
+    let rows = out["results"].as_array().unwrap();
+    assert_eq!(rows.len(), 1, "min_stars also enforced client-side: {rows:?}");
+    assert_eq!(rows[0]["repo"], json!("a/big"));
+    assert_eq!(backend_status(&out, "github")["status"], json!("ok"));
 }
 
 // ------------------------------------------------------------- repo_profile

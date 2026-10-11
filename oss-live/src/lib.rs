@@ -215,7 +215,7 @@ impl Default for LiveEngine {
 /// process: honest placeholders naming the backends that WOULD be consulted.
 fn untouched_status(tool: &str) -> Vec<BackendStatus> {
     let backends: &[&str] = match tool {
-        "oss_search_repos" => &["npms.io", "ecosyste.ms"],
+        "oss_search_repos" => &["npms.io", "github", "ecosyste.ms"],
         "oss_search_code" => &["github", "grep.app"],
         "oss_repo_profile" => &["ecosyste.ms", "deps.dev"],
         "oss_repo_tree" | "oss_fetch_file" => &["github-contents"],

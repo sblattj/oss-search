@@ -15,7 +15,10 @@ pub use ecosystems::{
     PACKAGES_BASE, REPOS_BASE,
 };
 pub use error::{FacadeError, Result};
-pub use github::{GitHubSearchClient, GITHUB_API_BASE, GITHUB_CODE_SEARCH_RPM, GITHUB_RESULT_CAP};
+pub use github::{
+    build_repo_query, GitHubRepoHit, GitHubRepoSearchResponse, GitHubSearchClient, RepoSearchFilters,
+    RepoSort, GITHUB_API_BASE, GITHUB_CODE_SEARCH_RPM, GITHUB_RESULT_CAP,
+};
 pub use github_content::{
     GithubContentClient, GhFileContent, GhTree, GhTreeEntry, GITHUB_CONTENT_RPH, GITHUB_CONTENT_RPM,
 };

@@ -140,6 +140,281 @@ fn build_query(query: &str, filters: &Filters, warnings: &mut Vec<String>) -> Re
     Ok(joined)
 }
 
+/// Result ordering for repository search.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RepoSort {
+    /// GitHub's default best-match relevance.
+    #[default]
+    BestMatch,
+    Stars,
+    Updated,
+}
+
+/// Filters for `GET /search/repositories`, mapped to GitHub qualifiers.
+#[derive(Debug, Clone, Default)]
+pub struct RepoSearchFilters {
+    pub language: Option<String>,
+    pub min_stars: Option<u64>,
+    pub topic: Option<String>,
+    pub sort: RepoSort,
+    pub limit: Option<u32>,
+}
+
+/// One repository from GitHub repository search.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct GitHubRepoHit {
+    pub full_name: String,
+    pub html_url: Option<String>,
+    pub description: Option<String>,
+    pub language: Option<String>,
+    pub stars: u64,
+    pub forks: u64,
+    pub pushed_at: Option<String>,
+    pub archived: bool,
+    /// SPDX id; `NOASSERTION` is mapped to `None`.
+    pub license: Option<String>,
+    pub topics: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GitHubRepoSearchResponse {
+    pub hits: Vec<GitHubRepoHit>,
+    pub total: Option<u64>,
+    pub has_more: bool,
+    pub status: Status,
+    pub warnings: Vec<String>,
+    pub elapsed: std::time::Duration,
+}
+
+impl GitHubRepoSearchResponse {
+    fn unavailable(reason: impl Into<String>, elapsed: std::time::Duration) -> Self {
+        Self {
+            hits: Vec::new(),
+            total: None,
+            has_more: false,
+            status: Status::Unavailable {
+                reason: reason.into(),
+            },
+            warnings: Vec::new(),
+            elapsed,
+        }
+    }
+}
+
+#[derive(Deserialize, Default)]
+#[serde(default)]
+struct GhRepoSearchResponse {
+    total_count: Option<u64>,
+    incomplete_results: Option<bool>,
+    items: Vec<GhRepoItem>,
+}
+
+#[derive(Deserialize, Default)]
+#[serde(default)]
+struct GhRepoItem {
+    full_name: Option<String>,
+    html_url: Option<String>,
+    description: Option<String>,
+    language: Option<String>,
+    stargazers_count: Option<u64>,
+    forks_count: Option<u64>,
+    pushed_at: Option<String>,
+    archived: Option<bool>,
+    license: Option<GhLicense>,
+    topics: Vec<String>,
+}
+
+/// Quote a qualifier value when it contains whitespace or quotes.
+fn qualifier_value(v: &str) -> String {
+    let v = v.trim();
+    if v.chars().any(|c| c.is_whitespace() || c == '"') {
+        format!("\"{}\"", v.replace('"', ""))
+    } else {
+        v.to_string()
+    }
+}
+
+/// Build the `q` string for repository search: free text plus qualifiers
+/// (`language:`, `stars:>=N`, `topic:`).
+pub fn build_repo_query(query: &str, filters: &RepoSearchFilters) -> Result<String> {
+    let q = query.trim();
+    if q.is_empty() {
+        return Err(FacadeError::InvalidQuery(
+            "GitHub requires at least one search term (bare qualifiers are rejected)".to_string(),
+        ));
+    }
+    let mut parts = vec![q.to_string()];
+    if let Some(v) = filters.language.as_deref().filter(|v| !v.trim().is_empty()) {
+        parts.push(format!("language:{}", qualifier_value(v)));
+    }
+    if let Some(n) = filters.min_stars.filter(|n| *n > 0) {
+        parts.push(format!("stars:>={n}"));
+    }
+    if let Some(v) = filters.topic.as_deref().filter(|v| !v.trim().is_empty()) {
+        parts.push(format!("topic:{}", qualifier_value(v)));
+    }
+    Ok(parts.join(" "))
+}
+
+impl GitHubSearchClient {
+    /// GitHub repository search (`GET /search/repositories`). Shares the
+    /// client's rate limiter with code search. Rate-limit and auth failures
+    /// come back as `Status::Unavailable`, never as an empty `Ok` result.
+    /// Works unauthenticated (10 req/min) but a token raises it to 30.
+    pub async fn search_repos(
+        &self,
+        query: &str,
+        filters: &RepoSearchFilters,
+    ) -> Result<GitHubRepoSearchResponse> {
+        let start = Instant::now();
+        let mut warnings = Vec::new();
+        if self.token.is_none() {
+            warnings.push(
+                "GITHUB_TOKEN is not set: unauthenticated repository search is limited to 10 requests/min"
+                    .to_string(),
+            );
+        }
+        let q = build_repo_query(query, filters)?;
+        let per_page = filters.limit.unwrap_or(30).clamp(1, 100);
+        let mut params = vec![("q", q), ("per_page", per_page.to_string())];
+        match filters.sort {
+            RepoSort::BestMatch => {}
+            RepoSort::Stars => params.push(("sort", "stars".to_string())),
+            RepoSort::Updated => params.push(("sort", "updated".to_string())),
+        }
+        let url = build_url(&self.base, "/search/repositories", &params)?;
+        let mut headers: Vec<(&'static str, String)> = vec![
+            ("Accept", "application/vnd.github+json".to_string()),
+            ("X-GitHub-Api-Version", "2022-11-28".to_string()),
+        ];
+        if let Some(token) = &self.token {
+            headers.push(("Authorization", format!("Bearer {token}")));
+        }
+        let mut backoff = INITIAL_BACKOFF;
+        let mut attempt = 0;
+        loop {
+            attempt += 1;
+            self.limiter.acquire().await;
+            let resp = match self.http.get_once(&url, &headers).await {
+                Ok(resp) => resp,
+                Err(FacadeError::RateLimited { retry_after }) => {
+                    return Ok(GitHubRepoSearchResponse::unavailable(
+                        format!("GitHub repository-search rate limit hit; retry_after={retry_after:?}"),
+                        start.elapsed(),
+                    ));
+                }
+                Err(e) => return Err(e),
+            };
+            let status = resp.status();
+            if status.is_success() {
+                let parsed: GhRepoSearchResponse =
+                    resp.json().await.map_err(|e| FacadeError::Decode {
+                        backend: "github",
+                        detail: e.to_string(),
+                    })?;
+                let partial = parsed.incomplete_results.unwrap_or(false);
+                if partial {
+                    warnings.push(
+                        "incomplete_results=true: GitHub timed out mid-query; the result set is partial"
+                            .to_string(),
+                    );
+                }
+                let hits: Vec<GitHubRepoHit> = parsed
+                    .items
+                    .into_iter()
+                    .filter_map(|i| {
+                        Some(GitHubRepoHit {
+                            full_name: i.full_name.filter(|n| !n.is_empty())?,
+                            html_url: i.html_url,
+                            description: i.description,
+                            language: i.language,
+                            stars: i.stargazers_count.unwrap_or(0),
+                            forks: i.forks_count.unwrap_or(0),
+                            pushed_at: i.pushed_at,
+                            archived: i.archived.unwrap_or(false),
+                            license: i
+                                .license
+                                .and_then(|l| l.spdx_id)
+                                .filter(|s| s != "NOASSERTION"),
+                            topics: i.topics,
+                        })
+                    })
+                    .collect();
+                let has_more = parsed
+                    .total_count
+                    .is_some_and(|t| t.min(GITHUB_RESULT_CAP) > hits.len() as u64);
+                return Ok(GitHubRepoSearchResponse {
+                    hits,
+                    total: parsed.total_count,
+                    has_more,
+                    status: if partial {
+                        Status::Degraded {
+                            reason: "incomplete_results=true".to_string(),
+                        }
+                    } else {
+                        Status::Ok
+                    },
+                    warnings,
+                    elapsed: start.elapsed(),
+                });
+            }
+            let code = status.as_u16();
+            if code == 401 {
+                return Ok(GitHubRepoSearchResponse::unavailable(
+                    "GitHub rejected the request as unauthorized (401): GITHUB_TOKEN is missing or invalid",
+                    start.elapsed(),
+                ));
+            }
+            if code == 429 {
+                let reset = header_value(&resp, "x-ratelimit-reset");
+                return Ok(GitHubRepoSearchResponse::unavailable(
+                    format!(
+                        "GitHub repository-search rate limit exhausted (429); x-ratelimit-reset={reset:?}"
+                    ),
+                    start.elapsed(),
+                ));
+            }
+            if code == 403 {
+                let remaining = header_value(&resp, "x-ratelimit-remaining");
+                let reset = header_value(&resp, "x-ratelimit-reset");
+                let retry = header_value(&resp, "retry-after");
+                let body = resp.text().await.unwrap_or_default();
+                let limited = remaining.as_deref() == Some("0")
+                    || retry.is_some()
+                    || body.to_ascii_lowercase().contains("rate limit");
+                if limited {
+                    return Ok(GitHubRepoSearchResponse::unavailable(
+                        format!(
+                            "GitHub repository-search rate limit exhausted (403); x-ratelimit-reset={reset:?} retry-after={retry:?}"
+                        ),
+                        start.elapsed(),
+                    ));
+                }
+                return Err(FacadeError::GitHub(format!(
+                    "403: {}",
+                    body.chars().take(200).collect::<String>()
+                )));
+            }
+            if status.is_server_error() && attempt < MAX_ATTEMPTS {
+                tokio::time::sleep(backoff).await;
+                backoff *= 2;
+                continue;
+            }
+            if status.is_server_error() {
+                return Ok(GitHubRepoSearchResponse::unavailable(
+                    format!("GitHub returned {status} after {MAX_ATTEMPTS} attempts"),
+                    start.elapsed(),
+                ));
+            }
+            let body = resp.text().await.unwrap_or_default();
+            return Err(FacadeError::GitHub(format!(
+                "{code}: {}",
+                body.chars().take(200).collect::<String>()
+            )));
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl BackendClient for GitHubSearchClient {
     async fn search_code(&self, query: &str, filters: &Filters) -> Result<BackendResponse> {
@@ -629,5 +904,195 @@ mod tests {
             handle.await.unwrap();
         }
         assert_eq!(server.received_requests().await.unwrap().len(), 15);
+    }
+
+    fn repo_body() -> serde_json::Value {
+        json!({
+            "total_count": 2,
+            "incomplete_results": false,
+            "items": [
+                {
+                    "full_name": "johnbalvin/pyairbnb",
+                    "html_url": "https://github.com/johnbalvin/pyairbnb",
+                    "description": "Airbnb scraper",
+                    "language": "Python",
+                    "stargazers_count": 150,
+                    "forks_count": 30,
+                    "pushed_at": "2026-08-01T00:00:00Z",
+                    "archived": false,
+                    "license": { "spdx_id": "MIT" },
+                    "topics": ["airbnb", "scraper"]
+                },
+                {
+                    "full_name": "o/nolicense",
+                    "license": { "spdx_id": "NOASSERTION" },
+                    "archived": true
+                }
+            ]
+        })
+    }
+
+    #[test]
+    fn repo_query_maps_qualifiers() {
+        let q = build_repo_query(
+            "airbnb scraper",
+            &RepoSearchFilters {
+                language: Some("Python".into()),
+                min_stars: Some(50),
+                topic: Some("web scraping".into()),
+                ..RepoSearchFilters::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            q,
+            "airbnb scraper language:Python stars:>=50 topic:\"web scraping\""
+        );
+        let plain = build_repo_query("x", &RepoSearchFilters::default()).unwrap();
+        assert_eq!(plain, "x");
+        assert!(build_repo_query("  ", &RepoSearchFilters::default()).is_err());
+    }
+
+    #[tokio::test]
+    async fn repo_search_parses_hits_and_sends_qualifiers_and_auth() {
+        use wiremock::matchers::{header, query_param};
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .and(query_param("q", "airbnb scraper language:Python stars:>=10"))
+            .and(query_param("sort", "stars"))
+            .and(query_param("per_page", "5"))
+            .and(header("authorization", "Bearer tok"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(repo_body()))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let resp = client
+            .search_repos(
+                "airbnb scraper",
+                &RepoSearchFilters {
+                    language: Some("Python".into()),
+                    min_stars: Some(10),
+                    sort: RepoSort::Stars,
+                    limit: Some(5),
+                    ..RepoSearchFilters::default()
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(resp.status, Status::Ok);
+        assert_eq!(resp.hits.len(), 2);
+        let h = &resp.hits[0];
+        assert_eq!(h.full_name, "johnbalvin/pyairbnb");
+        assert_eq!(h.stars, 150);
+        assert_eq!(h.forks, 30);
+        assert_eq!(h.language.as_deref(), Some("Python"));
+        assert_eq!(h.license.as_deref(), Some("MIT"));
+        assert_eq!(h.pushed_at.as_deref(), Some("2026-08-01T00:00:00Z"));
+        assert_eq!(h.topics, vec!["airbnb", "scraper"]);
+        assert!(!h.archived);
+        assert_eq!(resp.hits[1].license, None);
+        assert!(resp.hits[1].archived);
+        assert!(!resp.has_more);
+    }
+
+    #[tokio::test]
+    async fn repo_search_without_token_warns() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(repo_body()))
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), None);
+        let resp = client
+            .search_repos("x", &RepoSearchFilters::default())
+            .await
+            .unwrap();
+        assert_eq!(resp.status, Status::Ok);
+        assert!(resp.warnings.iter().any(|w| w.contains("10 requests/min")));
+    }
+
+    #[tokio::test]
+    async fn repo_search_rate_limits_are_unavailable_not_empty() {
+        for (code, remaining) in [(429u16, None), (403, Some("0"))] {
+            let server = MockServer::start().await;
+            let mut t = ResponseTemplate::new(code).insert_header("x-ratelimit-reset", "1770000000");
+            if let Some(r) = remaining {
+                t = t.insert_header("x-ratelimit-remaining", r);
+            }
+            Mock::given(method("GET"))
+                .and(path("/search/repositories"))
+                .respond_with(t)
+                .mount(&server)
+                .await;
+            let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+            let resp = client
+                .search_repos("x", &RepoSearchFilters::default())
+                .await
+                .unwrap();
+            assert!(resp.hits.is_empty());
+            match resp.status {
+                Status::Unavailable { reason } => {
+                    assert!(reason.contains("rate limit"), "{code}: {reason}");
+                    assert!(reason.contains("1770000000"));
+                }
+                other => panic!("{code}: expected Unavailable, got {other:?}"),
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn repo_search_secondary_403_by_body_is_unavailable() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(
+                ResponseTemplate::new(403)
+                    .set_body_string("You have exceeded a secondary rate limit."),
+            )
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let resp = client
+            .search_repos("x", &RepoSearchFilters::default())
+            .await
+            .unwrap();
+        assert!(matches!(resp.status, Status::Unavailable { .. }));
+    }
+
+    #[tokio::test]
+    async fn repo_search_unauthorized_and_incomplete() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(ResponseTemplate::new(401))
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("bad".into()));
+        let resp = client
+            .search_repos("x", &RepoSearchFilters::default())
+            .await
+            .unwrap();
+        assert!(matches!(resp.status, Status::Unavailable { .. }));
+
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "total_count": 5000, "incomplete_results": true,
+                "items": [{"full_name": "a/b"}]
+            })))
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let resp = client
+            .search_repos("x", &RepoSearchFilters::default())
+            .await
+            .unwrap();
+        assert!(matches!(resp.status, Status::Degraded { .. }));
+        assert!(resp.has_more);
+        assert_eq!(resp.hits.len(), 1);
     }
 }
