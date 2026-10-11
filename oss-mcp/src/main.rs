@@ -96,7 +96,7 @@ USAGE:
     oss-mcp [--live] [--engine stub|live|hotset]
 
 OPTIONS:
-        --live      Federate with real backends (GitHub code search, grep.app,
+        --live      Federate with real backends (GitHub code search, grep.app, Sourcegraph,
                     npms.io, ecosyste.ms, deps.dev).
         --engine E  Force an engine: stub (offline fixtures), live (remote
                     backends only), or hotset (local index only; exits if no

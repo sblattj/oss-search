@@ -5,7 +5,7 @@ Fast local + federated OSS code search and repo discovery, built for AI agents (
 Not recreating the wheel is a superpower. `oss-search` answers two questions for an agent:
 
 1. **Which library already solves this?** — multi-signal repo ranking (dependents, centrality, maintenance, security posture), not just star count.
-2. **Show me real code that does this** — sub-50ms regex search over a local hot-set corpus, federated with live backends (GitHub code search, grep.app) for the long tail.
+2. **Show me real code that does this** — sub-50ms regex search over a local hot-set corpus, federated with live backends (GitHub code search, grep.app, Sourcegraph) for the long tail.
 
 ## Highlights
 
@@ -146,12 +146,14 @@ opencode — `opencode.json` at the project root:
 ```
 
 `--live` enables the remote backends (GitHub REST code and repository search,
-grep.app, deps.dev, ecosyste.ms, npms.io); without it `oss-mcp` serves an
-offline stub. `oss_search_repos` draws candidates from npms.io (npm packages)
-and GitHub repository search (any language), dedupes them by `owner/name`, and
-scores both with the same per-signal model; a GitHub-only repo has no
-dependents signal, so it is scored on stars, recency, and license. Without
-`GITHUB_TOKEN` repository search is limited to 10 requests/min.
+grep.app via its MCP endpoint, Sourcegraph, deps.dev, ecosyste.ms, npms.io);
+without it `oss-mcp` serves an offline stub. `oss_search_repos` draws
+candidates from npms.io (npm packages) and GitHub repository search (any
+language), dedupes them by `owner/name`, and scores both with the same
+per-signal model; a GitHub-only repo has no dependents signal, so it is scored
+on stars, recency, and license. Without `GITHUB_TOKEN` repository search is
+limited to 10 requests/min. Sourcegraph answers anonymously; set
+`SOURCEGRAPH_TOKEN` for higher rate limits.
 `oss-mcp --help` prints the full invocation contract.
 
 ## Query language
@@ -175,7 +177,7 @@ cargo test --workspace   # 368 tests
 | Crate | Role |
 |---|---|
 | `oss-query` | query schema, strict text⇄structured grammar, typed errors, backend planning |
-| `oss-facade` | remote clients: GitHub, grep.app, deps.dev, ecosyste.ms, npms.io (rate-limited) |
+| `oss-facade` | remote clients: GitHub, grep.app, Sourcegraph, deps.dev, ecosyste.ms, npms.io (rate-limited) |
 | `oss-corpus` | cloning, CAS blob store, dedup, license detection |
 | `oss-index` | positional-trigram index, regex planning, ranking, incremental updates |
 | `oss-semantic` | tree-sitter chunking, embeddings, vector store, RRF fusion, query routing |

@@ -12,6 +12,8 @@ pub enum FacadeError {
     GrepApp(String),
     #[error("mcp grep.app error: {0}")]
     McpGrepApp(String),
+    #[error("sourcegraph error: {0}")]
+    Sourcegraph(String),
     #[error("github error: {0}")]
     GitHub(String),
     #[error("deps.dev error: {0}")]

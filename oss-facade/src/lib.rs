@@ -7,6 +7,7 @@ mod grep_app;
 mod http;
 mod npms;
 mod rate;
+mod sourcegraph;
 mod types;
 
 pub use deps_dev::{DepsAdvisory, DepsDevClient, DepsVersionDetails, DepsVersionInfo, DEPS_DEV_BASE};
@@ -26,6 +27,7 @@ pub use grep_app::{GrepAppClient, McpGrepAppClient, GREP_APP_BASE, MCP_GREP_APP_
 pub use http::DEFAULT_TIMEOUT;
 pub use npms::{NpmsClient, NpmsPackageScore, NPMS_BASE};
 pub use rate::RateLimiter;
+pub use sourcegraph::{SourcegraphClient, SOURCEGRAPH_BASE, SOURCEGRAPH_DEADLINE};
 pub use types::{BackendResponse, Capabilities, Filters, Hit, LineRange, Status};
 
 #[async_trait::async_trait]

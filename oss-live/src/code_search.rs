@@ -66,10 +66,24 @@ pub(crate) async fn run(inner: &Inner, params: &SearchCodeParams) -> Result<Engi
         ..Filters::default()
     };
 
-    // 3. Fan out: GitHub always; grep.app via its MCP endpoint (Unavailable tolerated).
-    let (github_resps, grep_resps) = tokio::join!(
+    // 3. Fan out: GitHub and grep.app always; Sourcegraph when the plan
+    //    selected it (Unavailable tolerated for every backend).
+    let planned: HashSet<PlannedBackend> = probe_queries
+        .iter()
+        .filter_map(|(_, q)| q.plan().ok())
+        .flat_map(|p| p.backends.into_iter().map(|b| b.backend).collect::<Vec<_>>())
+        .collect();
+    let sourcegraph_planned = planned.contains(&PlannedBackend::Sourcegraph);
+    let (github_resps, grep_resps, sg_resps) = tokio::join!(
         run_all_probes(&inner.github, &probe_queries, &filters),
         run_all_probes(&inner.grep_app, &probe_queries, &filters),
+        async {
+            if sourcegraph_planned {
+                run_all_probes(&inner.sourcegraph, &probe_queries, &filters).await
+            } else {
+                Vec::new()
+            }
+        },
     );
 
     // 4. Merge with per-backend attribution (dedup on repo+path).
@@ -80,6 +94,9 @@ pub(crate) async fn run(inner: &Inner, params: &SearchCodeParams) -> Result<Engi
     for (probe_idx, resp) in grep_resps.iter().enumerate() {
         absorb(&mut merged, "grep.app", probe_idx, &params.probes, resp);
     }
+    for (probe_idx, resp) in sg_resps.iter().enumerate() {
+        absorb(&mut merged, "sourcegraph", probe_idx, &params.probes, resp);
+    }
 
     // 5. Truthful statuses: consulted backends first; backends the plan
     //    selected but this engine cannot dispatch are reported, not hidden.
@@ -87,22 +104,22 @@ pub(crate) async fn run(inner: &Inner, params: &SearchCodeParams) -> Result<Engi
         status::aggregate("github", github_resps.iter().collect::<Vec<_>>().as_slice()),
         status::aggregate("grep.app", grep_resps.iter().collect::<Vec<_>>().as_slice()),
     ];
-    let planned: HashSet<PlannedBackend> = probe_queries
-        .iter()
-        .filter_map(|(_, q)| q.plan().ok())
-        .flat_map(|p| p.backends.into_iter().map(|b| b.backend).collect::<Vec<_>>())
-        .collect();
+    let consulted = if sourcegraph_planned { 3 } else { 2 };
+    if sourcegraph_planned {
+        statuses.push(status::aggregate(
+            "sourcegraph",
+            sg_resps.iter().collect::<Vec<_>>().as_slice(),
+        ));
+    }
     for backend in planned {
         match backend {
             PlannedBackend::LocalIndex => statuses.push(status::unavailable(
                 "local_index",
                 "live engine has no local index; the stub engine serves the hot-set corpus",
             )),
-            PlannedBackend::Sourcegraph => statuses.push(status::unavailable(
-                "sourcegraph",
-                "no Sourcegraph client is wired into the live engine yet",
-            )),
-            PlannedBackend::GitHub | PlannedBackend::GrepApp => {}
+            PlannedBackend::Sourcegraph
+            | PlannedBackend::GitHub
+            | PlannedBackend::GrepApp => {}
         }
     }
     if inner.github_token.is_none()
@@ -113,13 +130,14 @@ pub(crate) async fn run(inner: &Inner, params: &SearchCodeParams) -> Result<Engi
         );
     }
     // partial reflects only backends the engine actually consulted failing;
-    // undispatchable planned backends (local index, Sourcegraph) are recorded
-    // as statuses but do not mark the result partial.
-    let partial = [&statuses[0], &statuses[1]]
-        .into_iter()
+    // undispatchable planned backends (the local index) are recorded as
+    // statuses but do not mark the result partial.
+    let partial = statuses[..consulted]
+        .iter()
         .any(|s| s.status == BackendState::Error || s.status == BackendState::Degraded);
     let backend_has_more = github_resps.iter().any(|r| r.has_more)
-        || grep_resps.iter().any(|r| r.has_more);
+        || grep_resps.iter().any(|r| r.has_more)
+        || sg_resps.iter().any(|r| r.has_more);
 
     // 6. Shape rows by mode, then window to the limit.
     let mut rows: Vec<Value> = match params.mode {
