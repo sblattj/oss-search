@@ -40,8 +40,8 @@ use oss_core::{
     SearchCodeParams, SearchReposParams,
 };
 use oss_facade::{
-    DepsDevClient, EcosystemsClient, GitHubSearchClient, GithubContentClient, GrepAppClient,
-    NpmsClient, DEPS_DEV_BASE, GITHUB_API_BASE, GREP_APP_BASE, NPMS_BASE, PACKAGES_BASE,
+    DepsDevClient, EcosystemsClient, GitHubSearchClient, GithubContentClient, McpGrepAppClient,
+    NpmsClient, DEPS_DEV_BASE, GITHUB_API_BASE, MCP_GREP_APP_BASE, NPMS_BASE, PACKAGES_BASE,
     REPOS_BASE,
 };
 use oss_rank::Ranker;
@@ -51,6 +51,8 @@ use oss_rank::Ranker;
 #[derive(Debug, Clone)]
 pub struct LiveEngineConfig {
     pub github_api_base: String,
+    /// Base of the supported grep.app MCP endpoint (`mcp.grep.app`), not the
+    /// legacy bot-gated `grep.app/api/search`.
     pub grep_app_base: String,
     pub npms_base: String,
     pub ecosystems_repos_base: String,
@@ -65,7 +67,7 @@ impl Default for LiveEngineConfig {
     fn default() -> Self {
         Self {
             github_api_base: GITHUB_API_BASE.to_string(),
-            grep_app_base: GREP_APP_BASE.to_string(),
+            grep_app_base: MCP_GREP_APP_BASE.to_string(),
             npms_base: NPMS_BASE.to_string(),
             ecosystems_repos_base: REPOS_BASE.to_string(),
             ecosystems_packages_base: PACKAGES_BASE.to_string(),
@@ -95,7 +97,7 @@ impl LiveEngineConfig {
 
 pub(crate) struct Inner {
     pub github: GitHubSearchClient,
-    pub grep_app: GrepAppClient,
+    pub grep_app: McpGrepAppClient,
     pub github_content: GithubContentClient,
     pub npms: NpmsClient,
     pub ecosystems: EcosystemsClient,
@@ -178,7 +180,7 @@ impl LiveEngine {
             };
             Inner {
                 github,
-                grep_app: GrepAppClient::with_base(&config.grep_app_base),
+                grep_app: McpGrepAppClient::with_base(&config.grep_app_base),
                 github_content,
                 npms: NpmsClient::with_base(&config.npms_base),
                 ecosystems: EcosystemsClient::with_bases(

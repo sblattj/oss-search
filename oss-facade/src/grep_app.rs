@@ -187,6 +187,11 @@ impl BackendClient for GrepAppClient {
     }
 }
 
+/// The streamable-HTTP MCP transport rejects POSTs (406) without both types.
+fn mcp_accept() -> (&'static str, String) {
+    ("accept", "application/json, text/event-stream".to_string())
+}
+
 #[derive(Clone)]
 pub struct McpGrepAppClient {
     inner: std::sync::Arc<McpGrepAppInner>,
@@ -195,7 +200,9 @@ pub struct McpGrepAppClient {
 struct McpGrepAppInner {
     http: Http,
     base: String,
-    session: tokio::sync::Mutex<Option<String>>,
+    /// `None` = not initialized; `Some(None)` = initialized, stateless server
+    /// (the live endpoint issues no `mcp-session-id`); `Some(Some(id))` = session.
+    session: tokio::sync::Mutex<Option<Option<String>>>,
     next_id: std::sync::atomic::AtomicU64,
 }
 
@@ -243,32 +250,29 @@ impl McpGrepAppClient {
                 "clientInfo": { "name": "oss-facade", "version": env!("CARGO_PKG_VERSION") }
             }
         });
-        let resp = self.inner.http.post_json(&endpoint, &body, &[]).await?;
+        let resp = self.inner.http.post_json(&endpoint, &body, &[mcp_accept()]).await?;
         if !resp.status().is_success() {
             let status = resp.status();
             return Err(FacadeError::McpGrepApp(format!(
                 "initialize failed with status {status}"
             )));
         }
+        // The production endpoint is stateless and sends no session header;
+        // a session id is optional and echoed back only when issued.
         let session_id = header_value(&resp, "mcp-session-id");
-        if session_id.is_none() {
-            return Err(FacadeError::McpGrepApp(
-                "initialize response missing mcp-session-id header".to_string(),
-            ));
-        }
         let notification = serde_json::json!({
             "jsonrpc": "2.0",
             "method": "notifications/initialized"
         });
-        let headers = session_id
-            .clone()
-            .map(|sid| vec![("mcp-session-id", sid)]);
-        let notify_headers: &[(&'static str, String)] = headers.as_deref().unwrap_or(&[]);
+        let mut notify_headers: Vec<(&'static str, String)> = vec![mcp_accept()];
+        if let Some(sid) = session_id.clone() {
+            notify_headers.push(("mcp-session-id", sid));
+        }
         self.inner
             .http
-            .post_json(&endpoint, &notification, notify_headers)
+            .post_json(&endpoint, &notification, &notify_headers)
             .await?;
-        *guard = session_id;
+        *guard = Some(session_id);
         Ok(())
     }
 
@@ -305,11 +309,20 @@ impl McpGrepAppClient {
             "params": { "name": "searchGitHub", "arguments": arguments }
         });
         let endpoint = format!("{}/", self.inner.base.trim_end_matches('/'));
-        let headers = vec![("mcp-session-id", sid)];
+        let mut headers: Vec<(&'static str, String)> = vec![mcp_accept()];
+        if let Some(sid) = sid {
+            headers.push(("mcp-session-id", sid));
+        }
         let resp = self.inner.http.post_json_once(&endpoint, &body, &headers).await?;
         let status = resp.status();
         if status.as_u16() == 404 || status.as_u16() == 400 {
             return Ok(ToolsCallOutcome::SessionExpired);
+        }
+        if status.as_u16() == 429 {
+            let retry_after = header_value(&resp, "retry-after")
+                .and_then(|v| v.parse::<u64>().ok())
+                .map(std::time::Duration::from_secs);
+            return Err(FacadeError::RateLimited { retry_after });
         }
         if !status.is_success() {
             return Err(FacadeError::McpGrepApp(format!(
@@ -437,7 +450,89 @@ fn parse_line_no(line: &str) -> Option<u64> {
     }
 }
 
+/// Parse the block format the production endpoint returns:
+/// `Repository:` / `Path:` / `URL:` / `License:` then `--- Snippet N (Line L) ---`
+/// sections, one block per file.
+fn parse_repository_blocks(text: &str) -> Vec<Hit> {
+    fn finish(
+        hits: &mut Vec<Hit>,
+        repo: Option<String>,
+        path: Option<String>,
+        url: Option<String>,
+        license: Option<String>,
+        snippet: String,
+        range: Option<(u64, u64)>,
+    ) {
+        let (Some(repo), Some(path)) = (repo, path) else { return };
+        hits.push(Hit {
+            backend: "mcp-grep-app",
+            url: url.or_else(|| Some(format!("https://github.com/{repo}/blob/HEAD/{path}"))),
+            repo: Some(repo),
+            path: Some(path),
+            line_ranges: range
+                .map(|(start, end)| vec![LineRange { start, end }])
+                .unwrap_or_default(),
+            snippet: snippet.trim().to_string(),
+            license: license.filter(|l| !l.eq_ignore_ascii_case("unknown")),
+            score: None,
+        });
+    }
+    let mut hits = Vec::new();
+    let (mut repo, mut path, mut url, mut license) = (None, None, None, None);
+    let mut snippet = String::new();
+    let mut range: Option<(u64, u64)> = None;
+    let mut cur_start: Option<u64> = None;
+    let mut cur_lines = 0u64;
+    let close_snippet = |range: &mut Option<(u64, u64)>, start: &mut Option<u64>, n: &mut u64| {
+        if let Some(st) = start.take() {
+            let end = st + n.saturating_sub(1);
+            *range = Some(match *range {
+                Some((a, b)) => (a.min(st), b.max(end)),
+                None => (st, end),
+            });
+        }
+        *n = 0;
+    };
+    for line in text.lines() {
+        if let Some(r) = line.strip_prefix("Repository: ") {
+            close_snippet(&mut range, &mut cur_start, &mut cur_lines);
+            finish(
+                &mut hits,
+                repo.take(),
+                path.take(),
+                url.take(),
+                license.take(),
+                std::mem::take(&mut snippet),
+                range.take(),
+            );
+            repo = Some(r.trim().to_string());
+        } else if repo.is_some() && cur_start.is_none() && snippet.is_empty() && line.starts_with("Path: ") {
+            path = Some(line["Path: ".len()..].trim().to_string());
+        } else if repo.is_some() && cur_start.is_none() && snippet.is_empty() && line.starts_with("URL: ") {
+            url = Some(line["URL: ".len()..].trim().to_string());
+        } else if repo.is_some() && cur_start.is_none() && snippet.is_empty() && line.starts_with("License: ") {
+            license = Some(line["License: ".len()..].trim().to_string());
+        } else if let Some(rest) = line
+            .strip_prefix("--- Snippet ")
+            .and_then(|r| r.split("(Line ").nth(1))
+        {
+            close_snippet(&mut range, &mut cur_start, &mut cur_lines);
+            cur_start = rest.trim_end_matches(" ---").trim_end_matches(')').trim().parse().ok();
+        } else if cur_start.is_some() {
+            snippet.push_str(line);
+            snippet.push('\n');
+            cur_lines += 1;
+        }
+    }
+    close_snippet(&mut range, &mut cur_start, &mut cur_lines);
+    finish(&mut hits, repo, path, url, license, snippet, range);
+    hits
+}
+
 pub fn parse_hits_from_text(text: &str) -> (Vec<Hit>, usize) {
+    if text.lines().any(|l| l.starts_with("Repository: ")) {
+        return (parse_repository_blocks(text), 0);
+    }
     struct Partial {
         repo: String,
         path: String,
@@ -539,7 +634,7 @@ impl BackendClient for McpGrepAppClient {
             Err(e) => return Err(e),
         };
         match outcome {
-            ToolsCallOutcome::IsError(text) => Ok(BackendResponse::degraded(
+            ToolsCallOutcome::IsError(text) => Ok(BackendResponse::unavailable(
                 format!(
                     "mcp.grep.app searchGitHub returned an error: {}",
                     truncate(&text, 300)
@@ -813,8 +908,24 @@ mod tests {
         assert!(session_headers);
     }
 
+    #[test]
+    fn parses_production_repository_blocks() {
+        let text = "Repository: flutter/flutter\nPath: a/b.mm\nURL: https://github.com/flutter/flutter/blob/master/a/b.mm\nLicense: BSD-3-Clause\n\nSnippets:\n--- Snippet 1 (Line 39) ---\n\nstruct S {\n  int x;\n\n--- Snippet 2 (Line 168) ---\nfoo();\nbar();\n\nRepository: o/r2\nPath: c.js\nURL: https://github.com/o/r2/blob/main/c.js\nLicense: Unknown\n\nSnippets:\n--- Snippet 1 (Line 3) ---\nuseState();\n";
+        let (hits, unparsed) = parse_hits_from_text(text);
+        assert_eq!(unparsed, 0);
+        assert_eq!(hits.len(), 2);
+        assert_eq!(hits[0].repo.as_deref(), Some("flutter/flutter"));
+        assert_eq!(hits[0].path.as_deref(), Some("a/b.mm"));
+        assert_eq!(hits[0].license.as_deref(), Some("BSD-3-Clause"));
+        assert_eq!(hits[0].line_ranges[0].start, 39);
+        assert!(hits[0].snippet.contains("foo();"));
+        assert_eq!(hits[1].repo.as_deref(), Some("o/r2"));
+        assert_eq!(hits[1].license, None);
+        assert_eq!(hits[1].line_ranges[0].start, 3);
+    }
+
     #[tokio::test]
-    async fn mcp_tool_error_is_degraded() {
+    async fn mcp_tool_error_is_unavailable() {
         let server = MockServer::start().await;
         Mock::given(method("POST"))
             .and(path("/"))
@@ -847,7 +958,37 @@ mod tests {
             .await;
         let client = McpGrepAppClient::with_base(server.uri());
         let resp = client.search_code("useFetch", &Filters::default()).await.unwrap();
-        assert!(matches!(resp.status, Status::Degraded { .. }));
+        assert!(matches!(resp.status, Status::Unavailable { .. }));
         assert!(resp.hits.is_empty());
+    }
+
+    #[tokio::test]
+    async fn mcp_stateless_server_without_session_header_works() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .and(body_partial_json(json!({"method": "tools/call"})))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "jsonrpc": "2.0", "id": 2,
+                "result": { "content": [{ "type": "text", "text": "https://github.com/o/r/blob/main/a.rs\n\n1│x\n\nLicense: MIT\n" }], "isError": false }
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "jsonrpc": "2.0", "id": 1, "result": {} })))
+            .mount(&server)
+            .await;
+        let client = McpGrepAppClient::with_base(server.uri());
+        let resp = client.search_code("x", &Filters::default()).await.unwrap();
+        assert_eq!(resp.status, Status::Ok);
+        assert_eq!(resp.hits.len(), 1);
+        let requests = server.received_requests().await.unwrap();
+        assert!(requests.iter().all(|r| r.headers.get("mcp-session-id").is_none()));
+        assert!(requests.iter().all(|r| {
+            r.headers
+                .get("accept")
+                .is_some_and(|v| v.to_str().unwrap_or("").contains("text/event-stream"))
+        }));
     }
 }

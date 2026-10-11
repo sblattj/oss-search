@@ -10,7 +10,7 @@ use std::sync::Arc;
 use oss_core::{call_tool, SearchEngine};
 use oss_live::{LiveEngine, LiveEngineConfig};
 use serde_json::{json, Value};
-use wiremock::matchers::{method, path, query_param};
+use wiremock::matchers::{body_partial_json, method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 async fn live_engine(server: &MockServer) -> LiveEngine {
@@ -62,27 +62,48 @@ fn gh_item(repo: &str, file: &str) -> Value {
     })
 }
 
-fn grep_body(total: u64, hits: Vec<(String, String)>) -> Value {
-    json!({
-        "hits": {
-            "total": total,
-            "hits": hits
-                .into_iter()
-                .map(|(repo, file)| {
-                    json!({
-                        "content": {
-                            "snippet": "let w = <mark>spawn_worker</mark>(pool);",
-                            "repo": repo,
-                            "path": file,
-                            "license": "MIT",
-                            "branch": "main"
-                        },
-                        "score": 10.0
-                    })
-                })
-                .collect::<Vec<_>>()
-        }
-    })
+/// grep.app MCP `searchGitHub` text result for the given (repo, path) hits.
+fn grep_text(hits: Vec<(String, String)>) -> String {
+    hits.into_iter()
+        .map(|(repo, file)| {
+            format!(
+                "https://github.com/{repo}/blob/main/{file}\n\n1\u{2502}let w = spawn_worker(pool);\n\nLicense: MIT\n\n"
+            )
+        })
+        .collect()
+}
+
+fn grep_result(text: &str, is_error: bool) -> ResponseTemplate {
+    ResponseTemplate::new(200).set_body_json(json!({
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": { "content": [{ "type": "text", "text": text }], "isError": is_error }
+    }))
+}
+
+/// Mount a stateless MCP grep.app endpoint (POST /; no `mcp-session-id`,
+/// like production) whose `tools/call` answers with `search`.
+async fn mount_mcp_grep(server: &MockServer, search: ResponseTemplate) {
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .and(body_partial_json(json!({"method": "initialize"})))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "jsonrpc": "2.0", "id": 1, "result": { "protocolVersion": "2025-06-18", "capabilities": {} }
+        })))
+        .mount(server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .and(body_partial_json(json!({"method": "notifications/initialized"})))
+        .respond_with(ResponseTemplate::new(202))
+        .mount(server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .and(body_partial_json(json!({"method": "tools/call"})))
+        .respond_with(search)
+        .mount(server)
+        .await;
 }
 
 #[tokio::test]
@@ -96,11 +117,7 @@ async fn search_code_merges_two_backends_one_unavailable() {
         )))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(429))
-        .mount(&server)
-        .await;
+    mount_mcp_grep(&server, ResponseTemplate::new(429)).await;
 
     let engine = live_engine(&server).await;
     let out = call(
@@ -123,6 +140,7 @@ async fn search_code_merges_two_backends_one_unavailable() {
     let grep = backend_status(&out, "grep.app");
     assert_eq!(grep["status"], json!("error"), "grep: {grep}");
     assert!(grep["detail"].as_str().unwrap().contains("rate limited"));
+    assert!(grep["detail"].as_str().unwrap().contains("mcp.grep.app"), "{grep}");
 
     // per-backend attribution on rows: every row credits github only
     for row in out["results"].as_array().unwrap() {
@@ -146,17 +164,10 @@ async fn search_code_dedupes_and_attributes_both_backends() {
         )))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(grep_body(
-            2,
-            vec![
+    mount_mcp_grep(&server, grep_result(&grep_text(vec![
                 ("tokio-rs/tokio".into(), "src/worker.rs".into()),
                 ("smol-rs/smol".into(), "src/task.rs".into()),
-            ],
-        )))
-        .mount(&server)
-        .await;
+            ]), false)).await;
 
     let engine = live_engine(&server).await;
     let out = call(
@@ -204,11 +215,7 @@ async fn search_code_two_probes_widen_probe_breadth() {
         )))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(404))
-        .mount(&server)
-        .await;
+    mount_mcp_grep(&server, ResponseTemplate::new(404)).await;
 
     let engine = live_engine(&server).await;
     let out = call(
@@ -239,11 +246,7 @@ async fn search_code_regex_probe_error_propagates_typed() {
         .respond_with(ResponseTemplate::new(200).set_body_json(github_body(0, vec![])))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(grep_body(0, vec![])))
-        .mount(&server)
-        .await;
+    mount_mcp_grep(&server, grep_result("", false)).await;
 
     let engine = live_engine(&server).await;
     let err = call(
@@ -271,11 +274,7 @@ async fn search_code_snippets_mode_rows() {
         )))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(grep_body(0, vec![])))
-        .mount(&server)
-        .await;
+    mount_mcp_grep(&server, grep_result("", false)).await;
 
     let engine = live_engine(&server).await;
     let out = call(
@@ -290,6 +289,64 @@ async fn search_code_snippets_mode_rows() {
     assert_eq!(rows[0]["repo"], json!("a/b"));
     assert_eq!(rows[0]["path"], json!("src/x.rs"));
     assert_eq!(rows[0]["probe"], json!("spawn_worker"));
+}
+
+#[tokio::test]
+async fn search_code_routes_grep_app_to_mcp_endpoint() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/search/code"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(github_body(0, vec![])))
+        .mount(&server)
+        .await;
+    mount_mcp_grep(
+        &server,
+        grep_result(&grep_text(vec![("smol-rs/smol".into(), "src/task.rs".into())]), false),
+    )
+    .await;
+
+    let engine = live_engine(&server).await;
+    let out = call(&engine, "oss_search_code", json!({"probes": ["spawn_worker"], "limit": 5}))
+        .await
+        .unwrap();
+
+    assert_eq!(backend_status(&out, "grep.app")["status"], json!("ok"));
+    let rows = out["results"].as_array().unwrap();
+    assert_eq!(rows.len(), 1);
+    assert!(rows[0]["backends"].as_array().unwrap().contains(&json!("grep.app")));
+    let reqs = server.received_requests().await.unwrap();
+    assert!(
+        reqs.iter().any(|r| r.method.as_str() == "POST"
+            && String::from_utf8_lossy(&r.body).contains("searchGitHub")),
+        "no MCP searchGitHub call"
+    );
+    assert!(
+        reqs.iter().all(|r| r.url.path() != "/api/search"),
+        "legacy endpoint must not be called"
+    );
+}
+
+#[tokio::test]
+async fn search_code_grep_app_error_result_is_unavailable_not_ok() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/search/code"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(github_body(
+            1,
+            vec![gh_item("a/b", "src/x.rs")],
+        )))
+        .mount(&server)
+        .await;
+    mount_mcp_grep(&server, grep_result("upstream search failed", true)).await;
+
+    let engine = live_engine(&server).await;
+    let out = call(&engine, "oss_search_code", json!({"probes": ["spawn_worker"]}))
+        .await
+        .unwrap();
+    let grep = backend_status(&out, "grep.app");
+    assert_eq!(grep["status"], json!("error"), "grep: {grep}");
+    assert!(grep["detail"].as_str().unwrap().contains("upstream search failed"));
+    assert_eq!(out["partial"], json!(true));
 }
 
 // --------------------------------------------------------------- search_repos
@@ -839,11 +896,7 @@ async fn token_absence_is_reported_not_fatal() {
         .respond_with(ResponseTemplate::new(200).set_body_json(github_body(1, vec![gh_item("a/b", "x.rs")])))
         .mount(&server)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/api/search"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(grep_body(0, vec![])))
-        .mount(&server)
-        .await;
+    mount_mcp_grep(&server, grep_result("", false)).await;
 
     let base = server.uri();
     let engine = tokio::task::spawn_blocking(move || {
