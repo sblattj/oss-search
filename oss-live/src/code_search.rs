@@ -66,7 +66,7 @@ pub(crate) async fn run(inner: &Inner, params: &SearchCodeParams) -> Result<Engi
         ..Filters::default()
     };
 
-    // 3. Fan out: GitHub always; grep.app legacy path (Unavailable tolerated).
+    // 3. Fan out: GitHub always; grep.app via its MCP endpoint (Unavailable tolerated).
     let (github_resps, grep_resps) = tokio::join!(
         run_all_probes(&inner.github, &probe_queries, &filters),
         run_all_probes(&inner.grep_app, &probe_queries, &filters),
