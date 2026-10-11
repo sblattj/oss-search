@@ -145,8 +145,13 @@ opencode — `opencode.json` at the project root:
 }
 ```
 
-`--live` enables the remote backends (GitHub REST code search, grep.app,
-deps.dev, ecosyste.ms, npms.io); without it `oss-mcp` serves an offline stub.
+`--live` enables the remote backends (GitHub REST code and repository search,
+grep.app, deps.dev, ecosyste.ms, npms.io); without it `oss-mcp` serves an
+offline stub. `oss_search_repos` draws candidates from npms.io (npm packages)
+and GitHub repository search (any language), dedupes them by `owner/name`, and
+scores both with the same per-signal model; a GitHub-only repo has no
+dependents signal, so it is scored on stars, recency, and license. Without
+`GITHUB_TOKEN` repository search is limited to 10 requests/min.
 `oss-mcp --help` prints the full invocation contract.
 
 ## Query language
