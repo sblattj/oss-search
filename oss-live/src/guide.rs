@@ -10,7 +10,7 @@ pub fn guide_document() -> Value {
         "engine": "live",
         "which_tool_when": [
             "oss_search_repos: discovery — 'does a tool for X exist?' (npm + ecosyste.ms, ranked with per-signal contributions)",
-            "oss_search_code: vetting — 'who actually implements idiom X?' (github + grep.app code search, merged with per-backend attribution)",
+            "oss_search_code: vetting — 'who actually implements idiom X?' (github + grep.app + sourcegraph code search, merged with per-backend attribution)",
             "oss_repo_profile: one-repo brief (ecosyste.ms + deps.dev merged)",
             "oss_repo_tree: file map via the GitHub trees API before guessing any path",
             "oss_fetch_file: byte-exact file read via the GitHub contents API, prefer line_range",
@@ -57,6 +57,7 @@ pub fn guide_document() -> Value {
         "live_backend_matrix": {
             "github": "code search: legacy syntax only (no regex/symbol:/boolean), needs GITHUB_TOKEN, 10 req/min client-side, 1000 results/query cap",
             "grep.app": "regex-capable corpus of ~1M popular repos; the legacy JSON endpoint is undocumented and often bot-challenged (429/HTML) — tolerated as Unavailable, never faked",
+            "sourcegraph": "regex-capable code search over the public streaming API (/.api/search/stream); anonymous by default (rate limited, 429 -> Unavailable), set SOURCEGRAPH_TOKEN for higher limits; no server-side offset, so deeper pages re-fetch",
             "npms.io": "npm package search + quality/popularity/maintenance scores; scores can be months stale",
             "ecosyste.ms": "repo/package metadata incl. dependents, stars, last push; 5000 req/hour per IP per service",
             "deps.dev": "exact package/version/advisory lookup across 7 systems",

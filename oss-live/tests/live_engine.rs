@@ -10,10 +10,26 @@ use std::sync::Arc;
 use oss_core::{call_tool, SearchEngine};
 use oss_live::{LiveEngine, LiveEngineConfig};
 use serde_json::{json, Value};
-use wiremock::matchers::{method, path, query_param};
+use wiremock::matchers::{method, path, query_param, query_param_contains};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+/// Real Sourcegraph stream sample (trimmed): two hits, one on github.com.
+const SG_SAMPLE: &str = include_str!("../../oss-facade/testdata/sourcegraph-stream.txt");
+
+/// Every engine test gets an empty-but-healthy Sourcegraph by default
+/// (lowest priority) so tests about other backends stay independent of it.
+/// Tests that care mount their own Sourcegraph mock at a higher priority.
 async fn live_engine(server: &MockServer) -> LiveEngine {
+    Mock::given(method("GET"))
+        .and(path("/.api/search/stream"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("content-type", "text/event-stream")
+                .set_body_string("event: done\ndata: {}\n\n"),
+        )
+        .with_priority(200)
+        .mount(server)
+        .await;
     let base = server.uri();
     tokio::task::spawn_blocking(move || LiveEngine::with_config(LiveEngineConfig::all_at(base)))
         .await
@@ -132,7 +148,95 @@ async fn search_code_merges_two_backends_one_unavailable() {
 
     // plan-selected but undispatchable backends are reported, not hidden
     assert_eq!(backend_status(&out, "local_index")["status"], json!("error"));
-    assert_eq!(backend_status(&out, "sourcegraph")["status"], json!("error"));
+    assert_eq!(backend_status(&out, "sourcegraph")["status"], json!("ok"));
+}
+
+#[tokio::test]
+async fn search_code_merges_sourcegraph_hits() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/search/code"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(github_body(
+            1,
+            vec![gh_item("sixstars/starctf2022", "web-oh-my-grafana/docker/grafana-8.2.6/grafana-8.2.6/packages/grafana-ui/src/utils/storybook/UseState.tsx")],
+        )))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/api/search"))
+        .respond_with(ResponseTemplate::new(429))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/.api/search/stream"))
+        .and(query_param_contains("q", "patternType:regexp"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("content-type", "text/event-stream")
+                .set_body_string(SG_SAMPLE),
+        )
+        .with_priority(1)
+        .mount(&server)
+        .await;
+
+    let engine = live_engine(&server).await;
+    let out = call(
+        &engine,
+        "oss_search_code",
+        json!({"probes": ["/use(State|Effect)/"], "mode": "snippets", "limit": 10}),
+    )
+    .await
+    .unwrap();
+
+    assert_eq!(backend_status(&out, "sourcegraph")["status"], json!("ok"));
+    let rows = out["results"].as_array().unwrap();
+    // two sourcegraph files; one of them is also found by github and merges
+    assert_eq!(rows.len(), 2, "{rows:?}");
+    let shared = rows
+        .iter()
+        .find(|r| r["repo"] == json!("sixstars/starctf2022"))
+        .expect("shared row");
+    assert_eq!(shared["backends"], json!(["github", "sourcegraph"]));
+    let sg_only = rows
+        .iter()
+        .find(|r| r["repo"] == json!("ChrisFeldmeier/OpenCodeRust"))
+        .expect("sourcegraph-only row");
+    assert_eq!(sg_only["backends"], json!(["sourcegraph"]));
+    assert!(sg_only["snippet"].as_str().unwrap().contains("UseState"));
+}
+
+#[tokio::test]
+async fn search_code_sourcegraph_429_is_reported_and_partial() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/search/code"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(github_body(
+            1,
+            vec![gh_item("tokio-rs/tokio", "src/worker.rs")],
+        )))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/api/search"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(grep_body(0, vec![])))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/.api/search/stream"))
+        .respond_with(ResponseTemplate::new(429))
+        .with_priority(1)
+        .mount(&server)
+        .await;
+
+    let engine = live_engine(&server).await;
+    let out = call(&engine, "oss_search_code", json!({"probes": ["spawn_worker"], "limit": 5}))
+        .await
+        .unwrap();
+    let sg = backend_status(&out, "sourcegraph");
+    assert_eq!(sg["status"], json!("error"), "{sg}");
+    assert!(sg["detail"].as_str().unwrap().contains("rate limit"));
+    assert_eq!(out["partial"], json!(true));
+    assert_eq!(out["results"].as_array().unwrap().len(), 1);
 }
 
 #[tokio::test]

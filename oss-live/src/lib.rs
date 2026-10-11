@@ -16,7 +16,7 @@
 //!   unavailable — an empty result set from a failing backend is never
 //!   presented as a negative finding;
 //! * backends the query plan selected but this engine cannot dispatch
-//!   (local index, Sourcegraph) are reported as Unavailable rather than
+//!   (the local index) are reported as Unavailable rather than
 //!   silently dropped.
 
 mod code_search;
@@ -41,8 +41,8 @@ use oss_core::{
 };
 use oss_facade::{
     DepsDevClient, EcosystemsClient, GitHubSearchClient, GithubContentClient, GrepAppClient,
-    NpmsClient, DEPS_DEV_BASE, GITHUB_API_BASE, GREP_APP_BASE, NPMS_BASE, PACKAGES_BASE,
-    REPOS_BASE,
+    NpmsClient, SourcegraphClient, DEPS_DEV_BASE, GITHUB_API_BASE, GREP_APP_BASE, NPMS_BASE,
+    PACKAGES_BASE, REPOS_BASE, SOURCEGRAPH_BASE,
 };
 use oss_rank::Ranker;
 
@@ -52,11 +52,14 @@ use oss_rank::Ranker;
 pub struct LiveEngineConfig {
     pub github_api_base: String,
     pub grep_app_base: String,
+    pub sourcegraph_base: String,
     pub npms_base: String,
     pub ecosystems_repos_base: String,
     pub ecosystems_packages_base: String,
     pub deps_dev_base: String,
     pub github_token: Option<String>,
+    /// Optional Sourcegraph token (`SOURCEGRAPH_TOKEN`); anonymous when unset.
+    pub sourcegraph_token: Option<String>,
     /// Skip client-side rate-limit pacing (tests only: uncapped pacers).
     pub uncapped_limiters: bool,
 }
@@ -66,11 +69,13 @@ impl Default for LiveEngineConfig {
         Self {
             github_api_base: GITHUB_API_BASE.to_string(),
             grep_app_base: GREP_APP_BASE.to_string(),
+            sourcegraph_base: SOURCEGRAPH_BASE.to_string(),
             npms_base: NPMS_BASE.to_string(),
             ecosystems_repos_base: REPOS_BASE.to_string(),
             ecosystems_packages_base: PACKAGES_BASE.to_string(),
             deps_dev_base: DEPS_DEV_BASE.to_string(),
             github_token: std::env::var("GITHUB_TOKEN").ok().filter(|t| !t.is_empty()),
+            sourcegraph_token: std::env::var("SOURCEGRAPH_TOKEN").ok().filter(|t| !t.is_empty()),
             uncapped_limiters: false,
         }
     }
@@ -83,11 +88,13 @@ impl LiveEngineConfig {
         Self {
             github_api_base: base.clone(),
             grep_app_base: base.clone(),
+            sourcegraph_base: base.clone(),
             npms_base: base.clone(),
             ecosystems_repos_base: base.clone(),
             ecosystems_packages_base: base.clone(),
             deps_dev_base: base,
             github_token: Some("test-token".to_string()),
+            sourcegraph_token: None,
             uncapped_limiters: true,
         }
     }
@@ -96,6 +103,7 @@ impl LiveEngineConfig {
 pub(crate) struct Inner {
     pub github: GitHubSearchClient,
     pub grep_app: GrepAppClient,
+    pub sourcegraph: SourcegraphClient,
     pub github_content: GithubContentClient,
     pub npms: NpmsClient,
     pub ecosystems: EcosystemsClient,
@@ -179,6 +187,10 @@ impl LiveEngine {
             Inner {
                 github,
                 grep_app: GrepAppClient::with_base(&config.grep_app_base),
+                sourcegraph: SourcegraphClient::with_base(
+                    &config.sourcegraph_base,
+                    config.sourcegraph_token.clone(),
+                ),
                 github_content,
                 npms: NpmsClient::with_base(&config.npms_base),
                 ecosystems: EcosystemsClient::with_bases(
@@ -216,7 +228,7 @@ impl Default for LiveEngine {
 fn untouched_status(tool: &str) -> Vec<BackendStatus> {
     let backends: &[&str] = match tool {
         "oss_search_repos" => &["npms.io", "ecosyste.ms"],
-        "oss_search_code" => &["github", "grep.app"],
+        "oss_search_code" => &["github", "grep.app", "sourcegraph"],
         "oss_repo_profile" => &["ecosyste.ms", "deps.dev"],
         "oss_repo_tree" | "oss_fetch_file" => &["github-contents"],
         "oss_fetch_docs" => &["ecosyste.ms", "github-contents"],

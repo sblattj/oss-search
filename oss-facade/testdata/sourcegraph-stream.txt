@@ -1,0 +1,8 @@
+event: matches
+data: [{"type":"content","path":"web-oh-my-grafana/docker/grafana-8.2.6/grafana-8.2.6/packages/grafana-ui/src/utils/storybook/UseState.tsx","pathMatches":[{"start":{"offset":93,"line":0,"column":93},"end":{"offset":101,"line":0,"column":101}}],"repositoryID":57776447,"repository":"github.com/sixstars/starctf2022","repoStars":74,"repoLastFetched":"2026-10-11T14:33:31.862992Z","branches":[""],"commit":"64f067089fd97638cf5bcc5e679c0593d98aeffd","hunks":null,"lineMatches":[{"line":"export class UseState<T> extends React.Component<StateHolderProps<T>, { value: T; initialState: T }> {","lineNumber":9,"offsetAndLengths":[[13,8]]},{"line":"      action('UseState current state')(this.state.value);","lineNumber":37,"offsetAndLengths":[[14,8]]}],"language":"TSX"},{"type":"content","path":"crates/opencode-tui/src/hooks/use_state.rs","repositoryID":64308167,"repository":"github.com/ChrisFeldmeier/OpenCodeRust","repoStars":63,"repoLastFetched":"2026-10-11T18:04:09.106191Z","branches":[""],"commit":"618c4b920c52af19231ce93ec5259afc2f40185a","hunks":null,"lineMatches":[{"line":"pub struct UseState<T> {","lineNumber":3,"offsetAndLengths":[[11,8]]}],"language":"Rust"}]
+
+event: progress
+data: {"done":true,"repositoriesCount":2,"matchCount":3,"durationMs":1385}
+
+event: done
+data: {}
