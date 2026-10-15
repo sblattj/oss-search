@@ -2,6 +2,7 @@
 #
 # Trigger: push a tag `v*` (e.g. v0.2.0) -> builds, uploads artifacts, and
 # attaches assets to the GitHub Release named after the tag.
+# Then the npm job publishes the npm/oss-search shim (trusted publishing).
 # Trigger: workflow_dispatch -> dry-run build; artifacts only, no Release
 # (pass the `version` input, or leave empty to use the workspace version).
 #
@@ -113,3 +114,56 @@ jobs:
           files: |
             oss-search-*.tar.gz
             oss-search-*.tar.gz.sha256
+
+  # Publishes the npm/oss-search shim after every target's binaries are on the
+  # Release (the shim downloads them on first run, so publishing first would
+  # hand out a package that 404s). Auth is npm trusted publishing: npmjs.com ->
+  # oss-search -> Settings -> Trusted Publisher lists GitHub Actions, repository
+  # sblattj/oss-search, workflow release.yml, no environment. No NPM_TOKEN.
+  npm:
+    name: publish npm shim
+    needs: build
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: npm/oss-search
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      # Trusted publishing needs npm >= 11.5.1; Node 22 ships npm 10.
+      - run: npm install -g npm@11
+
+      - name: Check the tag matches the shim version
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          if [[ "v${version}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match npm/oss-search/package.json version ${version}"
+            exit 1
+          fi
+
+      - run: npm test
+
+      - name: Publish
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          if npm view "oss-search@${version}" version >/dev/null 2>&1; then
+            echo "::notice::oss-search@${version} is already on npm; skipping publish"
+            exit 0
+          fi
+          if ! npm publish --provenance --access public; then
+            echo "::error::npm publish of oss-search@${version} failed. Check the package's Trusted Publisher (GitHub Actions, sblattj/oss-search, release.yml, no environment)."
+            exit 1
+          fi

@@ -6,6 +6,6 @@ members = [
 ]
 
 [workspace.package]
-version = "0.3.0"
+version = "0.3.1"
 license = "MIT"
 repository = "https://github.com/sblattj/oss-search"

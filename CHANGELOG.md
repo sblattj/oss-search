@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The newest heading's version must match the `[workspace.package]` version and
 `oss-mcp`'s `VERSION` constant (enforced by `oss-mcp/tests/version.rs`).
 
+## [0.3.1] - 2026-10-14
+
+### Changed
+
+- The `oss-search` npm package is published by the release workflow over npm
+  trusted publishing (GitHub OIDC), with a provenance attestation, after the
+  release binaries are attached. No code changes.
+
 ## [0.3.0] - 2026-10-11
 
 ### Added
