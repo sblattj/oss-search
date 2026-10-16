@@ -29,9 +29,11 @@ with `OSS_SEARCH_CACHE_DIR`):
 npx -y oss-search --version
 ```
 
-**2. cargo install from git** (requires a Rust toolchain):
+**2. cargo install** (requires a Rust toolchain):
 
 ```sh
+cargo install oss-mcp oss-cli
+# or the unreleased tip of main:
 cargo install --git https://github.com/sblattj/oss-search oss-mcp
 cargo install --git https://github.com/sblattj/oss-search oss-cli
 ```

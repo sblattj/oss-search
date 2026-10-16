@@ -3,14 +3,16 @@ name = "oss-cli"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "CLI twin of the oss-search MCP server, mirroring its 7-tool surface one-to-one with structured JSON output."
 edition = "2024"
 
 [dependencies]
-oss-core = { path = "../oss-core" }
-oss-live = { path = "../oss-live" }
-oss-corpus = { path = "../oss-corpus" }
-oss-index = { path = "../oss-index" }
-oss-semantic = { path = "../oss-semantic" }
+oss-core = { path = "../oss-core", version = "0.3.1" }
+oss-live = { path = "../oss-live", version = "0.3.1" }
+oss-corpus = { path = "../oss-corpus", version = "0.3.1" }
+oss-index = { path = "../oss-index", version = "0.3.1" }
+oss-semantic = { path = "../oss-semantic", version = "0.3.1" }
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

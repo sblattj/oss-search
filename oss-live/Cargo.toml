@@ -3,14 +3,16 @@ name = "oss-live"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Production SearchEngine for oss-search: local index and federated live backends with per-call truthful backend status."
 edition = "2024"
 
 [dependencies]
-oss-core = { path = "../oss-core" }
-oss-facade = { path = "../oss-facade" }
-oss-index = { path = "../oss-index" }
-oss-query = { path = "../oss-query" }
-oss-rank = { path = "../oss-rank" }
+oss-core = { path = "../oss-core", version = "0.3.1" }
+oss-facade = { path = "../oss-facade", version = "0.3.1" }
+oss-index = { path = "../oss-index", version = "0.3.1" }
+oss-query = { path = "../oss-query", version = "0.3.1" }
+oss-rank = { path = "../oss-rank", version = "0.3.1" }
 regex = "1"
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }

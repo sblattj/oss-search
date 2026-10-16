@@ -3,6 +3,8 @@ name = "oss-semantic"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Semantic layer for oss-search: tree-sitter function chunking, local embeddings, and RRF hybrid lexical+dense fusion."
 edition = "2024"
 
 [dependencies]

@@ -3,11 +3,13 @@ name = "oss-eval"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Evaluation harness for oss-search: golden-query scoring, code-search quality, latency, and report generation."
 edition = "2024"
 
 [dependencies]
-oss-index = { path = "../oss-index" }
-oss-rank = { path = "../oss-rank" }
+oss-index = { path = "../oss-index", version = "0.3.1" }
+oss-rank = { path = "../oss-rank", version = "0.3.1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

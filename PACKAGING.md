@@ -2,76 +2,39 @@
 
 ## Decision
 
-`oss-search` distributes its binaries via **GitHub Releases** and
-**`cargo install --git`**. The internal crates are *not* published to
-crates.io. There is no thin `oss-mcp` meta crate on crates.io.
+`oss-search` ships through four channels, all from the release workflow on a
+`v*` tag: prebuilt binaries on the GitHub Release, the `oss-search` npm shim,
+the workspace crates on crates.io, and `cargo install --git` for any commit.
 
 ```sh
-cargo install --git https://github.com/sblattj/oss-search oss-mcp
-cargo install --git https://github.com/sblattj/oss-search oss-cli
+cargo install oss-mcp oss-cli
+cargo install --git https://github.com/sblattj/oss-search oss-mcp   # any commit
 ```
 
-Prebuilt binaries for each release tag are attached to
-<https://github.com/sblattj/oss-search/releases>.
+## crates.io
 
-## Why not crates.io (Option X)
+A registry tarball cannot contain path dependencies, so every non-dev
+intra-workspace dependency carries a version requirement equal to the
+workspace version, e.g. `oss-core = { path = "../oss-core", version = "0.3.1" }`.
+`oss-mcp/tests/version.rs` fails when one of them drifts, and CI runs
+`cargo publish --workspace --dry-run --locked`, which packages and verifies
+all 11 crates against a temporary local registry.
 
-Publishing `oss-mcp` to crates.io requires publishing its *entire* internal
-dependency closure first, because a registry tarball cannot contain path
-dependencies. Running `cargo package -p oss-mcp --allow-dirty --no-verify`
-against the pre-0.2.0 manifests failed hard:
+The `crates` job in `.github/workflows/release.yml` publishes them in
+dependency order (`oss-core`, `oss-corpus`, `oss-facade`, `oss-index`,
+`oss-query`, `oss-rank`, `oss-semantic`, `oss-eval`, `oss-live`, `oss-cli`,
+`oss-mcp`), skipping any version already on crates.io so a re-run is safe.
+Auth is crates.io trusted publishing (GitHub OIDC via
+`rust-lang/crates-io-auth-action`): each crate lists repository
+`sblattj/oss-search`, workflow `release.yml`, no environment. There is no
+registry token secret.
 
-```
-error: failed to verify manifest at `oss-mcp/Cargo.toml`
-
-Caused by:
-  all dependencies must have a version requirement specified when packaging.
-  dependency `oss-core` does not specify a version
-  Note: The packaged dependency will use the version from crates.io,
-  the `path` specification will be removed from the dependency declaration.
-```
-
-Fixing that means adding version requirements to every internal path
-dependency and then publishing 8 crates in dependency order
-(`oss-core`, `oss-query`, `oss-facade`, `oss-rank`, `oss-index`,
-`oss-semantic`, `oss-live`, then `oss-mcp` itself; `oss-eval` and `oss-cli`
-are leaves). That path was rejected for now because:
-
-1. **Name claims are irreversible and public.** Each crates.io publish
-   permanently reserves a crate name and version. Renaming or restructuring
-   the workspace later (this is a young project) would strand those names.
-2. **Registry drift.** Once published, every internal dep resolves through
-   the registry, so `Cargo.lock` in downstream installs can pick *different*
-   internal-crate versions than the monorepo tests ran against. The
-   `--git`/`--path` path always builds exactly the commit the user asked for.
-3. **Cost with no current user demand.** Nobody is depending on these crates
-   from crates.io yet; the audience installs binaries. Publishing is pure
-   overhead until someone asks to `oss-core = "0.2"` as a library.
-
-A thin meta crate on crates.io was also rejected: a meta crate cannot wrap or
-re-export a binary, so it could only squat the name — misleading for anyone
-who `cargo add`s it. If name reservation ever matters, publish the real
-`oss-mcp` (Option X) rather than a stub.
-
-## Why `cargo install --git` works today (Option Y)
-
-`cargo install --git` clones the repository and resolves the **workspace**
-manifest at that commit, so path dependencies between members resolve within
-the checkout exactly as they do in `cargo build --release` here. No registry
-metadata is required. This was verified by installing from the repository the
-same way `--git` resolves it:
-
-```sh
-cargo install --path oss-mcp --root <tmp>   # same workspace + path-dep resolution as --git
-```
-
-which built and installed the `oss-mcp` binary successfully (see
-`Verification` below). The literal `--git https://github.com/sblattj/oss-search`
-form resolves identically once the tagged commit is pushed.
+0.2.0 and 0.3.0 were published by hand before the job existed.
 
 ## Release checklist
 
-1. Bump `[workspace.package] version` in the root `Cargo.toml`.
+1. Bump `[workspace.package] version` in the root `Cargo.toml`, and every
+   intra-workspace `version = "x.y.z"` requirement in the member manifests.
 2. Update `oss-mcp/src/version.rs` (`VERSION` const) to match.
 3. Add a `## [x.y.z]` heading to `CHANGELOG.md`.
 4. `cargo test --workspace` — the version-gate tests in
@@ -81,6 +44,7 @@ form resolves identically once the tagged commit is pushed.
    `oss-mcp` + `oss-cli` for all four targets (`--release --locked`), packages
    them as `oss-search-<version>-<target>.tar.gz` (+ `.sha256`), uploads them
    as workflow artifacts, and attaches them to the GitHub Release for the tag.
+   The `npm` and `crates` jobs then publish the shim and the crates.
    Or run the workflow manually ("Run workflow") for a dry run: pass `version`,
    or leave it empty to use the `[workspace.package]` version from the root
    `Cargo.toml`. Artifacts upload; no Release is touched.
@@ -118,11 +82,3 @@ form resolves identically once the tagged commit is pushed.
 - `cargo clippy --workspace --all-targets` — clean.
 - `cargo install --path oss-mcp --root <tmp>` — builds and installs the
   binary standalone, the same resolution `cargo install --git` performs.
-
-## Switching to crates.io later (Option X)
-
-If library consumers appear, the migration is mechanical and the version
-inheritance added in 0.2.0 already does the heavy lifting: add version
-requirements next to each internal path dependency, publish the 8 crates in
-dependency order, then `cargo publish -p oss-mcp`. Nothing in the current
-tree blocks that move.

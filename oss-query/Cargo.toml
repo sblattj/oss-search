@@ -3,6 +3,8 @@ name = "oss-query"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Typed query parameters and validation for the oss-search 7-tool surface (RE2-class regex only)."
 edition = "2021"
 
 [dependencies]

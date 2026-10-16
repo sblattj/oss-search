@@ -14,6 +14,11 @@ The newest heading's version must match the `[workspace.package]` version and
 - The `oss-search` npm package is published by the release workflow over npm
   trusted publishing (GitHub OIDC), with a provenance attestation, after the
   release binaries are attached. No code changes.
+- The workspace crates are published to crates.io by the release workflow
+  over crates.io trusted publishing, so `cargo install oss-cli` and
+  `cargo install oss-mcp` track each release. Intra-workspace dependencies
+  now carry a version requirement, checked against the workspace version by
+  `oss-mcp/tests/version.rs`; CI runs `cargo publish --workspace --dry-run`.
 
 ## [0.3.0] - 2026-10-11
 

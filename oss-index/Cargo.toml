@@ -3,6 +3,8 @@ name = "oss-index"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Pure-Rust positional-trigram code-search index for oss-search: sub-50ms regex search over a local hot-set with incremental reindexing."
 edition = "2021"
 
 [dependencies]

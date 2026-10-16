@@ -3,6 +3,8 @@ name = "oss-corpus"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Corpus pipeline for oss-search: git ingestion into a BLAKE3/zstd content-addressed store with dedup and SPDX license detection."
 edition = "2024"
 
 [dependencies]

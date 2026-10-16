@@ -3,6 +3,8 @@ name = "oss-facade"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Typed HTTP clients for oss-search's live backends: GitHub code search, grep.app, npms.io, and deps.dev, with rate limiting."
 edition = "2024"
 
 [dependencies]

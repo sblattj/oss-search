@@ -3,6 +3,8 @@ name = "oss-core"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Core types, tool dispatch, and the strict structured result envelope for the oss-search agent-facing code-search stack."
 edition = "2024"
 
 [dependencies]

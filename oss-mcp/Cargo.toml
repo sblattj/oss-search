@@ -3,11 +3,13 @@ name = "oss-mcp"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "MCP server exposing oss-search's 7 code-search and repo-discovery tools over stdio for AI coding agents."
 edition = "2024"
 
 [dependencies]
-oss-core = { path = "../oss-core" }
-oss-live = { path = "../oss-live" }
+oss-core = { path = "../oss-core", version = "0.3.1" }
+oss-live = { path = "../oss-live", version = "0.3.1" }
 serde_json = "1"
 rmcp = { version = "3", features = ["server", "transport-io"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std"] }

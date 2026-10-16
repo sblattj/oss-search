@@ -2,7 +2,8 @@
 #
 # Trigger: push a tag `v*` (e.g. v0.2.0) -> builds, uploads artifacts, and
 # attaches assets to the GitHub Release named after the tag.
-# Then the npm job publishes the npm/oss-search shim (trusted publishing).
+# Then the npm job publishes the npm/oss-search shim and the crates job
+# publishes the workspace crates to crates.io (both via trusted publishing).
 # Trigger: workflow_dispatch -> dry-run build; artifacts only, no Release
 # (pass the `version` input, or leave empty to use the workspace version).
 #
@@ -167,3 +168,59 @@ jobs:
             echo "::error::npm publish of oss-search@${version} failed. Check the package's Trusted Publisher (GitHub Actions, sblattj/oss-search, release.yml, no environment)."
             exit 1
           fi
+
+  # Publishes the 11 workspace crates to crates.io, dependencies first, so
+  # `cargo install oss-cli` / `cargo install oss-mcp` track the release.
+  # Auth is crates.io trusted publishing: each crate's Settings -> Trusted
+  # Publishing lists GitHub, repository sblattj/oss-search, workflow
+  # release.yml, no environment. No CARGO_REGISTRY_TOKEN secret.
+  # Re-runnable: a crate whose version is already on crates.io is skipped.
+  crates:
+    name: publish crates
+    needs: build
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: stable
+
+      - name: Check the tag matches the workspace version
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n1)"
+          if [[ "v${version}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match [workspace.package] version ${version}"
+            exit 1
+          fi
+
+      - name: Get a crates.io token (trusted publishing)
+        id: auth
+        uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
+
+      - name: Publish (dependencies first)
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          for crate in oss-core oss-corpus oss-facade oss-index oss-query oss-rank \
+                       oss-semantic oss-eval oss-live oss-cli oss-mcp; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' -A 'oss-search-release (github.com/sblattj/oss-search)' \
+              "https://crates.io/api/v1/crates/${crate}/${version}")"
+            if [[ "${code}" == "200" ]]; then
+              echo "::notice::${crate}@${version} is already on crates.io; skipping"
+              continue
+            fi
+            # cargo waits for each crate to reach the index before returning,
+            # so the next crate can resolve it.
+            cargo publish --locked -p "${crate}"
+          done

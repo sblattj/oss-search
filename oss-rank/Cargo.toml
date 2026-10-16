@@ -3,6 +3,8 @@ name = "oss-rank"
 version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+description = "Multi-signal repository discovery ranking for oss-search: dependents, dependency-graph PageRank, maintenance and security posture."
 edition = "2024"
 
 [dependencies]

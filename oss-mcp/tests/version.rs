@@ -112,3 +112,47 @@ fn every_workspace_member_inherits_the_workspace_version() {
         );
     }
 }
+
+/// crates.io strips `path`, so every non-dev intra-workspace dependency needs a
+/// `version` requirement, and it must track the workspace version or the
+/// published crates would depend on an older release of their siblings.
+#[test]
+fn intra_workspace_dependencies_pin_the_workspace_version() {
+    let ws = workspace_version();
+    let mut checked = 0;
+    for entry in fs::read_dir(workspace_root()).expect("read workspace root") {
+        let manifest_path = entry.expect("dir entry").path().join("Cargo.toml");
+        if !manifest_path.is_file() || manifest_path.parent() == Some(workspace_root().as_path()) {
+            continue;
+        }
+        let manifest = read(&manifest_path);
+        let mut dev = false;
+        for line in manifest.lines().map(str::trim) {
+            if line.starts_with('[') {
+                dev = line.contains("dev-dependencies");
+                continue;
+            }
+            if dev || !line.contains("path = \"../oss-") {
+                continue;
+            }
+            let pinned = line
+                .split("version = \"")
+                .nth(1)
+                .and_then(|rest| rest.split('"').next())
+                .unwrap_or_else(|| {
+                    panic!(
+                        "{}: `{line}` has no version requirement (needed for crates.io)",
+                        manifest_path.display()
+                    )
+                });
+            assert_eq!(
+                pinned,
+                ws,
+                "{}: `{line}` pins {pinned}, workspace is {ws}",
+                manifest_path.display()
+            );
+            checked += 1;
+        }
+    }
+    assert!(checked > 0, "found no intra-workspace dependencies to check");
+}
