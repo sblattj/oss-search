@@ -80,6 +80,26 @@ fn changelog_heading_matches_workspace_version() {
     );
 }
 
+/// The release workflow's npm and mcp-registry jobs refuse a tag that does not
+/// match these manifests; checking here catches the drift before the tag.
+#[test]
+fn npm_shim_and_registry_entry_match_workspace_version() {
+    let ws = workspace_version();
+    let json = |rel: &str| -> serde_json::Value {
+        serde_json::from_str(&read(&workspace_root().join(rel)))
+            .unwrap_or_else(|e| panic!("{rel} is not valid JSON: {e}"))
+    };
+    let shim = json("npm/oss-search/package.json");
+    assert_eq!(shim["version"], ws.as_str(), "npm/oss-search/package.json version");
+    let server = json("registry/server.json");
+    assert_eq!(server["version"], ws.as_str(), "registry/server.json version");
+    let packages = server["packages"].as_array().expect("server.json packages[]");
+    assert!(!packages.is_empty(), "server.json lists no packages");
+    for pkg in packages {
+        assert_eq!(pkg["version"], ws.as_str(), "registry/server.json packages[].version");
+    }
+}
+
 #[test]
 fn all_three_sources_read_0_3_1() {
     assert_eq!(workspace_version(), "0.3.1");

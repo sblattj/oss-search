@@ -2,9 +2,10 @@
 
 ## Decision
 
-`oss-search` ships through four channels, all from the release workflow on a
+`oss-search` ships through five channels, all from the release workflow on a
 `v*` tag: prebuilt binaries on the GitHub Release, the `oss-search` npm shim,
-the workspace crates on crates.io, and `cargo install --git` for any commit.
+the workspace crates on crates.io, the `io.github.sblattj/oss-search` entry on
+the MCP registry, and `cargo install --git` for any commit.
 
 ```sh
 cargo install oss-mcp oss-cli
@@ -31,20 +32,45 @@ registry token secret.
 
 0.2.0 and 0.3.0 were published by hand before the job existed.
 
+## npm
+
+The `npm` job publishes `npm/oss-search` with `--provenance` after every
+build target is on the Release (the shim downloads them on first run). Auth is
+npm trusted publishing: npmjs.com -> `oss-search` -> Settings -> Trusted
+Publisher lists GitHub Actions, `sblattj/oss-search`, `release.yml`, no
+environment, with "Allow npm publish" checked. Without that entry the publish
+fails with `E404 Not Found - PUT https://registry.npmjs.org/oss-search`.
+0.2.0 and 0.3.0 were published by hand; 0.3.1 was the first CI publish.
+
+## MCP registry
+
+The `mcp-registry` job publishes `registry/server.json` as
+`io.github.sblattj/oss-search` with a pinned, sha256-checked `mcp-publisher`.
+It runs after the `npm` job and first waits until the shim version is
+readable on npm, because the registry checks the package's `mcpName`. Auth is
+`mcp-publisher login github-oidc` (the repo's OIDC token proves the
+`io.github.sblattj` namespace), no secret. A version already on the registry
+is skipped, so a re-run is safe. 0.2.0 and 0.3.1 were published by hand with
+`mcp-publisher login github` + `mcp-publisher publish` from `registry/`; 0.3.0
+was never listed.
+
 ## Release checklist
 
 1. Bump `[workspace.package] version` in the root `Cargo.toml`, and every
-   intra-workspace `version = "x.y.z"` requirement in the member manifests.
+   intra-workspace `version = "x.y.z"` requirement in the member manifests,
+   `npm/oss-search/package.json`, and both `version` fields in
+   `registry/server.json`.
 2. Update `oss-mcp/src/version.rs` (`VERSION` const) to match.
 3. Add a `## [x.y.z]` heading to `CHANGELOG.md`.
 4. `cargo test --workspace` — the version-gate tests in
-   `oss-mcp/tests/version.rs` fail if any of the three disagree, or if a
+   `oss-mcp/tests/version.rs` fail if any of these disagree, or if a
    workspace member stops inheriting the workspace version.
 5. Tag `vx.y.z` and push it — `.github/workflows/release.yml` then builds
    `oss-mcp` + `oss-cli` for all four targets (`--release --locked`), packages
    them as `oss-search-<version>-<target>.tar.gz` (+ `.sha256`), uploads them
    as workflow artifacts, and attaches them to the GitHub Release for the tag.
-   The `npm` and `crates` jobs then publish the shim and the crates.
+   The `npm` and `crates` jobs then publish the shim and the crates, and the
+   `mcp-registry` job publishes the MCP registry entry.
    Or run the workflow manually ("Run workflow") for a dry run: pass `version`,
    or leave it empty to use the `[workspace.package]` version from the root
    `Cargo.toml`. Artifacts upload; no Release is touched.

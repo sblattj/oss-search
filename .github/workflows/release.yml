@@ -3,7 +3,9 @@
 # Trigger: push a tag `v*` (e.g. v0.2.0) -> builds, uploads artifacts, and
 # attaches assets to the GitHub Release named after the tag.
 # Then the npm job publishes the npm/oss-search shim and the crates job
-# publishes the workspace crates to crates.io (both via trusted publishing).
+# publishes the workspace crates to crates.io (both via trusted publishing),
+# and the mcp-registry job publishes registry/server.json to the MCP registry
+# once the shim is visible on npm (GitHub OIDC, no secret).
 # Trigger: workflow_dispatch -> dry-run build; artifacts only, no Release
 # (pass the `version` input, or leave empty to use the workspace version).
 #
@@ -224,3 +226,88 @@ jobs:
             # so the next crate can resolve it.
             cargo publish --locked -p "${crate}"
           done
+
+  # Publishes registry/server.json to the MCP registry (registry.modelcontextprotocol.io)
+  # as io.github.sblattj/oss-search. The registry validates the npm package's
+  # mcpName, so this waits for the shim version to be readable on npm (a fresh
+  # publish can stay invisible for minutes). Auth is `mcp-publisher login
+  # github-oidc`: the io.github.sblattj/* namespace is proven by this repo's
+  # OIDC token, no secret. Re-runnable: a version already on the registry is skipped.
+  mcp-registry:
+    name: publish MCP registry entry
+    needs: npm
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      MCP_PUBLISHER_VERSION: "1.8.1"
+      MCP_PUBLISHER_SHA256: "a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc"
+      MCP_SERVER_NAME: "io.github.sblattj/oss-search"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Check the tag matches server.json
+        id: ver
+        run: |
+          set -euo pipefail
+          version="$(jq -r .version registry/server.json)"
+          pkg_version="$(jq -r '.packages[0].version' registry/server.json)"
+          if [[ "v${version}" != "${GITHUB_REF_NAME}" || "${pkg_version}" != "${version}" ]]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match registry/server.json (version ${version}, packages[0].version ${pkg_version})"
+            exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Skip if already on the registry
+        id: existing
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          code="$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://registry.modelcontextprotocol.io/v0/servers/${MCP_SERVER_NAME/\//%2F}/versions/${VERSION}")"
+          if [[ "${code}" == "200" ]]; then
+            echo "::notice::${MCP_SERVER_NAME}@${VERSION} is already on the MCP registry; skipping"
+            echo "skip=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "skip=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Wait for the npm shim to be readable
+        if: steps.existing.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 40); do
+            if npm view "oss-search@${VERSION}" version --prefer-online >/dev/null 2>&1; then
+              echo "oss-search@${VERSION} is on npm"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::oss-search@${VERSION} still not readable on npm after 20 minutes; re-run this job once it is"
+          exit 1
+
+      - name: Install mcp-publisher (pinned, sha256-verified)
+        if: steps.existing.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          tarball="mcp-publisher_linux_amd64.tar.gz"
+          curl -fsSL -o "${tarball}" \
+            "https://github.com/modelcontextprotocol/registry/releases/download/v${MCP_PUBLISHER_VERSION}/${tarball}"
+          echo "${MCP_PUBLISHER_SHA256}  ${tarball}" | sha256sum -c -
+          tar xzf "${tarball}" mcp-publisher
+          ./mcp-publisher --version
+
+      - name: Publish
+        if: steps.existing.outputs.skip != 'true'
+        working-directory: registry
+        run: |
+          set -euo pipefail
+          ../mcp-publisher login github-oidc
+          ../mcp-publisher publish
