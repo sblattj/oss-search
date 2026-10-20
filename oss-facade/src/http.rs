@@ -118,11 +118,27 @@ fn transport_error(http: &Http, e: reqwest::Error) -> FacadeError {
     } else if e.is_decode() {
         FacadeError::Decode {
             backend: "http",
-            detail: e.to_string(),
+            detail: error_chain(&e),
         }
     } else {
-        FacadeError::Transport(e.to_string())
+        FacadeError::Transport(error_chain(&e))
     }
+}
+
+/// `reqwest::Error`'s Display stops at "error sending request for url (...)";
+/// the actual cause (refused connection, untrusted certificate) is in `source()`.
+pub fn error_chain(e: &dyn std::error::Error) -> String {
+    let mut out = e.to_string();
+    let mut source = e.source();
+    while let Some(cause) = source {
+        let text = cause.to_string();
+        if !out.contains(&text) {
+            out.push_str(": ");
+            out.push_str(&text);
+        }
+        source = cause.source();
+    }
+    out
 }
 
 pub fn header_value(resp: &Response, name: &str) -> Option<String> {
@@ -151,4 +167,48 @@ pub fn build_url(base: &str, path: &str, params: &[(&str, String)]) -> Result<St
         }
     }
     Ok(url.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn transport_error_keeps_the_source_chain() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}/", listener.local_addr().unwrap());
+        drop(listener);
+
+        let err = Http::new().get_once(&url, &[]).await.unwrap_err();
+        let FacadeError::Transport(msg) = err else {
+            panic!("expected a transport error, got {err:?}");
+        };
+        assert!(msg.starts_with("error sending request"), "{msg}");
+        assert!(
+            msg.to_ascii_lowercase().contains("connect"),
+            "underlying cause missing from: {msg}"
+        );
+    }
+
+    #[test]
+    fn error_chain_joins_every_source() {
+        let inner = std::io::Error::other("invalid peer certificate: UnknownIssuer");
+        assert_eq!(
+            error_chain(&Wrap(inner)),
+            "wrapped: invalid peer certificate: UnknownIssuer"
+        );
+    }
+
+    #[derive(Debug)]
+    struct Wrap(std::io::Error);
+    impl std::fmt::Display for Wrap {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("wrapped")
+        }
+    }
+    impl std::error::Error for Wrap {
+        fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+            Some(&self.0)
+        }
+    }
 }

@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, header_value, is_html, Http};
+use crate::http::{build_url, error_chain, header_value, is_html, Http};
 use crate::types::{
     BackendResponse, Capabilities, Filters, Hit, LineRange, Status,
 };
@@ -395,7 +395,7 @@ async fn parse_rpc_response(resp: reqwest::Response) -> Result<RpcResponse> {
     let text = resp
         .text()
         .await
-        .map_err(|e| FacadeError::Transport(e.to_string()))?;
+        .map_err(|e| FacadeError::Transport(error_chain(&e)))?;
     if content_type.to_ascii_lowercase().contains("text/event-stream") {
         for line in text.lines() {
             if let Some(data) = line.strip_prefix("data:")

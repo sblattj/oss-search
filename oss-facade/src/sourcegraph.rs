@@ -12,7 +12,7 @@ use serde::Deserialize;
 use tokio::time::Instant;
 
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, header_value};
+use crate::http::{build_url, error_chain, header_value};
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, LineRange, Status};
 use crate::BackendClient;
 
@@ -317,7 +317,7 @@ impl BackendClient for SourcegraphClient {
             let mut resp = req
                 .send()
                 .await
-                .map_err(|e| FacadeError::Transport(e.to_string()))?;
+                .map_err(|e| FacadeError::Transport(error_chain(&e)))?;
             let status = resp.status();
             if status.as_u16() == 429 {
                 let retry_after = header_value(&resp, "retry-after")
@@ -338,7 +338,7 @@ impl BackendClient for SourcegraphClient {
             while let Some(chunk) = resp
                 .chunk()
                 .await
-                .map_err(|e| FacadeError::Transport(e.to_string()))?
+                .map_err(|e| FacadeError::Transport(error_chain(&e)))?
             {
                 total += chunk.len();
                 if total > MAX_BODY_BYTES {
