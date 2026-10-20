@@ -7,13 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The newest heading's version must match the `[workspace.package]` version and
 `oss-mcp`'s `VERSION` constant (enforced by `oss-mcp/tests/version.rs`).
 
-## [0.3.1] - 2026-10-14
+## [0.3.1] - 2026-10-20
+
+### Fixed
+
+- Live backends (grep.app, Sourcegraph, npms.io, ecosyste.ms) work behind a
+  TLS-intercepting proxy: reqwest now trusts the OS root store in addition to
+  the bundled webpki roots, so a proxy CA installed in the system store is
+  accepted (#4).
+- Transport errors keep their full `source()` chain (e.g. the underlying
+  connect or certificate error) instead of a bare
+  `error sending request for url (...)` (#4).
 
 ### Changed
 
 - The `oss-search` npm package is published by the release workflow over npm
   trusted publishing (GitHub OIDC), with a provenance attestation, after the
-  release binaries are attached. No code changes.
+  release binaries are attached.
 - The workspace crates are published to crates.io by the release workflow
   over crates.io trusted publishing, so `cargo install oss-cli` and
   `cargo install oss-mcp` track each release. Intra-workspace dependencies
