@@ -2,9 +2,15 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn git(dir: &Path, args: &[&str]) {
+    // Ignore the developer's global and system git config: a global
+    // `init.templatedir` or `core.hooksPath` would install hooks that can
+    // write files into the fixture worktree and change what tests count.
     let out = Command::new("git")
         .args(args)
         .current_dir(dir)
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env_remove("GIT_TEMPLATE_DIR")
         .env("GIT_AUTHOR_NAME", "Fixture")
         .env("GIT_AUTHOR_EMAIL", "fixture@example.com")
         .env("GIT_COMMITTER_NAME", "Fixture")

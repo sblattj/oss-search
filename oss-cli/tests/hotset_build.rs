@@ -13,9 +13,13 @@ use serde_json::Value;
 const BIN: &str = env!("CARGO_BIN_EXE_oss-cli");
 
 fn git(dir: &Path, args: &[&str]) {
+    // Ignore the developer's global/system git config (templates, hooks).
     let out = Command::new("git")
         .args(args)
         .current_dir(dir)
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env_remove("GIT_TEMPLATE_DIR")
         .env("GIT_AUTHOR_NAME", "Fixture")
         .env("GIT_AUTHOR_EMAIL", "fixture@example.com")
         .env("GIT_COMMITTER_NAME", "Fixture")
