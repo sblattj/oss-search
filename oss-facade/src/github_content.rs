@@ -10,8 +10,9 @@
 use base64::Engine as _;
 use serde::Deserialize;
 
+use crate::cooldown::{skipped_reason, Cooldown};
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, Http, DEFAULT_TIMEOUT};
+use crate::http::{build_url, is_rate_limited, rate_limit_wait, Http, DEFAULT_TIMEOUT};
 use crate::rate::RateLimiter;
 
 pub const GITHUB_CONTENT_RPH: u32 = 5000;
@@ -24,6 +25,8 @@ pub struct GithubContentClient {
     base: String,
     token: Option<String>,
     limiter: RateLimiter,
+    /// One bucket for every contents/trees request.
+    cooldown: Cooldown,
 }
 
 impl GithubContentClient {
@@ -49,6 +52,7 @@ impl GithubContentClient {
             base: base.into(),
             token,
             limiter,
+            cooldown: Cooldown::new(),
         }
     }
 
@@ -61,6 +65,15 @@ impl GithubContentClient {
             headers.push(("Authorization", format!("Bearer {token}")));
         }
         headers
+    }
+
+    /// Error for a call skipped because the contents bucket is cooling down.
+    fn skipped(&self, what: &str) -> Option<FacadeError> {
+        let rem = self.cooldown.remaining()?;
+        Some(FacadeError::GitHub(format!(
+            "{what} request rate limited: {}",
+            skipped_reason("github contents", rem)
+        )))
     }
 
     /// Recursively list a repo tree. `ref_or_sha` may be a branch, tag, or
@@ -82,6 +95,9 @@ impl GithubContentClient {
             Vec::new()
         };
         let url = build_url(&self.base, &path, &params)?;
+        if let Some(e) = self.skipped("tree") {
+            return Err(e);
+        }
         self.limiter.acquire().await;
         let resp = self.http.get_once(&url, &self.headers()).await?;
         if resp.status().as_u16() == 404 {
@@ -130,6 +146,9 @@ impl GithubContentClient {
             .map(|r| vec![("ref", r.to_string())])
             .unwrap_or_default();
         let url = build_url(&self.base, &api_path, &params)?;
+        if let Some(e) = self.skipped("contents") {
+            return Err(e);
+        }
         self.limiter.acquire().await;
         let resp = self.http.get_once(&url, &self.headers()).await?;
         if resp.status().as_u16() == 404 {
@@ -170,6 +189,8 @@ impl GithubContentClient {
 
     async fn error_status(&self, resp: reqwest::Response, what: &str) -> FacadeError {
         let status = resp.status();
+        let limited = is_rate_limited(status, resp.headers());
+        let wait = rate_limit_wait(resp.headers());
         let body = resp.text().await.unwrap_or_default();
         let detail = &body[..body.len().min(200)];
         if status.as_u16() == 401 {
@@ -183,6 +204,9 @@ impl GithubContentClient {
             ));
         }
         if status.as_u16() == 403 || status.as_u16() == 429 {
+            if limited {
+                self.cooldown.trip(wait);
+            }
             return FacadeError::GitHub(format!(
                 "{what} request rate limited ({status}): contents budget is {GITHUB_CONTENT_RPH}/hour authenticated, 60/hour anonymous; back off"
             ));
@@ -397,5 +421,43 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(file.text, "abc");
+    }
+
+    #[tokio::test]
+    async fn rate_limited_contents_cools_down_and_skips_next_call() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/repos/o/r/contents/a.txt"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GithubContentClient::with_base(server.uri(), Some("tok".into()));
+        let first = client.file_contents("o", "r", "a.txt", None).await.unwrap_err();
+        assert!(first.to_string().contains("rate limited"), "{first}");
+        let second = client.file_contents("o", "r", "a.txt", None).await.unwrap_err();
+        assert!(second.to_string().contains("not called"), "{second}");
+        // Same bucket covers trees too.
+        let tree = client.tree("o", "r", "HEAD", true).await.unwrap_err();
+        assert!(tree.to_string().contains("not called"), "{tree}");
+    }
+
+    #[tokio::test]
+    async fn too_large_403_does_not_trip_contents_cooldown() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/repos/o/r/contents/big.bin"))
+            .respond_with(
+                ResponseTemplate::new(403)
+                    .set_body_string(r#"{"message":"This file is too_large to display"}"#),
+            )
+            .expect(2)
+            .mount(&server)
+            .await;
+        let client = GithubContentClient::with_base(server.uri(), Some("tok".into()));
+        for _ in 0..2 {
+            let e = client.file_contents("o", "r", "big.bin", None).await.unwrap_err();
+            assert!(e.to_string().contains("too large"), "{e}");
+        }
     }
 }

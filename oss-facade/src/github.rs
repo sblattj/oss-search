@@ -2,7 +2,8 @@ use serde::Deserialize;
 use tokio::time::Instant;
 
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, header_value, Http, DEFAULT_TIMEOUT};
+use crate::cooldown::{skipped_reason, Cooldown};
+use crate::http::{build_url, header_value, is_rate_limited, rate_limit_wait, Http, DEFAULT_TIMEOUT};
 use crate::rate::RateLimiter;
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, Status};
 use crate::BackendClient;
@@ -20,6 +21,9 @@ pub struct GitHubSearchClient {
     base: String,
     token: Option<String>,
     limiter: RateLimiter,
+    /// Code search and repository search are separate GitHub quotas.
+    code_cooldown: Cooldown,
+    repo_cooldown: Cooldown,
 }
 
 impl GitHubSearchClient {
@@ -45,6 +49,8 @@ impl GitHubSearchClient {
             base: base.into(),
             token,
             limiter,
+            code_cooldown: Cooldown::new(),
+            repo_cooldown: Cooldown::new(),
         }
     }
 }
@@ -294,10 +300,17 @@ impl GitHubSearchClient {
         let mut attempt = 0;
         loop {
             attempt += 1;
+            if let Some(rem) = self.repo_cooldown.remaining() {
+                return Ok(GitHubRepoSearchResponse::unavailable(
+                    skipped_reason("github repository search", rem),
+                    start.elapsed(),
+                ));
+            }
             self.limiter.acquire().await;
             let resp = match self.http.get_once(&url, &headers).await {
                 Ok(resp) => resp,
                 Err(FacadeError::RateLimited { retry_after }) => {
+                    self.repo_cooldown.trip(retry_after);
                     return Ok(GitHubRepoSearchResponse::unavailable(
                         format!("GitHub repository-search rate limit hit; retry_after={retry_after:?}"),
                         start.elapsed(),
@@ -366,6 +379,7 @@ impl GitHubSearchClient {
                 ));
             }
             if code == 429 {
+                self.repo_cooldown.trip(rate_limit_wait(resp.headers()));
                 let reset = header_value(&resp, "x-ratelimit-reset");
                 return Ok(GitHubRepoSearchResponse::unavailable(
                     format!(
@@ -378,11 +392,15 @@ impl GitHubSearchClient {
                 let remaining = header_value(&resp, "x-ratelimit-remaining");
                 let reset = header_value(&resp, "x-ratelimit-reset");
                 let retry = header_value(&resp, "retry-after");
+                let header_limited = is_rate_limited(status, resp.headers());
+                let wait = rate_limit_wait(resp.headers());
                 let body = resp.text().await.unwrap_or_default();
-                let limited = remaining.as_deref() == Some("0")
+                let limited = header_limited
+                    || remaining.as_deref() == Some("0")
                     || retry.is_some()
                     || body.to_ascii_lowercase().contains("rate limit");
                 if limited {
+                    self.repo_cooldown.trip(wait);
                     return Ok(GitHubRepoSearchResponse::unavailable(
                         format!(
                             "GitHub repository-search rate limit exhausted (403); x-ratelimit-reset={reset:?} retry-after={retry:?}"
@@ -450,10 +468,17 @@ impl BackendClient for GitHubSearchClient {
         let mut attempt = 0;
         loop {
             attempt += 1;
+            if let Some(rem) = self.code_cooldown.remaining() {
+                return Ok(BackendResponse::unavailable(
+                    skipped_reason("github code search", rem),
+                    start.elapsed(),
+                ));
+            }
             self.limiter.acquire().await;
             let resp = match self.http.get_once(&url, &headers).await {
                 Ok(resp) => resp,
                 Err(FacadeError::RateLimited { retry_after }) => {
+                    self.code_cooldown.trip(retry_after);
                     return Ok(BackendResponse::unavailable(
                         format!(
                             "GitHub code-search rate limit hit (client budget {} requests/min, server limit 10/min); retry_after={retry_after:?}",
@@ -533,6 +558,7 @@ impl BackendClient for GitHubSearchClient {
                 ));
             }
             if status.as_u16() == 429 {
+                self.code_cooldown.trip(rate_limit_wait(resp.headers()));
                 let reset = header_value(&resp, "x-ratelimit-reset");
                 return Ok(BackendResponse::unavailable(
                     format!(
@@ -544,7 +570,8 @@ impl BackendClient for GitHubSearchClient {
             if status.as_u16() == 403 {
                 let remaining = header_value(&resp, "x-ratelimit-remaining");
                 let reset = header_value(&resp, "x-ratelimit-reset");
-                if remaining.as_deref() == Some("0") {
+                if remaining.as_deref() == Some("0") || is_rate_limited(status, resp.headers()) {
+                    self.code_cooldown.trip(rate_limit_wait(resp.headers()));
                     return Ok(BackendResponse::unavailable(
                         format!(
                             "GitHub code-search rate limit exhausted (403 with x-ratelimit-remaining=0); x-ratelimit-reset={reset:?}"
@@ -1094,5 +1121,99 @@ mod tests {
         assert!(matches!(resp.status, Status::Degraded { .. }));
         assert!(resp.has_more);
         assert_eq!(resp.hits.len(), 1);
+    }
+
+    fn reason_of(status: &Status) -> String {
+        match status {
+            Status::Unavailable { reason } => reason.clone(),
+            other => panic!("expected Unavailable, got {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn code_search_429_cools_down_and_skips_next_call() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/code"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let first = client.search_code("q", &Filters::default()).await.unwrap();
+        assert!(reason_of(&first.status).contains("rate limit"));
+        let second = client.search_code("q", &Filters::default()).await.unwrap();
+        assert!(reason_of(&second.status).contains("not called"));
+    }
+
+    #[tokio::test]
+    async fn repo_search_429_cools_down_and_skips_next_call() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let f = RepoSearchFilters::default();
+        let first = client.search_repos("q", &f).await.unwrap();
+        assert!(reason_of(&first.status).contains("rate limit"));
+        let second = client.search_repos("q", &f).await.unwrap();
+        assert!(reason_of(&second.status).contains("not called"));
+    }
+
+    #[tokio::test]
+    async fn code_and_repo_search_cooldowns_are_independent() {
+        let reset = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + 900;
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/code"))
+            .respond_with(
+                ResponseTemplate::new(403)
+                    .insert_header("x-ratelimit-remaining", "0")
+                    .insert_header("x-ratelimit-reset", reset.to_string().as_str()),
+            )
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/search/repositories"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "total_count": 0, "incomplete_results": false, "items": []
+            })))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        let first = client.search_code("q", &Filters::default()).await.unwrap();
+        assert!(reason_of(&first.status).contains("rate limit"));
+        let repos = client
+            .search_repos("q", &RepoSearchFilters::default())
+            .await
+            .unwrap();
+        assert!(matches!(repos.status, Status::Ok), "{:?}", repos.status);
+        let second = client.search_code("q", &Filters::default()).await.unwrap();
+        let reason = reason_of(&second.status);
+        assert!(reason.contains("not called"), "{reason}");
+        assert!(reason.contains("resets in 1"), "{reason}");
+    }
+
+    #[tokio::test]
+    async fn plain_403_does_not_trip_code_cooldown() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/search/code"))
+            .respond_with(ResponseTemplate::new(403).set_body_string("forbidden"))
+            .expect(2)
+            .mount(&server)
+            .await;
+        let client = GitHubSearchClient::with_base(server.uri(), Some("tok".into()));
+        assert!(client.search_code("q", &Filters::default()).await.is_err());
+        assert!(client.search_code("q", &Filters::default()).await.is_err());
     }
 }
