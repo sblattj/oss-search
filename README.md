@@ -47,7 +47,7 @@ Binaries land in `~/.cargo/bin/`.
 `x86_64-unknown-linux-gnu`:
 
 ```sh
-curl -fsSL https://github.com/sblattj/oss-search/releases/latest/download/oss-search-0.3.1-aarch64-apple-darwin.tar.gz | tar xz
+curl -fsSL https://github.com/sblattj/oss-search/releases/latest/download/oss-search-0.3.2-aarch64-apple-darwin.tar.gz | tar xz
 ```
 
 From a checkout instead:

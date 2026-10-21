@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The newest heading's version must match the `[workspace.package]` version and
 `oss-mcp`'s `VERSION` constant (enforced by `oss-mcp/tests/version.rs`).
 
+## [0.3.2] - 2026-10-21
+
+### Fixed
+
+- A rate-limited backend is no longer called again on every request until its
+  window resets. Each backend keeps a cooldown per quota bucket (GitHub code
+  search, repository search and contents are separate; so are ecosyste.ms
+  repos and packages). While a bucket cools down, the call is skipped and the
+  backend reports `unavailable` with "rate limited; resets in 12m 30s; not
+  called", so the rest of the fan-out still answers (#6).
+- When the server's requested wait is 2 s or less, the call waits and retries
+  once instead of failing; Sourcegraph's retry stays inside its 20 s deadline
+  (#6).
+- Reset times are read from `Retry-After` as seconds or an HTTP-date, else
+  from `x-ratelimit-reset` when `x-ratelimit-remaining` is 0, capped at 1 h.
+  A GitHub 403 counts as a rate limit only with one of those signals, so a
+  plain 403 (e.g. a file too large) does not cool anything down (#6).
+
+### Changed
+
+- The release workflow publishes `registry/server.json` to the MCP registry
+  over GitHub OIDC after the npm shim is readable, skipping a version that is
+  already listed.
+
 ## [0.3.1] - 2026-10-20
 
 ### Fixed

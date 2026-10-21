@@ -16,7 +16,7 @@ cargo install --git https://github.com/sblattj/oss-search oss-mcp   # any commit
 
 A registry tarball cannot contain path dependencies, so every non-dev
 intra-workspace dependency carries a version requirement equal to the
-workspace version, e.g. `oss-core = { path = "../oss-core", version = "0.3.1" }`.
+workspace version, e.g. `oss-core = { path = "../oss-core", version = "0.3.2" }`.
 `oss-mcp/tests/version.rs` fails when one of them drifts, and CI runs
 `cargo publish --workspace --dry-run --locked`, which packages and verifies
 all 11 crates against a temporary local registry.

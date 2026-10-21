@@ -8,11 +8,11 @@ description = "Production SearchEngine for oss-search: local index and federated
 edition = "2024"
 
 [dependencies]
-oss-core = { path = "../oss-core", version = "0.3.1" }
-oss-facade = { path = "../oss-facade", version = "0.3.1" }
-oss-index = { path = "../oss-index", version = "0.3.1" }
-oss-query = { path = "../oss-query", version = "0.3.1" }
-oss-rank = { path = "../oss-rank", version = "0.3.1" }
+oss-core = { path = "../oss-core", version = "0.3.2" }
+oss-facade = { path = "../oss-facade", version = "0.3.2" }
+oss-index = { path = "../oss-index", version = "0.3.2" }
+oss-query = { path = "../oss-query", version = "0.3.2" }
+oss-rank = { path = "../oss-rank", version = "0.3.2" }
 regex = "1"
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }

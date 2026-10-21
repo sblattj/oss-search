@@ -101,10 +101,10 @@ fn npm_shim_and_registry_entry_match_workspace_version() {
 }
 
 #[test]
-fn all_three_sources_read_0_3_1() {
-    assert_eq!(workspace_version(), "0.3.1");
-    assert_eq!(oss_mcp::version::VERSION, "0.3.1");
-    assert_eq!(changelog_version(), "0.3.1");
+fn all_three_sources_read_0_3_2() {
+    assert_eq!(workspace_version(), "0.3.2");
+    assert_eq!(oss_mcp::version::VERSION, "0.3.2");
+    assert_eq!(changelog_version(), "0.3.2");
 }
 
 #[test]

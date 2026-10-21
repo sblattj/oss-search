@@ -8,8 +8,8 @@ description = "Evaluation harness for oss-search: golden-query scoring, code-sea
 edition = "2024"
 
 [dependencies]
-oss-index = { path = "../oss-index", version = "0.3.1" }
-oss-rank = { path = "../oss-rank", version = "0.3.1" }
+oss-index = { path = "../oss-index", version = "0.3.2" }
+oss-rank = { path = "../oss-rank", version = "0.3.2" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
