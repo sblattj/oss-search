@@ -3,17 +3,19 @@ use serde::Deserialize;
 use crate::error::{FacadeError, Result};
 use crate::http::{build_url, encode_segment, Http};
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, Status};
-use crate::BackendClient;
+use crate::{skipped_reason, BackendClient, Cooldown};
 
 pub const NPMS_BASE: &str = "https://api.npms.io";
 pub const NPMS_MAX_SIZE: u32 = 250;
 pub const NPMS_MAX_FROM: u32 = 10_000;
+const NPMS_LABEL: &str = "npms.io";
 const STALENESS_WARNING_DAYS: i64 = 90;
 
 #[derive(Clone)]
 pub struct NpmsClient {
     http: Http,
     base: String,
+    cooldown: Cooldown,
 }
 
 impl Default for NpmsClient {
@@ -31,6 +33,7 @@ impl NpmsClient {
         Self {
             http: Http::new(),
             base: base.into(),
+            cooldown: Cooldown::new(),
         }
     }
 
@@ -40,9 +43,13 @@ impl NpmsClient {
             &format!("/v2/package/{}", encode_segment(name)),
             &[],
         )?;
+        if let Some(rem) = self.cooldown.remaining() {
+            return Err(FacadeError::Npms(skipped_reason(NPMS_LABEL, rem)));
+        }
         let resp = match self.http.get(&url, &[]).await {
             Ok(resp) => resp,
             Err(FacadeError::RateLimited { retry_after }) => {
+                self.cooldown.trip(retry_after);
                 return Err(FacadeError::Npms(format!(
                     "npms.io rate limited (429, retry_after={retry_after:?})"
                 )));
@@ -254,9 +261,16 @@ impl BackendClient for NpmsClient {
                 ("from", from.to_string()),
             ],
         )?;
+        if let Some(rem) = self.cooldown.remaining() {
+            return Ok(BackendResponse::unavailable(
+                skipped_reason(NPMS_LABEL, rem),
+                start.elapsed(),
+            ));
+        }
         let resp = match self.http.get(&url, &[]).await {
             Ok(resp) => resp,
             Err(FacadeError::RateLimited { retry_after }) => {
+                self.cooldown.trip(retry_after);
                 return Ok(BackendResponse::unavailable(
                     format!("npms.io rate limited (429, retry_after={retry_after:?})"),
                     start.elapsed(),
@@ -478,5 +492,44 @@ mod tests {
         assert_eq!(scores.maintenance, Some(0.6));
         assert!(!scores.warnings.is_empty());
         assert!(scores.warnings[0].contains("days old"));
+    }
+
+    #[tokio::test]
+    async fn rate_limit_cools_down_and_skips_further_calls() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/v2/search"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = NpmsClient::with_base(server.uri());
+        let first = client.search_code("react", &Filters::default()).await.unwrap();
+        assert!(matches!(first.status, Status::Unavailable { .. }));
+        let second = client.search_code("react", &Filters::default()).await.unwrap();
+        match second.status {
+            Status::Unavailable { reason } => assert!(reason.contains("not called"), "{reason}"),
+            other => panic!("expected Unavailable, got {other:?}"),
+        }
+        let err = client.package_scores("react").await.unwrap_err();
+        assert!(err.to_string().contains("not called"), "{err}");
+    }
+
+    #[tokio::test]
+    async fn rate_limit_without_retry_after_still_cools_down() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/v2/search"))
+            .respond_with(ResponseTemplate::new(429))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = NpmsClient::with_base(server.uri());
+        let _ = client.search_code("react", &Filters::default()).await.unwrap();
+        let second = client.search_code("react", &Filters::default()).await.unwrap();
+        match second.status {
+            Status::Unavailable { reason } => assert!(reason.contains("not called"), "{reason}"),
+            other => panic!("expected Unavailable, got {other:?}"),
+        }
     }
 }

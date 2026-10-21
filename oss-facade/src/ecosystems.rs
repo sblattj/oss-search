@@ -3,10 +3,12 @@ use serde::Deserialize;
 use crate::error::{FacadeError, Result};
 use crate::http::{build_url, encode_segment, Http};
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, Status};
-use crate::BackendClient;
+use crate::{skipped_reason, BackendClient, Cooldown};
 
 pub const REPOS_BASE: &str = "https://repos.ecosyste.ms";
 pub const PACKAGES_BASE: &str = "https://packages.ecosyste.ms";
+const REPOS_LABEL: &str = "ecosyste.ms repos";
+const PACKAGES_LABEL: &str = "ecosyste.ms packages";
 pub const ECOSYSTEMS_RATE_LIMIT_PER_HOUR: u32 = 5000;
 
 #[derive(Clone)]
@@ -14,6 +16,8 @@ pub struct EcosystemsClient {
     http: Http,
     repos_base: String,
     packages_base: String,
+    repos_cooldown: Cooldown,
+    packages_cooldown: Cooldown,
 }
 
 impl Default for EcosystemsClient {
@@ -32,6 +36,8 @@ impl EcosystemsClient {
             http: Http::new(),
             repos_base: repos_base.into(),
             packages_base: packages_base.into(),
+            repos_cooldown: Cooldown::new(),
+            packages_cooldown: Cooldown::new(),
         }
     }
 
@@ -69,9 +75,13 @@ impl EcosystemsClient {
             "/api/v1/repositories/lookup",
             &[("url", repo_url.to_string())],
         )?;
+        if let Some(rem) = self.repos_cooldown.remaining() {
+            return Err(FacadeError::Ecosystems(skipped_reason(REPOS_LABEL, rem)));
+        }
         let resp = match self.http.get(&url, &[]).await {
             Ok(resp) => resp,
             Err(FacadeError::RateLimited { retry_after }) => {
+                self.repos_cooldown.trip(retry_after);
                 return Err(FacadeError::Ecosystems(format!(
                     "ecosyste.ms rate limited (429, retry_after={retry_after:?}); the documented budget is {ECOSYSTEMS_RATE_LIMIT_PER_HOUR} requests/hour per IP per service; back off or use bulk dumps"
                 )));
@@ -124,15 +134,19 @@ impl EcosystemsClient {
         path: String,
         what: &str,
     ) -> Result<Option<T>> {
-        let base = if what == "repository" {
-            &self.repos_base
+        let (base, cooldown, label) = if what == "repository" {
+            (&self.repos_base, &self.repos_cooldown, REPOS_LABEL)
         } else {
-            &self.packages_base
+            (&self.packages_base, &self.packages_cooldown, PACKAGES_LABEL)
         };
         let url = build_url(base, &path, &[])?;
+        if let Some(rem) = cooldown.remaining() {
+            return Err(FacadeError::Ecosystems(skipped_reason(label, rem)));
+        }
         let resp = match self.http.get(&url, &[]).await {
             Ok(resp) => resp,
             Err(FacadeError::RateLimited { retry_after }) => {
+                cooldown.trip(retry_after);
                 return Err(FacadeError::Ecosystems(format!(
                     "ecosyste.ms rate limited (429, retry_after={retry_after:?}); the documented budget is {ECOSYSTEMS_RATE_LIMIT_PER_HOUR} requests/hour per IP per service; back off or use bulk dumps"
                 )));
@@ -538,5 +552,67 @@ mod tests {
         assert_eq!(meta.dependent_packages_count, Some(93237));
         assert_eq!(meta.latest_release_number.as_deref(), Some("5.2.1"));
         assert_eq!(meta.normalized_licenses, vec!["MIT"]);
+    }
+
+    #[tokio::test]
+    async fn services_have_independent_cooldowns() {
+        let repos = MockServer::start().await;
+        let packages = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/api/v1/registries/npm/packages/react"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&packages)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/api/v1/repositories/github.com/o/r"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({"full_name": "o/r"})))
+            .expect(1)
+            .mount(&repos)
+            .await;
+        let client = EcosystemsClient::with_bases(repos.uri(), packages.uri());
+        let first = client.search_code("react", &Filters::default()).await.unwrap();
+        assert!(matches!(first.status, Status::Unavailable { .. }));
+        let second = client.search_code("react", &Filters::default()).await.unwrap();
+        match second.status {
+            Status::Unavailable { reason } => {
+                assert!(reason.contains("ecosyste.ms packages"), "{reason}");
+                assert!(reason.contains("not called"), "{reason}");
+            }
+            other => panic!("expected Unavailable, got {other:?}"),
+        }
+        let ok = client.search_code("o/r", &Filters::default()).await.unwrap();
+        assert_eq!(ok.status, Status::Ok);
+    }
+
+    #[tokio::test]
+    async fn repos_cooldown_leaves_packages_service_callable() {
+        let repos = MockServer::start().await;
+        let packages = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/api/v1/repositories/github.com/o/r"))
+            .respond_with(ResponseTemplate::new(429))
+            .expect(1)
+            .mount(&repos)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/api/v1/registries/npm/packages/react"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({"name": "react"})))
+            .expect(1)
+            .mount(&packages)
+            .await;
+        let client = EcosystemsClient::with_bases(repos.uri(), packages.uri());
+        let first = client.search_code("o/r", &Filters::default()).await.unwrap();
+        assert!(matches!(first.status, Status::Unavailable { .. }));
+        let second = client.search_code("o/r", &Filters::default()).await.unwrap();
+        match second.status {
+            Status::Unavailable { reason } => {
+                assert!(reason.contains("ecosyste.ms repos"), "{reason}");
+                assert!(reason.contains("not called"), "{reason}");
+            }
+            other => panic!("expected Unavailable, got {other:?}"),
+        }
+        let ok = client.search_code("react", &Filters::default()).await.unwrap();
+        assert_eq!(ok.status, Status::Ok);
     }
 }
