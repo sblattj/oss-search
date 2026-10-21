@@ -3,7 +3,7 @@ use serde::Deserialize;
 use crate::error::{FacadeError, Result};
 use crate::http::{build_url, encode_segment, Http};
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, Status};
-use crate::BackendClient;
+use crate::{skipped_reason, BackendClient, Cooldown};
 
 pub const DEPS_DEV_BASE: &str = "https://api.deps.dev";
 
@@ -11,6 +11,7 @@ pub const DEPS_DEV_BASE: &str = "https://api.deps.dev";
 pub struct DepsDevClient {
     http: Http,
     base: String,
+    cooldown: Cooldown,
 }
 
 impl Default for DepsDevClient {
@@ -28,6 +29,7 @@ impl DepsDevClient {
         Self {
             http: Http::new(),
             base: base.into(),
+            cooldown: Cooldown::new(),
         }
     }
 
@@ -45,7 +47,7 @@ impl DepsDevClient {
             ),
             &[],
         )?;
-        let resp = self.handle_rate_limit(self.http.get(&url, &[]).await)?;
+        let resp = self.guarded_get(&url).await?;
         if resp.status().as_u16() == 404 {
             return Err(FacadeError::DepsDev(format!(
                 "package {system}/{name} not found"
@@ -83,7 +85,7 @@ impl DepsDevClient {
             ),
             &[],
         )?;
-        let resp = self.handle_rate_limit(self.http.get(&url, &[]).await)?;
+        let resp = self.guarded_get(&url).await?;
         if resp.status().as_u16() == 404 {
             return Err(FacadeError::DepsDev(format!(
                 "version {system}/{name}@{version} not found"
@@ -120,7 +122,7 @@ impl DepsDevClient {
 
     pub async fn advisory(&self, id: &str) -> Result<DepsAdvisory> {
         let url = build_url(&self.base, &format!("/v3/advisories/{}", encode_segment(id)), &[])?;
-        let resp = self.handle_rate_limit(self.http.get(&url, &[]).await)?;
+        let resp = self.guarded_get(&url).await?;
         if resp.status().as_u16() == 404 {
             return Err(FacadeError::DepsDev(format!("advisory {id} not found")));
         }
@@ -146,14 +148,19 @@ impl DepsDevClient {
         })
     }
 
-    fn handle_rate_limit(
-        &self,
-        result: Result<reqwest::Response>,
-    ) -> Result<reqwest::Response> {
-        match result {
-            Err(FacadeError::RateLimited { retry_after }) => Err(FacadeError::DepsDev(format!(
-                "deps.dev rate limited (429, retry_after={retry_after:?}); cache and back off"
-            ))),
+    /// GET through the cooldown: skip locally while cooling down, trip on a
+    /// typed rate-limit error.
+    async fn guarded_get(&self, url: &str) -> Result<reqwest::Response> {
+        if let Some(rem) = self.cooldown.remaining() {
+            return Err(FacadeError::DepsDev(skipped_reason("deps.dev", rem)));
+        }
+        match self.http.get(url, &[]).await {
+            Err(FacadeError::RateLimited { retry_after }) => {
+                self.cooldown.trip(retry_after);
+                Err(FacadeError::DepsDev(format!(
+                    "deps.dev rate limited (429, retry_after={retry_after:?}); cache and back off"
+                )))
+            }
             other => other,
         }
     }
@@ -500,5 +507,38 @@ mod tests {
             .unwrap();
         assert_eq!(resp.status, Status::Ok);
         assert!(resp.hits.is_empty());
+    }
+
+    #[tokio::test]
+    async fn rate_limit_cools_down_and_skips_further_calls() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/v3/systems/npm/packages/react"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = DepsDevClient::with_base(server.uri());
+        let first = client.search_code("react", &Filters::default()).await.unwrap_err();
+        assert!(first.to_string().contains("rate limit"), "{first}");
+        let second = client.search_code("react", &Filters::default()).await.unwrap_err();
+        assert!(second.to_string().contains("not called"), "{second}");
+        let third = client.advisory("GHSA-x").await.unwrap_err();
+        assert!(third.to_string().contains("not called"), "{third}");
+    }
+
+    #[tokio::test]
+    async fn rate_limit_without_retry_after_still_cools_down() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/v3/systems/npm/packages/react"))
+            .respond_with(ResponseTemplate::new(429))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = DepsDevClient::with_base(server.uri());
+        let _ = client.search_code("react", &Filters::default()).await.unwrap_err();
+        let second = client.search_code("react", &Filters::default()).await.unwrap_err();
+        assert!(second.to_string().contains("not called"), "{second}");
     }
 }
