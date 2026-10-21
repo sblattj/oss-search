@@ -1,7 +1,10 @@
 use serde::Deserialize;
 
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, error_chain, header_value, is_html, Http};
+use crate::cooldown::{skipped_reason, Cooldown};
+use crate::http::{
+    build_url, error_chain, header_value, is_html, is_rate_limited, rate_limit_wait, Http,
+};
 use crate::types::{
     BackendResponse, Capabilities, Filters, Hit, LineRange, Status,
 };
@@ -14,6 +17,7 @@ pub const MCP_GREP_APP_BASE: &str = "https://mcp.grep.app";
 pub struct GrepAppClient {
     http: Http,
     base: String,
+    cooldown: Cooldown,
 }
 
 impl Default for GrepAppClient {
@@ -31,6 +35,7 @@ impl GrepAppClient {
         Self {
             http: Http::new(),
             base: base.into(),
+            cooldown: Cooldown::new(),
         }
     }
 }
@@ -79,6 +84,12 @@ pub fn clean_snippet(raw: &str) -> String {
 impl BackendClient for GrepAppClient {
     async fn search_code(&self, query: &str, filters: &Filters) -> Result<BackendResponse> {
         let start = tokio::time::Instant::now();
+        if let Some(rem) = self.cooldown.remaining() {
+            return Ok(BackendResponse::unavailable(
+                skipped_reason("grep.app (legacy)", rem),
+                start.elapsed(),
+            ));
+        }
         let from = filters.offset.unwrap_or(0).to_string();
         let params = [
             ("q", query.to_string()),
@@ -107,6 +118,7 @@ impl BackendClient for GrepAppClient {
         let resp = match self.http.get(&url, &[]).await {
             Ok(resp) => resp,
             Err(FacadeError::RateLimited { retry_after }) => {
+                self.cooldown.trip(retry_after);
                 return Ok(BackendResponse::unavailable(
                     format!(
                         "grep.app legacy endpoint rate limited or bot-challenged (429, retry_after={retry_after:?}); the endpoint is undocumented and gated by Vercel; prefer McpGrepAppClient at {MCP_GREP_APP_BASE}"
@@ -204,6 +216,7 @@ struct McpGrepAppInner {
     /// (the live endpoint issues no `mcp-session-id`); `Some(Some(id))` = session.
     session: tokio::sync::Mutex<Option<Option<String>>>,
     next_id: std::sync::atomic::AtomicU64,
+    cooldown: Cooldown,
 }
 
 impl Default for McpGrepAppClient {
@@ -224,6 +237,7 @@ impl McpGrepAppClient {
                 base: base.into(),
                 session: tokio::sync::Mutex::new(None),
                 next_id: std::sync::atomic::AtomicU64::new(1),
+                cooldown: Cooldown::new(),
             }),
         }
     }
@@ -318,11 +332,10 @@ impl McpGrepAppClient {
         if status.as_u16() == 404 || status.as_u16() == 400 {
             return Ok(ToolsCallOutcome::SessionExpired);
         }
-        if status.as_u16() == 429 {
-            let retry_after = header_value(&resp, "retry-after")
-                .and_then(|v| v.parse::<u64>().ok())
-                .map(std::time::Duration::from_secs);
-            return Err(FacadeError::RateLimited { retry_after });
+        if is_rate_limited(status, resp.headers()) {
+            return Err(FacadeError::RateLimited {
+                retry_after: rate_limit_wait(resp.headers()),
+            });
         }
         if !status.is_success() {
             return Err(FacadeError::McpGrepApp(format!(
@@ -609,21 +622,34 @@ pub fn parse_hits_from_text(text: &str) -> (Vec<Hit>, usize) {
 impl BackendClient for McpGrepAppClient {
     async fn search_code(&self, query: &str, filters: &Filters) -> Result<BackendResponse> {
         let start = tokio::time::Instant::now();
-        let attempt = self.tools_call_search(query, filters).await;
-        let outcome = match attempt {
-            Ok(ToolsCallOutcome::SessionExpired) => {
-                *self.inner.session.lock().await = None;
-                match self.tools_call_search(query, filters).await {
-                    Ok(ToolsCallOutcome::SessionExpired) => {
-                        return Err(FacadeError::McpGrepApp(
-                            "session expired twice; server rejected re-initialization".to_string(),
-                        ));
+        if let Some(rem) = self.inner.cooldown.remaining() {
+            return Ok(BackendResponse::unavailable(
+                skipped_reason("grep.app", rem),
+                start.elapsed(),
+            ));
+        }
+        let attempt = async {
+            match self.tools_call_search(query, filters).await {
+                Ok(ToolsCallOutcome::SessionExpired) => {
+                    *self.inner.session.lock().await = None;
+                    match self.tools_call_search(query, filters).await {
+                        Ok(ToolsCallOutcome::SessionExpired) => {
+                            Err(FacadeError::McpGrepApp(
+                                "session expired twice; server rejected re-initialization"
+                                    .to_string(),
+                            ))
+                        }
+                        other => other,
                     }
-                    other => other?,
                 }
+                other => other,
             }
+        }
+        .await;
+        let outcome = match attempt {
             Ok(other) => other,
             Err(FacadeError::RateLimited { retry_after }) => {
+                self.inner.cooldown.trip(retry_after);
                 return Ok(BackendResponse::unavailable(
                     format!(
                         "mcp.grep.app rate limited (429, retry_after={retry_after:?})"
@@ -716,6 +742,88 @@ mod tests {
     use serde_json::json;
     use wiremock::matchers::{body_partial_json, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    fn unavailable_reason(resp: &BackendResponse) -> &str {
+        match &resp.status {
+            Status::Unavailable { reason } => reason.as_str(),
+            other => panic!("expected unavailable, got {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn mcp_429_trips_cooldown_and_sends_nothing_next_time() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .and(body_partial_json(json!({"method": "initialize"})))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "jsonrpc": "2.0", "id": 1, "result": {}
+            })))
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .and(body_partial_json(json!({"method": "notifications/initialized"})))
+            .respond_with(ResponseTemplate::new(202))
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .and(body_partial_json(json!({"method": "tools/call"})))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = McpGrepAppClient::with_base(server.uri());
+        let first = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(unavailable_reason(&first).contains("rate limited"));
+        assert_eq!(server.received_requests().await.unwrap().len(), 3);
+        // A clone shares the cooldown; nothing at all is sent.
+        let second = client
+            .clone()
+            .search_code("x_y_z", &Filters::default())
+            .await
+            .unwrap();
+        let reason = unavailable_reason(&second);
+        assert!(reason.contains("not called"), "{reason}");
+        assert_eq!(server.received_requests().await.unwrap().len(), 3);
+    }
+
+    #[tokio::test]
+    async fn mcp_429_on_session_init_skips_everything_next_time() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = McpGrepAppClient::with_base(server.uri());
+        let first = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(unavailable_reason(&first).contains("rate limited"));
+        let second = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(unavailable_reason(&second).contains("not called"));
+    }
+
+    #[tokio::test]
+    async fn legacy_429_trips_cooldown_and_skips_next_call() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/api/search"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = GrepAppClient::with_base(server.uri());
+        let first = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(unavailable_reason(&first).contains("rate limited"));
+        let second = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        let reason = unavailable_reason(&second);
+        assert!(reason.contains("not called"), "{reason}");
+        assert_eq!(server.received_requests().await.unwrap().len(), 1);
+    }
 
     #[test]
     fn cleans_snippet_markup() {

@@ -12,7 +12,8 @@ use serde::Deserialize;
 use tokio::time::Instant;
 
 use crate::error::{FacadeError, Result};
-use crate::http::{build_url, error_chain, header_value};
+use crate::cooldown::{skipped_reason, Cooldown, SHORT_RETRY_MAX};
+use crate::http::{build_url, error_chain, is_rate_limited, rate_limit_wait};
 use crate::types::{BackendResponse, Capabilities, Filters, Hit, LineRange, Status};
 use crate::BackendClient;
 
@@ -30,6 +31,7 @@ pub struct SourcegraphClient {
     base: String,
     token: Option<String>,
     deadline: Duration,
+    cooldown: Cooldown,
 }
 
 impl SourcegraphClient {
@@ -62,6 +64,7 @@ impl SourcegraphClient {
             base: base.into().trim_end_matches('/').to_string(),
             token,
             deadline,
+            cooldown: Cooldown::new(),
         }
     }
 }
@@ -293,6 +296,12 @@ impl StreamState {
 impl BackendClient for SourcegraphClient {
     async fn search_code(&self, query: &str, filters: &Filters) -> Result<BackendResponse> {
         let start = Instant::now();
+        if let Some(rem) = self.cooldown.remaining() {
+            return Ok(BackendResponse::unavailable(
+                skipped_reason("Sourcegraph", rem),
+                start.elapsed(),
+            ));
+        }
         let limit = filters.limit.unwrap_or(30).clamp(1, MAX_COUNT);
         let offset = filters.offset.unwrap_or(0);
         // The stream API has no offset: over-fetch and skip.
@@ -314,16 +323,28 @@ impl BackendClient for SourcegraphClient {
         let mut state = StreamState::default();
         let base = self.base.clone();
         let run = async {
+            let retry_req = req.try_clone();
             let mut resp = req
                 .send()
                 .await
                 .map_err(|e| FacadeError::Transport(error_chain(&e)))?;
+            // One short in-call retry when the server asks for a brief wait.
+            if is_rate_limited(resp.status(), resp.headers())
+                && let Some(w) = rate_limit_wait(resp.headers())
+                && w <= SHORT_RETRY_MAX
+                && let Some(again) = retry_req
+            {
+                tokio::time::sleep(w).await;
+                resp = again
+                    .send()
+                    .await
+                    .map_err(|e| FacadeError::Transport(error_chain(&e)))?;
+            }
             let status = resp.status();
-            if status.as_u16() == 429 {
-                let retry_after = header_value(&resp, "retry-after")
-                    .and_then(|s| s.parse::<u64>().ok())
-                    .map(Duration::from_secs);
-                return Err(FacadeError::RateLimited { retry_after });
+            if is_rate_limited(status, resp.headers()) {
+                return Err(FacadeError::RateLimited {
+                    retry_after: rate_limit_wait(resp.headers()),
+                });
             }
             if !status.is_success() {
                 let body = resp.text().await.unwrap_or_default();
@@ -369,6 +390,7 @@ impl BackendClient for SourcegraphClient {
         match outcome {
             Ok(Ok(())) => {}
             Ok(Err(FacadeError::RateLimited { retry_after })) => {
+                self.cooldown.trip(retry_after);
                 return Ok(BackendResponse::unavailable(
                     format!("Sourcegraph rate limit hit (429); retry_after={retry_after:?}; set SOURCEGRAPH_TOKEN for higher limits"),
                     start.elapsed(),
@@ -571,6 +593,70 @@ mod tests {
             other => panic!("expected unavailable, got {other:?}"),
         }
         assert!(resp.hits.is_empty());
+    }
+
+    fn is_unavailable(resp: &BackendResponse) -> Option<&str> {
+        match &resp.status {
+            Status::Unavailable { reason } => Some(reason.as_str()),
+            _ => None,
+        }
+    }
+
+    #[tokio::test]
+    async fn short_retry_after_is_retried_once_then_ok() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/.api/search/stream"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "1"))
+            .up_to_n_times(1)
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/.api/search/stream"))
+            .respond_with(sse(SAMPLE))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = SourcegraphClient::with_base(server.uri(), None);
+        let resp = client.search_code("useState", &Filters::default()).await.unwrap();
+        assert_eq!(resp.status, Status::Ok);
+        assert_eq!(resp.hits.len(), 2);
+        assert_eq!(server.received_requests().await.unwrap().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn long_retry_after_trips_cooldown_and_skips_next_call() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/.api/search/stream"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let client = SourcegraphClient::with_base(server.uri(), None);
+        let first = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(is_unavailable(&first).unwrap().contains("rate limit"));
+        let second = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        let reason = is_unavailable(&second).expect("unavailable");
+        assert!(reason.contains("not called"), "{reason}");
+        assert!(reason.contains("rate limit"), "{reason}");
+        assert_eq!(server.received_requests().await.unwrap().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn repeated_short_429_retries_only_once() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/.api/search/stream"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "1"))
+            .expect(2)
+            .mount(&server)
+            .await;
+        let client = SourcegraphClient::with_base(server.uri(), None);
+        let resp = client.search_code("x_y_z", &Filters::default()).await.unwrap();
+        assert!(is_unavailable(&resp).unwrap().contains("rate limit"));
+        assert_eq!(server.received_requests().await.unwrap().len(), 2);
     }
 
     #[tokio::test]
