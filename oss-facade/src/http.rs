@@ -1,7 +1,9 @@
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use reqwest::header::HeaderMap;
 use reqwest::{Client, Method, Response, StatusCode};
 
+use crate::cooldown::{MAX_COOLDOWN, SHORT_RETRY_MAX};
 use crate::error::{FacadeError, Result};
 
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
@@ -82,6 +84,7 @@ impl Http {
     ) -> Result<Response> {
         let mut backoff = INITIAL_BACKOFF;
         let mut attempt = 0;
+        let mut short_retry_used = false;
         loop {
             attempt += 1;
             let mut req = self.client.request(method.clone(), url);
@@ -93,14 +96,18 @@ impl Http {
             }
             let resp = req.send().await.map_err(|e| transport_error(self, e))?;
             let status = resp.status();
-            if status == StatusCode::TOO_MANY_REQUESTS && map_429 {
-                let retry_after = resp
-                    .headers()
-                    .get("retry-after")
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|s| s.parse::<u64>().ok())
-                    .map(Duration::from_secs);
-                return Err(FacadeError::RateLimited { retry_after });
+            if is_rate_limited(status, resp.headers()) {
+                let wait = rate_limit_wait(resp.headers());
+                if !short_retry_used && wait.is_some_and(|w| w <= SHORT_RETRY_MAX) {
+                    short_retry_used = true;
+                    // The short retry does not consume a 5xx attempt.
+                    attempt -= 1;
+                    tokio::time::sleep(wait.unwrap_or_default()).await;
+                    continue;
+                }
+                if status == StatusCode::TOO_MANY_REQUESTS && map_429 {
+                    return Err(FacadeError::RateLimited { retry_after: wait });
+                }
             }
             if status.is_server_error() && attempt < attempts {
                 tokio::time::sleep(backoff).await;
@@ -110,6 +117,53 @@ impl Http {
             return Ok(resp);
         }
     }
+}
+
+/// True for 429, or 403 carrying `x-ratelimit-remaining: 0` or a `retry-after` header
+/// (GitHub's primary and secondary limits).
+pub fn is_rate_limited(status: StatusCode, headers: &HeaderMap) -> bool {
+    if status == StatusCode::TOO_MANY_REQUESTS {
+        return true;
+    }
+    status == StatusCode::FORBIDDEN
+        && (header_str(headers, "x-ratelimit-remaining").is_some_and(|v| v.trim() == "0")
+            || headers.contains_key("retry-after"))
+}
+
+/// The wait the server asked for, clamped to `MAX_COOLDOWN`.
+pub fn rate_limit_wait(headers: &HeaderMap) -> Option<Duration> {
+    rate_limit_wait_at(headers, SystemTime::now())
+}
+
+fn header_str<'a>(headers: &'a HeaderMap, name: &str) -> Option<&'a str> {
+    headers.get(name).and_then(|v| v.to_str().ok())
+}
+
+fn rate_limit_wait_at(headers: &HeaderMap, now: SystemTime) -> Option<Duration> {
+    if let Some(v) = header_str(headers, "retry-after") {
+        let v = v.trim();
+        if let Ok(secs) = v.parse::<u64>() {
+            return Some(Duration::from_secs(secs).min(MAX_COOLDOWN));
+        }
+        if let Ok(when) = httpdate::parse_http_date(v) {
+            let wait = when.duration_since(now).unwrap_or(Duration::ZERO);
+            return Some(wait.min(MAX_COOLDOWN));
+        }
+    }
+    let remaining_ok = header_str(headers, "x-ratelimit-remaining")
+        .map(|v| v.trim() == "0")
+        .unwrap_or(true);
+    if remaining_ok
+        && let Some(reset) = header_str(headers, "x-ratelimit-reset")
+            .and_then(|v| v.trim().parse::<u64>().ok())
+    {
+        let now_secs = now.duration_since(UNIX_EPOCH).ok()?.as_secs();
+        return match reset.checked_sub(now_secs) {
+            Some(d) if d > 0 => Some(Duration::from_secs(d).min(MAX_COOLDOWN)),
+            _ => None,
+        };
+    }
+    None
 }
 
 fn transport_error(http: &Http, e: reqwest::Error) -> FacadeError {
@@ -210,5 +264,186 @@ mod tests {
         fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
             Some(&self.0)
         }
+    }
+
+    use reqwest::header::{HeaderName, HeaderValue};
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    fn hm(pairs: &[(&str, &str)]) -> HeaderMap {
+        let mut h = HeaderMap::new();
+        for (k, v) in pairs {
+            h.insert(
+                HeaderName::from_bytes(k.as_bytes()).unwrap(),
+                HeaderValue::from_str(v).unwrap(),
+            );
+        }
+        h
+    }
+
+    fn epoch(secs: u64) -> SystemTime {
+        UNIX_EPOCH + Duration::from_secs(secs)
+    }
+
+    fn real_now_secs() -> u64 {
+        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
+    }
+
+    #[tokio::test]
+    async fn get_short_retry_then_ok() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/x"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "1"))
+            .up_to_n_times(1)
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/x"))
+            .respond_with(ResponseTemplate::new(200))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let resp = Http::new().get(&format!("{}/x", server.uri()), &[]).await.unwrap();
+        assert_eq!(resp.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn get_long_wait_is_rate_limited_without_retry() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "60"))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let err = Http::new().get(&format!("{}/x", server.uri()), &[]).await.unwrap_err();
+        match err {
+            FacadeError::RateLimited { retry_after } => {
+                assert_eq!(retry_after, Some(Duration::from_secs(60)))
+            }
+            other => panic!("expected RateLimited, got {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn only_one_short_retry() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .respond_with(ResponseTemplate::new(429).insert_header("retry-after", "0"))
+            .expect(2)
+            .mount(&server)
+            .await;
+        let err = Http::new().get(&format!("{}/x", server.uri()), &[]).await.unwrap_err();
+        assert!(matches!(err, FacadeError::RateLimited { .. }), "{err:?}");
+    }
+
+    #[tokio::test]
+    async fn get_once_403_with_long_reset_is_returned_unretried() {
+        let server = MockServer::start().await;
+        let reset = (real_now_secs() + 900).to_string();
+        Mock::given(method("GET"))
+            .respond_with(
+                ResponseTemplate::new(403)
+                    .insert_header("x-ratelimit-remaining", "0")
+                    .insert_header("x-ratelimit-reset", reset.as_str()),
+            )
+            .expect(1)
+            .mount(&server)
+            .await;
+        let resp = Http::new()
+            .get_once(&format!("{}/x", server.uri()), &[])
+            .await
+            .unwrap();
+        assert_eq!(resp.status(), StatusCode::FORBIDDEN);
+    }
+
+    #[test]
+    fn wait_delta_seconds() {
+        let now = epoch(1_000_000);
+        assert_eq!(
+            rate_limit_wait_at(&hm(&[("retry-after", "42")]), now),
+            Some(Duration::from_secs(42))
+        );
+    }
+
+    #[test]
+    fn wait_http_date() {
+        let now = epoch(1_700_000_000);
+        let ahead = httpdate::fmt_http_date(now + Duration::from_secs(30));
+        let past = httpdate::fmt_http_date(now - Duration::from_secs(30));
+        assert_eq!(
+            rate_limit_wait_at(&hm(&[("retry-after", &ahead)]), now),
+            Some(Duration::from_secs(30))
+        );
+        assert_eq!(
+            rate_limit_wait_at(&hm(&[("retry-after", &past)]), now),
+            Some(Duration::ZERO)
+        );
+    }
+
+    #[test]
+    fn wait_ratelimit_reset() {
+        let now = epoch(1_700_000_000);
+        let reset = "1700000090";
+        assert_eq!(
+            rate_limit_wait_at(
+                &hm(&[("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", reset)]),
+                now
+            ),
+            Some(Duration::from_secs(90))
+        );
+        assert_eq!(
+            rate_limit_wait_at(&hm(&[("x-ratelimit-reset", reset)]), now),
+            Some(Duration::from_secs(90))
+        );
+        assert_eq!(
+            rate_limit_wait_at(
+                &hm(&[("x-ratelimit-remaining", "5"), ("x-ratelimit-reset", reset)]),
+                now
+            ),
+            None
+        );
+        assert_eq!(
+            rate_limit_wait_at(
+                &hm(&[("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", "1699999990")]),
+                now
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn wait_clamped_and_empty() {
+        let now = epoch(1_700_000_000);
+        assert_eq!(
+            rate_limit_wait_at(&hm(&[("retry-after", "99999999")]), now),
+            Some(MAX_COOLDOWN)
+        );
+        assert_eq!(
+            rate_limit_wait_at(
+                &hm(&[("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", "18446744073709551615")]),
+                now
+            ),
+            Some(MAX_COOLDOWN)
+        );
+        assert_eq!(rate_limit_wait_at(&HeaderMap::new(), now), None);
+    }
+
+    #[test]
+    fn rate_limited_classification() {
+        let none = HeaderMap::new();
+        assert!(is_rate_limited(StatusCode::TOO_MANY_REQUESTS, &none));
+        assert!(is_rate_limited(
+            StatusCode::FORBIDDEN,
+            &hm(&[("x-ratelimit-remaining", "0")])
+        ));
+        assert!(is_rate_limited(StatusCode::FORBIDDEN, &hm(&[("retry-after", "5")])));
+        assert!(!is_rate_limited(StatusCode::FORBIDDEN, &none));
+        assert!(!is_rate_limited(
+            StatusCode::FORBIDDEN,
+            &hm(&[("x-ratelimit-remaining", "3")])
+        ));
+        assert!(!is_rate_limited(StatusCode::INTERNAL_SERVER_ERROR, &none));
     }
 }

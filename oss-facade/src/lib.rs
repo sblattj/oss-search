@@ -1,3 +1,4 @@
+pub mod cooldown;
 mod deps_dev;
 mod ecosystems;
 mod error;
@@ -10,6 +11,7 @@ mod rate;
 mod sourcegraph;
 mod types;
 
+pub use cooldown::{format_wait, skipped_reason, Cooldown, DEFAULT_COOLDOWN, MAX_COOLDOWN, SHORT_RETRY_MAX};
 pub use deps_dev::{DepsAdvisory, DepsDevClient, DepsVersionDetails, DepsVersionInfo, DEPS_DEV_BASE};
 pub use ecosystems::{
     EcosystemsClient, EcosystemsPackage, EcosystemsPackageMeta, EcosystemsRepo, EcosystemsRepoMeta,
@@ -24,7 +26,7 @@ pub use github_content::{
     GithubContentClient, GhFileContent, GhTree, GhTreeEntry, GITHUB_CONTENT_RPH, GITHUB_CONTENT_RPM,
 };
 pub use grep_app::{GrepAppClient, McpGrepAppClient, GREP_APP_BASE, MCP_GREP_APP_BASE};
-pub use http::DEFAULT_TIMEOUT;
+pub use http::{is_rate_limited, rate_limit_wait, DEFAULT_TIMEOUT};
 pub use npms::{NpmsClient, NpmsPackageScore, NPMS_BASE};
 pub use rate::RateLimiter;
 pub use sourcegraph::{SourcegraphClient, SOURCEGRAPH_BASE, SOURCEGRAPH_DEADLINE};
