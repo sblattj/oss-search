@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The newest heading's version must match the `[workspace.package]` version and
 `oss-mcp`'s `VERSION` constant (enforced by `oss-mcp/tests/version.rs`).
 
+## [0.3.3] - 2026-11-20
+
+### Fixed
+
+- tools/list now carries ttlMs (3600000) and cacheScope (public), required by MCP 2026-07-28; the official SDK client previously rejected the result and listed no tools (#8).
+- oss_fetch_docs: /regex/ patterns are now compiled (case-insensitive, per line) instead of matched as literal text; an invalid regex returns a typed invalid-value error instead of silent 0 hits; the status detail prints the hit count (was a bool). Schema text now describes literal vs /regex/. The stub engine compiles /regex/ too, via the shared oss_core::LineMatcher (#9).
+
 ## [0.3.2] - 2026-10-21
 
 ### Fixed

@@ -2098,7 +2098,7 @@ dependencies = [
 
 [[package]]
 name = "oss-cli"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "clap",
  "oss-core",
@@ -2115,7 +2115,7 @@ dependencies = [
 
 [[package]]
 name = "oss-core"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "regex",
  "serde",
@@ -2124,7 +2124,7 @@ dependencies = [
 
 [[package]]
 name = "oss-corpus"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "blake3",
  "rusqlite",
@@ -2139,7 +2139,7 @@ dependencies = [
 
 [[package]]
 name = "oss-eval"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "oss-index",
  "oss-rank",
@@ -2150,7 +2150,7 @@ dependencies = [
 
 [[package]]
 name = "oss-facade"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -2165,7 +2165,7 @@ dependencies = [
 
 [[package]]
 name = "oss-index"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "rayon",
  "regex",
@@ -2178,7 +2178,7 @@ dependencies = [
 
 [[package]]
 name = "oss-live"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "oss-core",
  "oss-facade",
@@ -2194,7 +2194,7 @@ dependencies = [
 
 [[package]]
 name = "oss-mcp"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "oss-core",
  "oss-index",
@@ -2207,7 +2207,7 @@ dependencies = [
 
 [[package]]
 name = "oss-query"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "regex",
  "serde",
@@ -2217,7 +2217,7 @@ dependencies = [
 
 [[package]]
 name = "oss-rank"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "serde",
  "serde_json",
@@ -2225,7 +2225,7 @@ dependencies = [
 
 [[package]]
 name = "oss-semantic"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "bincode",
  "fastembed",
