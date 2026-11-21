@@ -763,19 +763,14 @@ impl SearchEngine for StubEngine {
                 input: input.clone(),
                 correction: "call oss_search_repos to find the exact owner/name first".into(),
             })?;
-        let needle = params
-            .pattern
-            .strip_prefix('/')
-            .and_then(|i| i.strip_suffix('/'))
-            .unwrap_or(&params.pattern)
-            .to_lowercase();
+        let matcher = crate::LineMatcher::new(&params.pattern, &input)?;
         let mut rows: Vec<Value> = Vec::new();
         for doc in &r.docs {
             let hits: Vec<Value> = doc
                 .lines
                 .iter()
                 .enumerate()
-                .filter(|(_, l)| l.to_lowercase().contains(&needle))
+                .filter(|(_, l)| matcher.is_match(l))
                 .map(|(i, l)| {
                     json!({
                         "line": i + 1,

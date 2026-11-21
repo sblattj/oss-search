@@ -2,6 +2,7 @@ mod dispatch;
 mod engine;
 mod envelope;
 mod error;
+mod line_matcher;
 mod params;
 mod schema;
 mod shaping;
@@ -22,4 +23,5 @@ pub use shaping::{
     sanitize_rows, sanitize_str, sanitize_value, SanitizeReport, Snippet, DEFAULT_CONTEXT_LINES,
     MAX_CONTEXT_LINES, MAX_LINE_LEN, MIN_CONTEXT_LINES,
 };
+pub use line_matcher::LineMatcher;
 pub use stub::StubEngine;

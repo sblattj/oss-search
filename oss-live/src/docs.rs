@@ -10,7 +10,7 @@ use oss_core::FetchDocsParams;
 use serde_json::{json, Value};
 
 use crate::status;
-use crate::util::{split_repo, strip_probe_delimiters};
+use crate::util::split_repo;
 use crate::Inner;
 
 pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<EngineOutput, ToolError> {
@@ -93,21 +93,7 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
     // Plain text: case-insensitive literal substring. `/regex/`: compiled with
     // the same regex engine `oss_search_code` uses (case-insensitive, per
     // line); an invalid regex is a typed error, never a silent 0 hits.
-    let (pattern, is_regex) = strip_probe_delimiters(&params.pattern);
-    let matcher = if is_regex {
-        let re = regex::RegexBuilder::new(pattern)
-            .case_insensitive(true)
-            .build()
-            .map_err(|e| ToolError::InvalidValue {
-                field: "pattern".into(),
-                message: format!("invalid regex `{pattern}`: {e}"),
-                input: input.clone(),
-                correction: "use RE2-style /regex/ syntax, or pass plain text for a literal match; see oss_guide".into(),
-            })?;
-        Matcher::Regex(re)
-    } else {
-        Matcher::Literal(pattern.to_lowercase())
-    };
+    let matcher = oss_core::LineMatcher::new(&params.pattern, &input)?;
     let source_url = meta
         .html_url
         .clone()
@@ -144,20 +130,6 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
         ],
     );
     Ok(EngineOutput::complete(if found { vec![row] } else { vec![] }))
-}
-
-enum Matcher {
-    Literal(String),
-    Regex(regex::Regex),
-}
-
-impl Matcher {
-    fn is_match(&self, line: &str) -> bool {
-        match self {
-            Matcher::Literal(needle) => line.to_lowercase().contains(needle),
-            Matcher::Regex(re) => re.is_match(line),
-        }
-    }
 }
 
 fn partial_empty() -> EngineOutput {
