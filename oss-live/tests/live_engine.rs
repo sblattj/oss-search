@@ -1119,6 +1119,76 @@ async fn fetch_docs_searches_readme_with_breadcrumbs() {
     assert_eq!(backend_status(&out, "github-contents")["status"], json!("ok"));
 }
 
+async fn docs_engine(server: &MockServer, readme: &str) -> LiveEngine {
+    Mock::given(method("GET"))
+        .and(path("/api/v1/repositories/lookup"))
+        .and(query_param("url", "https://github.com/acme/cli"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "full_name": "acme/cli",
+            "html_url": "https://github.com/acme/cli",
+            "metadata": { "files": { "readme": "README.md" } }
+        })))
+        .mount(server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/repos/acme/cli/contents/README.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "path": "README.md",
+            "size": readme.len(),
+            "encoding": "base64",
+            "content": base64_sim::b64(readme.as_bytes())
+        })))
+        .mount(server)
+        .await;
+    live_engine(server).await
+}
+
+#[tokio::test]
+async fn fetch_docs_slash_patterns_are_real_regexes() {
+    let server = MockServer::start().await;
+    let readme = "# cli\n\ncli choose item\nconfirm the action\nCHOOSE loudly\nchoooose many\ncho then se\nchoose a limit of 3";
+    let engine = docs_engine(&server, readme).await;
+    // (pattern, expected 1-based hit lines); case-insensitive like literals
+    let cases: &[(&str, &[u64])] = &[
+        ("choose", &[3, 5, 8]),
+        ("/choose/", &[3, 5, 8]),
+        ("/choose|confirm/", &[3, 4, 5, 8]),
+        ("/[Cc]hoose/", &[3, 5, 8]),
+        ("/cho+se/", &[3, 5, 6, 8]),
+        ("/choose.*limit/", &[8]),
+    ];
+    for (pattern, lines) in cases {
+        let out = call(&engine, "oss_fetch_docs", json!({"repo": "acme/cli", "pattern": pattern}))
+            .await
+            .unwrap();
+        let got: Vec<u64> = out["results"][0]["hits"]
+            .as_array()
+            .unwrap_or(&vec![])
+            .iter()
+            .map(|h| h["line"].as_u64().unwrap())
+            .collect();
+        assert_eq!(&got, lines, "pattern {pattern}");
+        let detail = backend_status(&out, "github-contents")["detail"].as_str().unwrap().to_string();
+        assert_eq!(detail, format!("readme fetched, {} matching line(s)", lines.len()), "pattern {pattern}");
+    }
+    // zero hits prints a count, not a bool
+    let out = call(&engine, "oss_fetch_docs", json!({"repo": "acme/cli", "pattern": "/zzz+/"}))
+        .await
+        .unwrap();
+    assert_eq!(backend_status(&out, "github-contents")["detail"], json!("readme fetched, 0 matching line(s)"));
+}
+
+#[tokio::test]
+async fn fetch_docs_invalid_regex_is_a_typed_error_not_zero_hits() {
+    let server = MockServer::start().await;
+    let engine = docs_engine(&server, "# cli\nchoose").await;
+    let err = call(&engine, "oss_fetch_docs", json!({"repo": "acme/cli", "pattern": "/cho(se/"}))
+        .await
+        .unwrap_err();
+    let text = format!("{err:?}");
+    assert!(text.contains("pattern") && text.contains("invalid regex"), "{text}");
+}
+
 #[tokio::test]
 async fn fetch_docs_never_fakes_content_when_unavailable() {
     let server = MockServer::start().await;

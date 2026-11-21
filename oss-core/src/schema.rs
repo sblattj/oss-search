@@ -111,7 +111,7 @@ pub fn tool_specs() -> Vec<ToolSpec> {
                 "type": "object",
                 "properties": {
                     "repo": { "type": "string" },
-                    "pattern": { "type": "string", "description": "Text or /regex/ to extract; returns matching lines + breadcrumbs." },
+                    "pattern": { "type": "string", "description": "Text (case-insensitive literal) or /regex/ (case-insensitive, matched per line) to extract; returns matching lines + breadcrumbs." },
                     "docs_host": { "type": "string", "description": "Override when docs live off-repo (e.g. learn.example.com)." }
                 },
                 "required": ["repo", "pattern"],

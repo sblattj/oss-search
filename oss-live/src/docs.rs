@@ -90,11 +90,24 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
         }
     };
 
-    // Literal substring match (case-insensitive) — the same semantics as the
-    // stub engine; /regex/ delimiters are honored by the caller's own tool
-    // contract but matched here as their inner literal to stay truthful.
-    let (needle, _is_regex) = strip_probe_delimiters(&params.pattern);
-    let needle = needle.to_lowercase();
+    // Plain text: case-insensitive literal substring. `/regex/`: compiled with
+    // the same regex engine `oss_search_code` uses (case-insensitive, per
+    // line); an invalid regex is a typed error, never a silent 0 hits.
+    let (pattern, is_regex) = strip_probe_delimiters(&params.pattern);
+    let matcher = if is_regex {
+        let re = regex::RegexBuilder::new(pattern)
+            .case_insensitive(true)
+            .build()
+            .map_err(|e| ToolError::InvalidValue {
+                field: "pattern".into(),
+                message: format!("invalid regex `{pattern}`: {e}"),
+                input: input.clone(),
+                correction: "use RE2-style /regex/ syntax, or pass plain text for a literal match; see oss_guide".into(),
+            })?;
+        Matcher::Regex(re)
+    } else {
+        Matcher::Literal(pattern.to_lowercase())
+    };
     let source_url = meta
         .html_url
         .clone()
@@ -105,7 +118,7 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
         .text
         .lines()
         .enumerate()
-        .filter(|(_, l)| l.to_lowercase().contains(&needle))
+        .filter(|(_, l)| matcher.is_match(l))
         .map(|(i, l)| {
             json!({
                 "line": i + 1,
@@ -116,6 +129,7 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
         .collect();
 
     let found = !hits.is_empty();
+    let hit_count = hits.len();
     let row = json!({
         "repo": meta.full_name.clone().unwrap_or_else(|| params.repo.clone()),
         "page": readme_path,
@@ -126,10 +140,24 @@ pub(crate) async fn run(inner: &Inner, params: &FetchDocsParams) -> Result<Engin
         "oss_fetch_docs",
         vec![
             status::ok("ecosyste.ms"),
-            status::ok_with("github-contents", format!("readme fetched, {found} matching line(s)")),
+            status::ok_with("github-contents", format!("readme fetched, {hit_count} matching line(s)")),
         ],
     );
     Ok(EngineOutput::complete(if found { vec![row] } else { vec![] }))
+}
+
+enum Matcher {
+    Literal(String),
+    Regex(regex::Regex),
+}
+
+impl Matcher {
+    fn is_match(&self, line: &str) -> bool {
+        match self {
+            Matcher::Literal(needle) => line.to_lowercase().contains(needle),
+            Matcher::Regex(re) => re.is_match(line),
+        }
+    }
 }
 
 fn partial_empty() -> EngineOutput {
