@@ -7,13 +7,16 @@ use oss_mcp::version::VERSION;
 use oss_mcp::{choose_engine, parse_engine_flag, EngineChoice};
 use rmcp::handler::server::ServerHandler;
 use rmcp::model::{
-    CallToolRequestParams, CallToolResponse, ContentBlock, ListToolsResult, PaginatedRequestParams,
+    CacheScope, CallToolRequestParams, CallToolResponse, ContentBlock, ListToolsResult, PaginatedRequestParams,
     ServerCapabilities, ServerInfo, TextContent, Tool,
 };
 use rmcp::service::{QuitReason, RequestContext, RoleServer};
 use rmcp::transport::io::stdio;
 use rmcp::ServiceExt;
 use serde_json::Value;
+
+/// Freshness window advertised on `tools/list` (one hour).
+const TOOLS_LIST_TTL_MS: u64 = 3_600_000;
 
 #[derive(Clone)]
 struct OssServer {
@@ -44,10 +47,12 @@ impl ServerHandler for OssServer {
                 )
             })
             .collect();
-        Ok(ListToolsResult {
-            tools,
-            ..Default::default()
-        })
+        // MCP 2026-07-28 requires ttlMs and cacheScope on list results. The
+        // tool list is static and identical for every caller, so it can be
+        // cached for an hour and shared.
+        Ok(ListToolsResult::with_all_items(tools)
+            .with_ttl_ms(TOOLS_LIST_TTL_MS)
+            .with_cache_scope(CacheScope::Public))
     }
 
     async fn call_tool(

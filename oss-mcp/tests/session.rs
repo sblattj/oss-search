@@ -264,3 +264,24 @@ fn snippets_mode_uses_line_locators() {
     assert!(row["lines"].as_array().unwrap().len() >= 3);
     assert!(row["lines"].as_array().unwrap().len() <= 11);
 }
+
+#[test]
+fn tools_list_carries_ttl_ms_and_cache_scope_on_2026_07_28() {
+    // Issue #8: 2026-07-28 requires ttlMs and cacheScope on list results.
+    let requests = vec![
+        json!({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
+            "protocolVersion": "2026-07-28",
+            "capabilities": {},
+            "clientInfo": {"name": "cache-fields-test", "version": "0.0.0"}
+        }}),
+        json!({"jsonrpc": "2.0", "method": "notifications/initialized"}),
+        json!({"jsonrpc": "2.0", "id": 2, "method": "tools/list"}),
+    ];
+    let responses = session(&requests);
+    let init = by_id(&responses, json!(1));
+    eprintln!("negotiated: {}", init["result"]["protocolVersion"]);
+    let list = by_id(&responses, json!(2));
+    assert_eq!(list["result"]["ttlMs"], 3_600_000, "ttlMs: {}", list["result"]);
+    assert_eq!(list["result"]["cacheScope"], "public", "cacheScope: {}", list["result"]);
+    assert!(list["result"]["tools"].as_array().is_some_and(|t| t.len() == 7));
+}
